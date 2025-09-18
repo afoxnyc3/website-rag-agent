@@ -2,6 +2,102 @@
 
 An intelligent knowledge assistant that automatically ingests website content and provides instant, contextual answers to user questions with confidence scoring.
 
+## 🏗️ How It Works
+
+This RAG (Retrieval-Augmented Generation) application ingests website content and provides intelligent, context-aware answers with confidence scoring.
+
+### Core Workflow
+
+```mermaid
+graph LR
+    A[User Input] --> B{Action Type}
+    B -->|Add Website| C[Scrape/Crawl]
+    B -->|Ask Question| D[RAG Query]
+    C --> E[Generate Embeddings]
+    E --> F[Store in Vector DB]
+    D --> G[Search Knowledge Base]
+    G --> H[Generate Response]
+    H --> I[Return with Confidence Score]
+```
+
+### 1️⃣ Adding Content to Knowledge Base
+
+When you add a website URL, the system:
+
+1. **Determines Strategy** - Single page → ScrapeTool, Multiple pages → CrawlTool
+2. **Fetches Content** - Tries fast fetch first, falls back to Playwright for JavaScript sites
+3. **Processes Content** - Cleans HTML, extracts text, chunks if >3000 characters
+4. **Generates Embeddings** - Creates 1536-dimensional vectors using OpenAI
+5. **Stores Vectors** - Saves in VectorStore with metadata for retrieval
+
+### 2️⃣ Answering Questions (RAG Process)
+
+When you ask a question, the system:
+
+1. **Embeds Query** - Converts your question to a vector
+2. **Searches Knowledge** - Finds similar content using cosine similarity
+3. **Calculates Confidence** - Scores relevance (0.0 to 1.0)
+4. **Decides Mode**:
+   - Confidence ≥ 0.5 → RAG mode (uses knowledge base)
+   - Confidence < 0.5 → Direct mode (GPT-5 only)
+5. **Generates Answer** - Augments prompt with context and calls GPT-5
+6. **Returns Response** - Includes answer, confidence score, and sources
+
+### 🔧 Technical Architecture
+
+```
+┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
+│   Frontend UI   │────▶│   API Routes     │────▶│   Tool Layer    │
+│  (React/Next)   │     │  /api/chat       │     │  ScrapeTool     │
+│                 │     │  /api/scrape     │     │  CrawlTool      │
+└─────────────────┘     │  /api/crawl      │     └─────────────────┘
+                        └──────────────────┘              │
+                                 │                        ▼
+                                 ▼                ┌─────────────────┐
+                        ┌──────────────────┐     │   Web Content   │
+                        │   RAG Service    │────▶│  Fetch/Browser  │
+                        │  - Embeddings    │     └─────────────────┘
+                        │  - Vector Search │
+                        │  - GPT-5 Chat    │
+                        └──────────────────┘
+```
+
+### 🎯 Key Features in Action
+
+- **Smart Scraping**: Automatically switches between fetch (fast) and Playwright (JavaScript)
+- **Respectful Crawling**: Honors robots.txt, implements rate limiting
+- **Intelligent Chunking**: Splits large documents for optimal embedding
+- **Confidence Scoring**: Shows how certain the AI is about its answer
+- **Source Attribution**: Links every answer back to its source material
+- **5-Minute Cache**: Avoids redundant scraping of same content
+
+### 📊 Example Flow
+
+**Adding a website:**
+```
+1. User enters: https://docs.example.com
+2. System crawls 10 pages (respecting robots.txt)
+3. Extracts ~50KB of documentation content
+4. Chunks into 17 documents
+5. Generates embeddings for each chunk
+6. Stores in knowledge base
+✅ "Successfully added 17 documents"
+```
+
+**Asking a question:**
+```
+1. User asks: "How do I configure authentication?"
+2. System embeds query → [0.23, -0.45, 0.78, ...]
+3. Searches knowledge base → finds 3 relevant chunks
+4. Best match confidence: 0.82 (high relevance!)
+5. Augments GPT-5 prompt with context
+6. Returns detailed answer with:
+   - Step-by-step configuration guide
+   - Confidence score: 82%
+   - Sources: [docs-auth-1, docs-auth-2]
+   - Mode: RAG (using knowledge base)
+```
+
 ## 🚀 Quick Start
 
 1. Install dependencies:
