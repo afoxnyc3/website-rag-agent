@@ -45,6 +45,19 @@ All core features implemented:
 - [ ] Add ESLint and Prettier configurations
 - [ ] Achieve 100% test coverage for core functions
 
+## Phase 2: Web Crawling - COMPLETED ✅
+
+### Completed
+- [x] Write comprehensive test suite (17 tests)
+- [x] Implement WebCrawler class
+- [x] Add robots.txt compliance
+- [x] Implement sitemap parsing
+- [x] Add rate limiting
+- [x] Integrate with PlaywrightScraper
+- [x] Create /api/crawl endpoint
+- [x] Add UI for crawl configuration
+- [x] Test with real websites
+
 ## Upcoming Phases
 
 ### Phase 0: Tool Chest Foundation
@@ -59,11 +72,11 @@ All core features implemented:
 - [x] Add URL content extraction
 - [x] Implement text cleaning and normalization
 
-### Phase 2: Web Crawling
-- [ ] Integrate Crawl4AI
-- [ ] Build multi-page crawler
-- [ ] Add robots.txt compliance
-- [ ] Implement rate limiting
+### Phase 2: Web Crawling ✅ COMPLETED
+- [x] Build multi-page crawler with Playwright
+- [x] Add robots.txt compliance
+- [x] Implement rate limiting
+- [x] Add sitemap.xml support
 
 ### Phase 3: Persistent Storage
 - [ ] Set up Vercel Postgres

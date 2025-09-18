@@ -112,3 +112,31 @@
 - Loading states with spinner
 - Dynamic knowledge base counter
 - Error handling and display
+
+## 2025-09-18 - Phase 2: Web Crawling
+
+### Decision: Build custom crawler instead of using Crawl4AI
+**Rationale**:
+- More control over crawling behavior
+- Better integration with existing Playwright scraper
+- Easier to test with TDD approach
+**Alternatives considered**: Crawl4AI library
+**Trade-offs**: More code to maintain vs full control
+**Result**: Built WebCrawler and PlaywrightCrawler classes
+
+### Decision: Implement comprehensive crawling features
+**Rationale**: Production-ready crawling requires:
+- Robots.txt compliance (ethical crawling)
+- Rate limiting (prevent server overload)
+- Sitemap support (discover all pages)
+- Depth control (prevent infinite crawling)
+**Result**: All features implemented and tested
+
+### Decision: Add UI controls for crawl configuration
+**Rationale**: Users need control over crawl behavior
+**Features added**:
+- Single page vs multi-page toggle
+- Depth control (1-5 levels)
+- Max pages limit (1-100)
+- Advanced settings toggle
+**Result**: Intuitive UI with sensible defaults

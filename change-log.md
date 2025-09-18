@@ -89,6 +89,40 @@
   - nextjs.org (137KB of content, chunked into ~46 documents)
 - **Verified**: RAG queries working with scraped content
 
+## 2025-09-18 - Phase 2: Web Crawling (TDD)
+
+### Implementation
+- **Created**: crawler.test.ts with 17 comprehensive test cases
+- **Implemented**: WebCrawler class with full functionality:
+  - URL discovery and link extraction
+  - Robots.txt parsing and compliance
+  - Sitemap XML parsing
+  - Rate limiting with configurable delays
+  - Depth-based crawling
+  - Include/exclude patterns
+  - Queue management
+- **Created**: PlaywrightCrawler extending WebCrawler
+  - Integrated with PlaywrightScraper
+  - Depth tracking per URL
+  - Automatic browser management
+- **Created**: /api/crawl endpoint
+  - Configurable crawl options
+  - Automatic chunking for large pages
+  - Detailed crawl results
+- **Updated**: Chat UI with crawl configuration
+  - Single page vs multi-page crawl modes
+  - Configurable depth and max pages
+  - Advanced settings toggle
+  - Real-time crawl feedback
+- **Result**: All 17 tests passing ✓
+
+## Phase 2 Complete: Web Crawling ✅
+- Successfully implemented multi-page crawling
+- TDD approach ensured quality (17/17 tests passing)
+- Respects robots.txt and implements rate limiting
+- UI allows crawling entire websites with configurable depth
+- Tested with example.com successfully
+
 ## Phase 1 Complete: Web Scraping ✅
 - Successfully integrated Playwright web scraping with RAG system
 - TDD approach ensured quality (14/14 tests passing)
