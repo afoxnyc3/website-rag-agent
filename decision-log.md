@@ -140,3 +140,33 @@
 - Max pages limit (1-100)
 - Advanced settings toggle
 **Result**: Intuitive UI with sensible defaults
+
+## 2025-09-18 - Course Correction: Phase 0
+
+### Decision: Return to Phase 0 (Tool Chest Foundation)
+**Rationale**:
+- Skipping Phase 0 was a tactical mistake
+- Current architecture lacks unified tool interface
+- Code duplication across scrapers and crawlers
+- No consistent error handling or response formats
+- Building more features on weak foundation compounds technical debt
+**Alternatives considered**: Continue with Phase 3 (Storage)
+**Trade-offs**: Short-term slowdown vs long-term maintainability
+**Result**: Implement Phase 0 before proceeding
+
+### Decision: Split Phase 0 into Foundation + Migration
+**Rationale**:
+- Smaller, focused PRs are easier to review
+- Can validate foundation before refactoring
+- Less risk of breaking existing features
+- Incremental progress and testing
+**Approach**:
+- Phase 0: Build tool foundation (new code)
+- Phase 0.5: Migrate existing features to tools
+**Result**: Two-phase approach for safer implementation
+
+### Learning: Architecture First
+**Insight**: "We don't have time to do it right, but we have time to do it twice"
+**Lesson**: Always build foundation before features
+**Impact**: 3 days of refactoring could have been avoided
+**Future**: Review full roadmap before starting each phase
