@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PlaywrightScraper } from '@/lib/scraper-playwright';
-import { FetchScraper } from '@/lib/scraper-fetch';
+import { ScrapeTool } from '@/lib/tools/scrape-tool';
 import { getRAGService } from '@/app/api/chat/route';
 
 export async function POST(request: NextRequest) {
   try {
-    const { url } = await request.json();
+    const { url, options = {} } = await request.json();
 
     if (!url) {
       return NextResponse.json(
@@ -14,47 +13,36 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let result;
-    let scraperUsed = 'fetch';
+    // Use ScrapeTool with auto strategy (tries fetch first, falls back to playwright)
+    const scrapeTool = new ScrapeTool();
+    const result = await scrapeTool.execute({
+      url,
+      strategy: options.strategy || 'auto',
+      maxLength: options.maxLength,
+      cache: options.cache !== false, // Enable caching by default
+    });
 
-    // Try simple fetch first (faster)
-    const fetchScraper = new FetchScraper();
-    result = await fetchScraper.scrape(url);
-
-    // If fetch fails or gets minimal content, try Playwright
-    if (result.error || result.content.length < 100) {
-      scraperUsed = 'playwright';
-      console.log(`Fetch scraper failed or got minimal content for ${url}, trying Playwright...`);
-
-      const playwrightScraper = new PlaywrightScraper();
-      try {
-        await playwrightScraper.initialize();
-        result = await playwrightScraper.scrape(url);
-        await playwrightScraper.close();
-      } catch (error) {
-        await playwrightScraper.close();
-        throw error;
-      }
-    }
-
-    if (result.error) {
+    if (!result.success) {
       return NextResponse.json(
-        { error: result.error, scraperUsed },
+        { error: result.error, strategy: result.metadata?.strategy },
         { status: 400 }
       );
     }
 
+    const scraperUsed = result.metadata?.strategy || 'unknown';
+
       // Chunk content if it's too large (max 3000 chars per chunk for embeddings)
       const MAX_CHUNK_SIZE = 3000;
       const ragService = await getRAGService();
+      const { url: scrapedUrl, title, content, scrapedAt } = result.data;
 
-      if (result.content.length > MAX_CHUNK_SIZE) {
+      if (content.length > MAX_CHUNK_SIZE) {
         // Split into chunks
         const chunks: string[] = [];
         let currentPosition = 0;
 
-        while (currentPosition < result.content.length) {
-          const chunk = result.content.slice(currentPosition, currentPosition + MAX_CHUNK_SIZE);
+        while (currentPosition < content.length) {
+          const chunk = content.slice(currentPosition, currentPosition + MAX_CHUNK_SIZE);
           chunks.push(chunk);
           currentPosition += MAX_CHUNK_SIZE;
         }
@@ -65,9 +53,9 @@ export async function POST(request: NextRequest) {
             id: `scraped-${Date.now()}-${i}`,
             content: chunks[i],
             metadata: {
-              url: result.url,
-              title: result.title,
-              scrapedAt: result.scrapedAt,
+              url: scrapedUrl,
+              title,
+              scrapedAt,
               source: 'web-scraper',
               chunkIndex: i,
               totalChunks: chunks.length
@@ -78,11 +66,11 @@ export async function POST(request: NextRequest) {
         // Content is small enough, add as single document
         await ragService.addDocument({
           id: `scraped-${Date.now()}`,
-          content: result.content,
+          content,
           metadata: {
-            url: result.url,
-            title: result.title,
-            scrapedAt: result.scrapedAt,
+            url: scrapedUrl,
+            title,
+            scrapedAt,
             source: 'web-scraper'
           }
         });
@@ -90,11 +78,11 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        title: result.title,
-        contentLength: result.content.length,
-        url: result.url,
+        title,
+        contentLength: content.length,
+        url: scrapedUrl,
         scraperUsed,
-        message: `Successfully scraped and added "${result.title}" to knowledge base`
+        message: `Successfully scraped and added "${title}" to knowledge base`
       });
   } catch (error) {
     console.error('Scraping error:', error);

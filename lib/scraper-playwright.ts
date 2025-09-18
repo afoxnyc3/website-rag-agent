@@ -17,11 +17,13 @@ export class PlaywrightScraper {
       });
       this.page = await this.browser.newPage();
 
-      // Set a user agent to avoid detection
-      await this.page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+      // Set extra HTTP headers including user agent
+      await this.page.setExtraHTTPHeaders({
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      });
 
       // Set viewport
-      await this.page.setViewport({ width: 1280, height: 720 });
+      await this.page.setViewportSize({ width: 1280, height: 720 });
 
       // Block heavy resources for faster loading (images, videos, etc)
       await this.page.route('**/*.{png,jpg,jpeg,gif,svg,webp,mp4,avi,mov,wmv,flv,swf}', route => route.abort());
