@@ -35,7 +35,9 @@ async function initializeKnowledgeBase(service: RAGService) {
 
   try {
     await service.addDocuments(sampleDocs);
-    console.log(`Initialized knowledge base with ${service.getDocumentCount()} documents`);
+    const docCount = await service.getDocumentCount();
+    console.log(`Initialized knowledge base with ${docCount} documents`);
+    console.log(`Storage type: ${service.getStorageType()}`);
   } catch (error) {
     console.error('Failed to initialize knowledge base:', error);
   }

@@ -1,5 +1,46 @@
 # Change Log
 
+## 2025-09-18 - Phase 3: Persistent Storage (feature/persistent-storage)
+
+### Completed
+- **Set up Vercel Postgres**: Configured Neon database with Vercel integration
+  - Enabled pgvector extension for vector similarity search
+  - Created database schema with documents, embeddings, and versions tables
+  - Added indexes for performance optimization
+- **Implemented PersistentVectorStore**: Full-featured persistent storage class
+  - Document CRUD operations with versioning
+  - Vector similarity search with pgvector
+  - Connection pooling for production
+  - Retry logic and error recovery
+  - Document caching for frequently accessed items
+- **Created Storage Strategy Pattern**: Abstraction for storage switching
+  - MemoryStorage for development/testing
+  - PersistentStorage for production
+  - Factory pattern for environment-based selection
+  - Seamless switching via environment variables
+- **Updated RAGService**: Integrated dual storage support
+  - Automatic storage type selection based on environment
+  - Backward compatible API
+  - Async operations throughout
+  - Graceful initialization and cleanup
+
+### Configuration
+- **Environment Variables**:
+  - `NODE_ENV`: Determines default storage (production → persistent)
+  - `USE_PERSISTENT_STORAGE`: Override storage type (true/false)
+  - `POSTGRES_URL`: Database connection string (auto-configured by Vercel)
+- **Database**: Vercel Postgres with Neon
+  - pgvector enabled for 1536-dimensional embeddings
+  - Automatic connection management
+  - SSL required for security
+
+### Testing
+- **Unit Tests**: 47 tests for storage components
+  - PersistentVectorStore: 24 tests ✓
+  - Storage Strategy: 23 tests ✓
+- **Integration**: Created integration test suite
+- **Backward Compatibility**: All existing features working
+
 ## 2025-09-18 - Phase 0.5: Tool Migration (feature/tool-migration) ✅ COMPLETED
 
 ### Completed

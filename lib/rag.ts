@@ -1,5 +1,5 @@
 import { generateEmbedding } from './embeddings';
-import { VectorStore, Document, SearchResult } from './vector-store';
+import { StorageFactory, StorageStrategy } from './storage/storage-strategy';
 import { openai } from '@ai-sdk/openai';
 import { generateText } from 'ai';
 
@@ -7,30 +7,45 @@ export interface RAGResponse {
   answer: string;
   confidence: number;
   sources: string[];
-  chunks: SearchResult[];
+  chunks: any[];
 }
 
 export class RAGService {
-  private vectorStore: VectorStore;
-  private readonly confidenceThreshold = 0.5; // Adjusted to realistic threshold
+  private storage: StorageStrategy;
+  private readonly confidenceThreshold = 0.5;
+  private initialized = false;
 
-  constructor() {
-    this.vectorStore = new VectorStore();
+  constructor(options?: { forceMemory?: boolean; forcePersistent?: boolean }) {
+    this.storage = StorageFactory.createStorage(options);
+  }
+
+  private async ensureInitialized(): Promise<void> {
+    if (!this.initialized) {
+      await this.storage.initialize();
+      this.initialized = true;
+
+      const storageType = StorageFactory.getStorageType();
+      console.log(`🗄️ RAGService initialized with ${storageType} storage`);
+    }
   }
 
   async addDocument(doc: { id?: string; content: string; metadata?: any }): Promise<void> {
+    await this.ensureInitialized();
+
     const docId = doc.id || Date.now().toString();
     const { embedding } = await generateEmbedding(doc.content);
 
-    this.vectorStore.addDocument({
-      id: docId,
-      content: doc.content,
-      embedding,
-      metadata: {
-        timestamp: new Date().toISOString(),
-        ...doc.metadata
-      }
-    });
+    await this.storage.addDocument(
+      {
+        id: docId,
+        content: doc.content,
+        metadata: {
+          timestamp: new Date().toISOString(),
+          ...doc.metadata
+        }
+      },
+      embedding
+    );
   }
 
   async addDocuments(contents: string[]): Promise<void> {
@@ -40,25 +55,23 @@ export class RAGService {
   }
 
   async query(question: string): Promise<RAGResponse> {
+    await this.ensureInitialized();
+
     console.log(`\n🔍 RAG Query: "${question}"`);
 
     const { embedding } = await generateEmbedding(question);
     console.log(`📊 Generated embedding with ${embedding.length} dimensions`);
 
-    // Lower threshold for initial search to get results
-    const searchResults = await this.vectorStore.search(
-      embedding,
-      3,
-      0.3 // Lowered further for debugging
-    );
+    // Search for similar documents
+    const searchResults = await this.storage.search(embedding, 5);
 
-    console.log(`📚 Found ${searchResults.length} results above 0.3 threshold`);
+    console.log(`📚 Found ${searchResults.length} results`);
     searchResults.forEach((r, i) => {
-      console.log(`  ${i+1}. Score: ${r.similarity.toFixed(3)} - "${r.document.content.substring(0, 50)}..."`);
+      console.log(`  ${i+1}. Score: ${r.similarity.toFixed(3)} - "${r.content.substring(0, 50)}..."`);
     });
 
     if (searchResults.length === 0) {
-      console.log(`❌ No results found above threshold`);
+      console.log(`❌ No results found`);
       return {
         answer: "I don't have enough information to answer accurately.",
         confidence: 0,
@@ -67,10 +80,12 @@ export class RAGService {
       };
     }
 
-    const maxConfidence = Math.max(...searchResults.map(r => r.confidence));
-    console.log(`✨ Max confidence: ${maxConfidence.toFixed(3)}`)
+    // Filter by confidence threshold
+    const relevantResults = searchResults.filter(r => r.similarity >= this.confidenceThreshold);
 
-    if (maxConfidence < this.confidenceThreshold) {
+    if (relevantResults.length === 0) {
+      const maxConfidence = Math.max(...searchResults.map(r => r.similarity));
+      console.log(`⚠️ No results above confidence threshold (${this.confidenceThreshold})`);
       return {
         answer: "I don't have enough information to answer accurately.",
         confidence: maxConfidence,
@@ -79,8 +94,11 @@ export class RAGService {
       };
     }
 
-    const context = searchResults
-      .map(r => r.document.content)
+    const maxConfidence = Math.max(...relevantResults.map(r => r.similarity));
+    console.log(`✨ Max confidence: ${maxConfidence.toFixed(3)}`);
+
+    const context = relevantResults
+      .map(r => r.content)
       .join('\n\n');
 
     const prompt = `Based on the following context, answer the question.
@@ -101,16 +119,36 @@ Answer:`;
     return {
       answer: text,
       confidence: maxConfidence,
-      sources: searchResults.map(r => r.document.id),
-      chunks: searchResults
+      sources: relevantResults.map(r => r.id),
+      chunks: relevantResults
     };
   }
 
-  getDocumentCount(): number {
-    return this.vectorStore.size;
+  async getDocumentCount(): Promise<number> {
+    await this.ensureInitialized();
+    const docs = await this.storage.listDocuments();
+    return docs.length;
   }
 
-  clearDocuments(): void {
-    this.vectorStore.clear();
+  async clearDocuments(): Promise<void> {
+    await this.ensureInitialized();
+    const docs = await this.storage.listDocuments();
+    for (const doc of docs) {
+      await this.storage.deleteDocument(doc.id);
+    }
+  }
+
+  async close(): Promise<void> {
+    if (this.initialized) {
+      await this.storage.close();
+      this.initialized = false;
+    }
+  }
+
+  getStorageType(): 'memory' | 'persistent' {
+    return StorageFactory.getStorageType();
   }
 }
+
+// For backward compatibility, export a default instance
+export const ragService = new RAGService();
