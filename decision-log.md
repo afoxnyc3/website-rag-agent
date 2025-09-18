@@ -170,3 +170,42 @@
 **Lesson**: Always build foundation before features
 **Impact**: 3 days of refactoring could have been avoided
 **Future**: Review full roadmap before starting each phase
+
+## 2025-09-18 - Phase 0.5: Tool Migration
+
+### Decision: Convert scrapers and crawlers to Tool architecture
+**Rationale**:
+- Eliminate code duplication across scrapers
+- Standardize error handling and responses
+- Enable tool composition and chaining
+- Consistent validation and retry logic
+**Implementation**:
+- ScrapeTool: Unified fetch + Playwright strategies
+- CrawlTool: Extends Tool base class
+**Result**: Cleaner, more maintainable codebase
+
+### Decision: Deprecate old files instead of deleting
+**Rationale**:
+- Preserve history and implementation details
+- Allow rollback if needed
+- Document evolution of codebase
+**Method**: Rename to .deprecated.ts
+**Result**: Clean compilation while preserving code
+
+### Decision: Add caching to ScrapeTool
+**Rationale**:
+- Reduce redundant API calls
+- Improve performance for repeated scrapes
+- Common pattern in web scraping
+**Implementation**: 5-minute TTL cache
+**Trade-offs**: Memory usage vs performance
+**Result**: Faster responses for cached content
+
+### Learning: Tool Migration Success
+**Validation Results**:
+- All 60 tests passing
+- All API endpoints functional
+- RAG system working correctly
+- No runtime errors
+**Insight**: Proper architecture makes refactoring easier
+**Benefit**: Future tools will be easier to add

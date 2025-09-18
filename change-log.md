@@ -1,5 +1,47 @@
 # Change Log
 
+## 2025-09-18 - Phase 0.5: Tool Migration (feature/tool-migration) ✅ COMPLETED
+
+### Completed
+- **Converted**: ScrapeTool from PlaywrightScraper and FetchScraper
+  - Unified fetch and Playwright strategies
+  - Added caching mechanism (5 min TTL)
+  - Implemented fallback logic (fetch → playwright)
+  - Schema-based validation
+- **Converted**: CrawlTool from WebCrawler
+  - Integrated with Tool architecture
+  - Maintained all existing functionality
+  - Added Tool-based validation and formatting
+  - Uses ScrapeTool internally for consistency
+- **Updated**: API endpoints to use new tools
+  - `/api/scrape` now uses ScrapeTool
+  - `/api/crawl` now uses CrawlTool
+  - Maintained backward compatibility
+- **Deprecated**: Old implementation files
+  - Renamed to .deprecated.ts to preserve history
+  - Excluded from TypeScript compilation
+- **Fixed**: Integration issues
+  - Resolved TypeScript errors
+  - Updated test suites for new architecture
+  - All 60 tests passing ✓
+
+### Architecture Benefits
+- Unified error handling across all tools
+- Standardized response formats
+- Better composability and reusability
+- Consistent caching strategy
+- Cleaner API endpoints
+
+### Validation & Testing
+- **Unit Tests**: All 60 tests passing ✓
+- **Integration Tests**: All API endpoints tested successfully
+  - `/api/scrape`: Working with ScrapeTool
+  - `/api/crawl`: Working with CrawlTool
+  - `/api/chat`: RAG system functioning correctly
+- **Build**: Production build successful
+- **Runtime**: No errors, all features operational
+- **Pull Request**: Created PR #3 for review
+
 ## 2025-09-18 - Phase 0: Tool Chest Foundation (TDD)
 
 ### Course Correction

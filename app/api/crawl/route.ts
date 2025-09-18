@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PlaywrightCrawler } from '@/lib/crawler-playwright';
+import { CrawlTool } from '@/lib/tools/crawl-tool';
 import { getRAGService } from '@/app/api/chat/route';
 
 export async function POST(request: NextRequest) {
@@ -13,28 +13,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Default crawl options
-    const crawlOptions = {
-      maxDepth: options.maxDepth || 1,
+    // Use CrawlTool with default options
+    const crawlTool = new CrawlTool();
+    const result = await crawlTool.execute({
+      url,
+      maxDepth: options.maxDepth !== undefined ? options.maxDepth : 1,
       maxPages: options.maxPages || 10,
       respectRobotsTxt: options.respectRobotsTxt !== false,
-      crawlDelay: options.crawlDelay || 1000, // 1 second default
+      crawlDelay: options.crawlDelay || 1000,
       followSitemap: options.followSitemap || false,
       includePatterns: options.includePatterns,
-      excludePatterns: options.excludePatterns || [/\.(pdf|zip|tar|gz)$/i],
-    };
+      excludePatterns: options.excludePatterns || ['.pdf', '.zip', '.tar', '.gz'],
+    });
 
-    const crawler = new PlaywrightCrawler();
-
-    // Crawl the website
-    const crawlResult = await crawler.crawl(url, crawlOptions);
-
-    if (crawlResult.errors.length > 0 && crawlResult.pagesVisited === 0) {
+    if (!result.success) {
       return NextResponse.json(
-        { error: crawlResult.errors[0] },
+        { error: result.error },
         { status: 400 }
       );
     }
+
+    const crawlResult = result.data;
 
     // Add crawled pages to RAG knowledge base
     const ragService = await getRAGService();
@@ -96,7 +95,7 @@ export async function POST(request: NextRequest) {
       message: `Successfully crawled ${crawlResult.pagesVisited} pages and added ${documentsAdded} documents to knowledge base`,
       details: {
         startUrl: crawlResult.startUrl,
-        pages: crawlResult.pages.map(p => ({
+        pages: crawlResult.pages.map((p: any) => ({
           url: p.url,
           title: p.title,
           contentLength: p.content.length,
