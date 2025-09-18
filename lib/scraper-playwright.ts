@@ -7,8 +7,24 @@ export class PlaywrightScraper {
 
   async initialize(): Promise<void> {
     if (!this.browser) {
-      this.browser = await chromium.launch({ headless: true });
+      this.browser = await chromium.launch({
+        headless: true,
+        args: [
+          '--disable-dev-shm-usage',
+          '--disable-blink-features=AutomationControlled',
+          '--disable-features=IsolateOrigins,site-per-process'
+        ]
+      });
       this.page = await this.browser.newPage();
+
+      // Set a user agent to avoid detection
+      await this.page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+
+      // Set viewport
+      await this.page.setViewport({ width: 1280, height: 720 });
+
+      // Block heavy resources for faster loading (images, videos, etc)
+      await this.page.route('**/*.{png,jpg,jpeg,gif,svg,webp,mp4,avi,mov,wmv,flv,swf}', route => route.abort());
     }
   }
 
@@ -67,11 +83,23 @@ export class PlaywrightScraper {
         throw new Error('Failed to initialize browser');
       }
 
-      // Navigate to the page
-      await this.page.goto(url, {
-        waitUntil: 'networkidle',
-        timeout: 30000
-      });
+      // Navigate to the page with more flexible options
+      try {
+        await this.page.goto(url, {
+          waitUntil: 'domcontentloaded', // Less strict than networkidle
+          timeout: 30000
+        });
+
+        // Wait a bit for dynamic content to load
+        await this.page.waitForTimeout(2000);
+      } catch (timeoutError) {
+        // Retry with even less strict settings
+        console.log(`First attempt timed out for ${url}, retrying with relaxed settings...`);
+        await this.page.goto(url, {
+          waitUntil: 'commit', // Just wait for navigation to start
+          timeout: 15000
+        });
+      }
 
       // Get title
       const title = await this.page.title();

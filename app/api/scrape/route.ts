@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PlaywrightScraper } from '@/lib/scraper-playwright';
+import { FetchScraper } from '@/lib/scraper-fetch';
 import { getRAGService } from '@/app/api/chat/route';
 
 export async function POST(request: NextRequest) {
@@ -13,21 +14,35 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const scraper = new PlaywrightScraper();
+    let result;
+    let scraperUsed = 'fetch';
 
-    try {
-      // Initialize browser
-      await scraper.initialize();
+    // Try simple fetch first (faster)
+    const fetchScraper = new FetchScraper();
+    result = await fetchScraper.scrape(url);
 
-      // Scrape the website
-      const result = await scraper.scrape(url);
+    // If fetch fails or gets minimal content, try Playwright
+    if (result.error || result.content.length < 100) {
+      scraperUsed = 'playwright';
+      console.log(`Fetch scraper failed or got minimal content for ${url}, trying Playwright...`);
 
-      if (result.error) {
-        return NextResponse.json(
-          { error: result.error },
-          { status: 400 }
-        );
+      const playwrightScraper = new PlaywrightScraper();
+      try {
+        await playwrightScraper.initialize();
+        result = await playwrightScraper.scrape(url);
+        await playwrightScraper.close();
+      } catch (error) {
+        await playwrightScraper.close();
+        throw error;
       }
+    }
+
+    if (result.error) {
+      return NextResponse.json(
+        { error: result.error, scraperUsed },
+        { status: 400 }
+      );
+    }
 
       // Chunk content if it's too large (max 3000 chars per chunk for embeddings)
       const MAX_CHUNK_SIZE = 3000;
@@ -78,12 +93,9 @@ export async function POST(request: NextRequest) {
         title: result.title,
         contentLength: result.content.length,
         url: result.url,
+        scraperUsed,
         message: `Successfully scraped and added "${result.title}" to knowledge base`
       });
-    } finally {
-      // Always close the browser
-      await scraper.close();
-    }
   } catch (error) {
     console.error('Scraping error:', error);
     return NextResponse.json(
