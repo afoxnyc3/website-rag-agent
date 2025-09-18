@@ -1,5 +1,41 @@
 # Scratchpad - Planning & Notes
 
+## Phase 1 Web Scraping COMPLETE ✅
+
+### What We Built
+1. **PlaywrightScraper Class**: Production-ready web scraper
+   - Handles JavaScript-rendered content
+   - Smart content selection strategies
+   - Proper error handling and cleanup
+
+2. **API Integration**: `/api/scrape` endpoint
+   - Accepts URLs via POST request
+   - Chunks large content (3000 chars/chunk)
+   - Adds to RAG knowledge base with metadata
+
+3. **UI Integration**: Enhanced chat interface
+   - URL input field with Globe icon
+   - Real-time scraping with loading states
+   - Dynamic knowledge base counter
+
+4. **TDD Success**: 14/14 tests passing
+
+### Technical Achievements
+- Successfully scraped and indexed 137KB from nextjs.org
+- Content chunked into ~46 documents
+- RAG queries working with scraped content
+- No token limit errors after chunking
+
+### Key Learnings
+- Chunking is critical for large content
+- 3000 chars ≈ 750 tokens (safe margin)
+- Playwright handles modern JavaScript sites
+- Metadata tracking is essential
+
+---
+
+# Scratchpad - Planning & Notes
+
 ## 2024-01-17 - RAG MVP Implementation Planning
 
 ### Current State
@@ -72,8 +108,17 @@ Starting with embeddings service:
 ## Next Phase Planning
 
 ### Immediate Actions:
-1. Commit and push RAG MVP
-2. Create PR for review
+1. Commit and push RAG MVP ✓
+2. Create PR for review ✓
+
+## Phase 1: Web Scraping Implementation (TDD)
+
+### TDD Approach:
+1. Write tests first for scraper service
+2. Test URL validation
+3. Test content extraction
+4. Test error handling
+5. Then implement to pass tests
 
 ### Phase 1: Web Scraping (Next Major Feature)
 - Install Playwright

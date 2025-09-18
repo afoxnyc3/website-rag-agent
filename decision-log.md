@@ -68,3 +68,47 @@
 - 0.6-0.8 = Very relevant
 - 0.5-0.6 = Relevant
 - <0.5 = Marginally relevant
+
+## 2024-01-17 - Web Scraping Phase
+
+### Decision: Use TDD methodology for web scraping
+**Rationale**: Ensure quality and reliability from the start
+**Alternatives considered**: Write code first, test later
+**Trade-offs**: Slower initial development vs higher quality
+**Result**: Created tests first, then implementation
+
+### Decision: Use Playwright for web scraping
+**Rationale**:
+- Handles JavaScript-rendered content
+- Cross-browser support
+- Reliable and well-maintained
+**Alternatives considered**: Puppeteer, Cheerio
+**Trade-offs**: Heavier dependency vs more capabilities
+**Result**: Installed Playwright for actual scraping
+
+### Decision: Implement chunking for long content
+**Rationale**: Embeddings have token limits, need manageable chunks
+**Alternatives considered**: Truncate content
+**Trade-offs**: More complex processing vs complete content coverage
+**Result**: Added chunkContent method with configurable size
+
+### Decision: Chunk size of 3000 characters for embeddings
+**Rationale**:
+- OpenAI embedding models have token limits
+- 3000 chars ≈ 750-1000 tokens (safe margin)
+- Prevents "maximum context length" errors
+**Alternatives considered**: 1000, 2000, 5000 chars
+**Trade-offs**: More documents vs context coherence
+**Result**: Implemented 3000 char chunks in scrape API
+**Learning**: Large websites (137KB) create ~46 chunks
+
+### Decision: Add URL input to chat UI
+**Rationale**: Users need easy way to add web content to knowledge base
+**Alternatives considered**: Separate page, CLI tool
+**Trade-offs**: UI complexity vs user convenience
+**Result**: Integrated URL input field above chat input
+**Features**:
+- Real-time scraping feedback
+- Loading states with spinner
+- Dynamic knowledge base counter
+- Error handling and display

@@ -50,6 +50,52 @@
   - Updated loading message for knowledge base search
   - Added system status indicator in footer
 
+## 2024-01-17 - Phase 1: Web Scraping (TDD)
+
+### Setup
+- **Merged**: RAG MVP PR to main branch
+- **Created**: feature/web-scraping branch
+- **Installed**: Vitest, @vitest/ui, happy-dom for testing
+- **Configured**: vitest.config.ts with coverage settings
+- **Added**: Test scripts to package.json
+
+### TDD Implementation
+- **Created**: scraper.test.ts with 14 test cases (TDD - Red phase)
+- **Implemented**: WebScraper class to pass all tests (TDD - Green phase)
+  - URL validation (http/https only)
+  - HTML text extraction
+  - Content cleaning and normalization
+  - Chunking for long content
+  - RAG formatting
+- **Implemented**: PlaywrightScraper class for real browser-based scraping
+  - Headless browser automation
+  - JavaScript-rendered content support
+  - Smart content selector strategies
+- **Installed**: Playwright for actual web scraping
+- **Result**: All 14 tests passing ✓
+
+### Integration with RAG System
+- **Created**: /api/scrape endpoint for web scraping
+- **Updated**: RAG service to accept documents with metadata
+- **Exported**: getRAGService() function for reuse
+- **Implemented**: Content chunking for large documents (3000 chars per chunk)
+- **Added**: UI components for URL input
+  - URL input field with Globe icon
+  - Loading state with spinner
+  - Success/error feedback messages
+  - Dynamic knowledge base counter
+- **Tested**: Successfully scraped and indexed:
+  - example.com (simple test)
+  - nextjs.org (137KB of content, chunked into ~46 documents)
+- **Verified**: RAG queries working with scraped content
+
+## Phase 1 Complete: Web Scraping ✅
+- Successfully integrated Playwright web scraping with RAG system
+- TDD approach ensured quality (14/14 tests passing)
+- UI allows users to add any website to knowledge base
+- Content chunking handles large documents
+- RAG system successfully queries scraped content
+
 ## Previous Session
 
 ### Initial Setup (from git history)

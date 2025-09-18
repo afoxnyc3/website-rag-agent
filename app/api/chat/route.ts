@@ -5,7 +5,7 @@ import { RAGService } from '@/lib/rag';
 let ragService: RAGService | null = null;
 let isInitialized = false;
 
-async function getRAGService(): Promise<RAGService> {
+export async function getRAGService(): Promise<RAGService> {
   if (!ragService) {
     ragService = new RAGService();
   }
