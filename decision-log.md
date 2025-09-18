@@ -1,5 +1,41 @@
 # Decision Log
 
+## 2025-09-18
+
+### Decision: Use Vercel Postgres with Neon for persistent storage
+**Rationale**:
+- Native Vercel integration for seamless deployment
+- Built-in pgvector support for vector operations
+- Automatic connection management
+- Good performance with connection pooling
+**Alternatives considered**:
+- Supabase (also good but less integrated)
+- Prisma (adds ORM complexity)
+**Trade-offs**: Vendor lock-in vs ease of use
+**Result**: Successfully integrated Neon database with pgvector
+
+### Decision: Implement Storage Strategy Pattern
+**Rationale**:
+- Allows seamless switching between storage types
+- Environment-based configuration
+- No code changes needed for different deployments
+**Alternatives considered**:
+- Hard-coded environment checks
+- Separate implementations per environment
+**Trade-offs**: Additional abstraction layer vs flexibility
+**Result**: Clean abstraction with factory pattern
+
+### Decision: Use environment variables for storage selection
+**Rationale**:
+- `NODE_ENV` for automatic selection
+- `USE_PERSISTENT_STORAGE` for override
+- No code changes needed between environments
+**Alternatives considered**:
+- Configuration files
+- Build-time constants
+**Trade-offs**: Runtime overhead vs deployment flexibility
+**Result**: Easy configuration management
+
 ## 2024-01-17
 
 ### Decision: Use feature branch strategy for RAG development

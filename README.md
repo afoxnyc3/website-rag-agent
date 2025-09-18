@@ -159,19 +159,28 @@ graph LR
 - **Phase 0.5**: Tool Migration - Converted scrapers/crawlers to Tools
 - **Phase 1**: Web Scraping - Playwright integration
 - **Phase 2**: Web Crawling - Multi-page with robots.txt compliance
+- **Phase 3**: Persistent Storage - Vercel Postgres with pgvector
 
 ### Current Features
 - ✅ Chat interface with GPT-5
-- ✅ In-memory vector storage with embeddings
+- ✅ Dual storage system (memory/persistent)
+- ✅ Vercel Postgres with pgvector for production
 - ✅ Web scraping (ScrapeTool with fetch/Playwright strategies)
 - ✅ Web crawling (CrawlTool with depth control)
 - ✅ RAG system with confidence scoring
 - ✅ Tool-based architecture for extensibility
+- ✅ Document versioning and history
+- ✅ Environment-based storage switching
+
+### Storage Configuration
+- **Development**: In-memory vector store (fast, no setup)
+- **Production**: Vercel Postgres with pgvector (persistent, scalable)
+- **Switching**: Automatic based on `NODE_ENV` or `USE_PERSISTENT_STORAGE`
 
 ### Upcoming Phases
-- **Phase 3**: Persistent Storage (pgvector)
 - **Phase 4**: Advanced RAG Features
 - **Phase 5**: Multi-modal Support
+- **Phase 6**: Performance Optimization
 
 ## 🎯 Success Metrics
 
