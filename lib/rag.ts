@@ -18,21 +18,24 @@ export class RAGService {
     this.vectorStore = new VectorStore();
   }
 
-  async addDocument(content: string, id?: string): Promise<void> {
-    const docId = id || Date.now().toString();
-    const { embedding } = await generateEmbedding(content);
+  async addDocument(doc: { id?: string; content: string; metadata?: any }): Promise<void> {
+    const docId = doc.id || Date.now().toString();
+    const { embedding } = await generateEmbedding(doc.content);
 
     this.vectorStore.addDocument({
       id: docId,
-      content,
+      content: doc.content,
       embedding,
-      metadata: { timestamp: new Date().toISOString() }
+      metadata: {
+        timestamp: new Date().toISOString(),
+        ...doc.metadata
+      }
     });
   }
 
   async addDocuments(contents: string[]): Promise<void> {
     for (const content of contents) {
-      await this.addDocument(content);
+      await this.addDocument({ content });
     }
   }
 

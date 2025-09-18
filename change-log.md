@@ -1,5 +1,37 @@
 # Change Log
 
+## 2025-09-18 - Phase 0: Tool Chest Foundation (TDD)
+
+### Course Correction
+- **Decision**: Return to Phase 0 after realizing we skipped foundation
+- **Rationale**: Building on weak foundation compounds technical debt
+- **Impact**: 3 days of potential refactoring avoided
+
+### Implementation
+- **Created**: Tool base class with execute, validate, and format methods
+- **Created**: ToolExecutor for orchestrating tool execution
+- **Created**: ToolRegistry for managing available tools
+- **Features**:
+  - Input validation against schemas
+  - Error handling and formatting
+  - Retry logic with exponential backoff
+  - Tool chaining and parallel execution
+  - Tool composition for pipelines
+  - Timeout handling
+- **Tests**: 21 comprehensive tests using TDD methodology
+- **Examples**: Created 3 example tools
+  - SearchTool: RAG knowledge base queries
+  - CalculateTool: Math expressions
+  - FormatTool: Text formatting
+- **Result**: All 21 tests passing ✓
+
+### Architecture Benefits
+- Unified interface for all operations
+- Consistent error handling
+- Standardized response formats
+- Easy extensibility
+- Better testability
+
 ## 2024-01-17
 
 ### Session Start - Working Baseline Established
@@ -49,6 +81,86 @@
   - Added source count display
   - Updated loading message for knowledge base search
   - Added system status indicator in footer
+
+## 2024-01-17 - Phase 1: Web Scraping (TDD)
+
+### Setup
+- **Merged**: RAG MVP PR to main branch
+- **Created**: feature/web-scraping branch
+- **Installed**: Vitest, @vitest/ui, happy-dom for testing
+- **Configured**: vitest.config.ts with coverage settings
+- **Added**: Test scripts to package.json
+
+### TDD Implementation
+- **Created**: scraper.test.ts with 14 test cases (TDD - Red phase)
+- **Implemented**: WebScraper class to pass all tests (TDD - Green phase)
+  - URL validation (http/https only)
+  - HTML text extraction
+  - Content cleaning and normalization
+  - Chunking for long content
+  - RAG formatting
+- **Implemented**: PlaywrightScraper class for real browser-based scraping
+  - Headless browser automation
+  - JavaScript-rendered content support
+  - Smart content selector strategies
+- **Installed**: Playwright for actual web scraping
+- **Result**: All 14 tests passing ✓
+
+### Integration with RAG System
+- **Created**: /api/scrape endpoint for web scraping
+- **Updated**: RAG service to accept documents with metadata
+- **Exported**: getRAGService() function for reuse
+- **Implemented**: Content chunking for large documents (3000 chars per chunk)
+- **Added**: UI components for URL input
+  - URL input field with Globe icon
+  - Loading state with spinner
+  - Success/error feedback messages
+  - Dynamic knowledge base counter
+- **Tested**: Successfully scraped and indexed:
+  - example.com (simple test)
+  - nextjs.org (137KB of content, chunked into ~46 documents)
+- **Verified**: RAG queries working with scraped content
+
+## 2025-09-18 - Phase 2: Web Crawling (TDD)
+
+### Implementation
+- **Created**: crawler.test.ts with 17 comprehensive test cases
+- **Implemented**: WebCrawler class with full functionality:
+  - URL discovery and link extraction
+  - Robots.txt parsing and compliance
+  - Sitemap XML parsing
+  - Rate limiting with configurable delays
+  - Depth-based crawling
+  - Include/exclude patterns
+  - Queue management
+- **Created**: PlaywrightCrawler extending WebCrawler
+  - Integrated with PlaywrightScraper
+  - Depth tracking per URL
+  - Automatic browser management
+- **Created**: /api/crawl endpoint
+  - Configurable crawl options
+  - Automatic chunking for large pages
+  - Detailed crawl results
+- **Updated**: Chat UI with crawl configuration
+  - Single page vs multi-page crawl modes
+  - Configurable depth and max pages
+  - Advanced settings toggle
+  - Real-time crawl feedback
+- **Result**: All 17 tests passing ✓
+
+## Phase 2 Complete: Web Crawling ✅
+- Successfully implemented multi-page crawling
+- TDD approach ensured quality (17/17 tests passing)
+- Respects robots.txt and implements rate limiting
+- UI allows crawling entire websites with configurable depth
+- Tested with example.com successfully
+
+## Phase 1 Complete: Web Scraping ✅
+- Successfully integrated Playwright web scraping with RAG system
+- TDD approach ensured quality (14/14 tests passing)
+- UI allows users to add any website to knowledge base
+- Content chunking handles large documents
+- RAG system successfully queries scraped content
 
 ## Previous Session
 

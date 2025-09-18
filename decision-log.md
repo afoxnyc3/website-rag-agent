@@ -68,3 +68,105 @@
 - 0.6-0.8 = Very relevant
 - 0.5-0.6 = Relevant
 - <0.5 = Marginally relevant
+
+## 2024-01-17 - Web Scraping Phase
+
+### Decision: Use TDD methodology for web scraping
+**Rationale**: Ensure quality and reliability from the start
+**Alternatives considered**: Write code first, test later
+**Trade-offs**: Slower initial development vs higher quality
+**Result**: Created tests first, then implementation
+
+### Decision: Use Playwright for web scraping
+**Rationale**:
+- Handles JavaScript-rendered content
+- Cross-browser support
+- Reliable and well-maintained
+**Alternatives considered**: Puppeteer, Cheerio
+**Trade-offs**: Heavier dependency vs more capabilities
+**Result**: Installed Playwright for actual scraping
+
+### Decision: Implement chunking for long content
+**Rationale**: Embeddings have token limits, need manageable chunks
+**Alternatives considered**: Truncate content
+**Trade-offs**: More complex processing vs complete content coverage
+**Result**: Added chunkContent method with configurable size
+
+### Decision: Chunk size of 3000 characters for embeddings
+**Rationale**:
+- OpenAI embedding models have token limits
+- 3000 chars ≈ 750-1000 tokens (safe margin)
+- Prevents "maximum context length" errors
+**Alternatives considered**: 1000, 2000, 5000 chars
+**Trade-offs**: More documents vs context coherence
+**Result**: Implemented 3000 char chunks in scrape API
+**Learning**: Large websites (137KB) create ~46 chunks
+
+### Decision: Add URL input to chat UI
+**Rationale**: Users need easy way to add web content to knowledge base
+**Alternatives considered**: Separate page, CLI tool
+**Trade-offs**: UI complexity vs user convenience
+**Result**: Integrated URL input field above chat input
+**Features**:
+- Real-time scraping feedback
+- Loading states with spinner
+- Dynamic knowledge base counter
+- Error handling and display
+
+## 2025-09-18 - Phase 2: Web Crawling
+
+### Decision: Build custom crawler instead of using Crawl4AI
+**Rationale**:
+- More control over crawling behavior
+- Better integration with existing Playwright scraper
+- Easier to test with TDD approach
+**Alternatives considered**: Crawl4AI library
+**Trade-offs**: More code to maintain vs full control
+**Result**: Built WebCrawler and PlaywrightCrawler classes
+
+### Decision: Implement comprehensive crawling features
+**Rationale**: Production-ready crawling requires:
+- Robots.txt compliance (ethical crawling)
+- Rate limiting (prevent server overload)
+- Sitemap support (discover all pages)
+- Depth control (prevent infinite crawling)
+**Result**: All features implemented and tested
+
+### Decision: Add UI controls for crawl configuration
+**Rationale**: Users need control over crawl behavior
+**Features added**:
+- Single page vs multi-page toggle
+- Depth control (1-5 levels)
+- Max pages limit (1-100)
+- Advanced settings toggle
+**Result**: Intuitive UI with sensible defaults
+
+## 2025-09-18 - Course Correction: Phase 0
+
+### Decision: Return to Phase 0 (Tool Chest Foundation)
+**Rationale**:
+- Skipping Phase 0 was a tactical mistake
+- Current architecture lacks unified tool interface
+- Code duplication across scrapers and crawlers
+- No consistent error handling or response formats
+- Building more features on weak foundation compounds technical debt
+**Alternatives considered**: Continue with Phase 3 (Storage)
+**Trade-offs**: Short-term slowdown vs long-term maintainability
+**Result**: Implement Phase 0 before proceeding
+
+### Decision: Split Phase 0 into Foundation + Migration
+**Rationale**:
+- Smaller, focused PRs are easier to review
+- Can validate foundation before refactoring
+- Less risk of breaking existing features
+- Incremental progress and testing
+**Approach**:
+- Phase 0: Build tool foundation (new code)
+- Phase 0.5: Migrate existing features to tools
+**Result**: Two-phase approach for safer implementation
+
+### Learning: Architecture First
+**Insight**: "We don't have time to do it right, but we have time to do it twice"
+**Lesson**: Always build foundation before features
+**Impact**: 3 days of refactoring could have been avoided
+**Future**: Review full roadmap before starting each phase

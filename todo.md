@@ -24,31 +24,81 @@ All core features implemented:
 - ✅ UI displaying RAG metadata
 - ✅ Knowledge base loaded and queryable
 
+## Phase 1: Web Scraping (TDD) - COMPLETED ✅
+
+### Completed
+- [x] Set up Vitest for TDD approach
+- [x] Write comprehensive test suite (14 tests)
+- [x] Implement WebScraper class with mocked functionality
+- [x] Implement PlaywrightScraper for real web scraping
+- [x] All tests passing (14/14) ✅
+- [x] Integrate scraper with RAG system
+- [x] Add UI for URL input
+- [x] Test with real websites (example.com, nextjs.org)
+- [x] Add scraped content to knowledge base dynamically
+- [x] Implement content chunking for large documents
+- [x] Add scraping feedback to UI
+
 ### Testing & Quality
 - [ ] Set up testing framework with Vitest
 - [ ] Create initial test suite for RAG components
 - [ ] Add ESLint and Prettier configurations
 - [ ] Achieve 100% test coverage for core functions
 
+## Phase 2: Web Crawling - COMPLETED ✅
+
+### Completed
+- [x] Write comprehensive test suite (17 tests)
+- [x] Implement WebCrawler class
+- [x] Add robots.txt compliance
+- [x] Implement sitemap parsing
+- [x] Add rate limiting
+- [x] Integrate with PlaywrightScraper
+- [x] Create /api/crawl endpoint
+- [x] Add UI for crawl configuration
+- [x] Test with real websites
+
+## Current Priority: Phase 0 - Tool Chest Foundation (IN PROGRESS)
+
+### Phase 0: Build Foundation (feature/tool-foundation)
+- [ ] Create base Tool class with execute method
+- [ ] Implement ToolExecutor for tool orchestration
+- [ ] Build tool registry for tool discovery
+- [ ] Define tool interfaces and schemas
+- [ ] Create tool validation and error handling
+- [ ] Add tool response formatting
+- [ ] Implement structured output support
+- [ ] Write comprehensive test suite (TDD)
+
+### Phase 0.5: Tool Migration (feature/tool-migration)
+- [ ] Convert PlaywrightScraper to ScrapeTool
+- [ ] Convert FetchScraper to FetchTool
+- [ ] Convert WebCrawler to CrawlTool
+- [ ] Convert RAG operations to RAGTools
+- [ ] Unify error handling across all tools
+- [ ] Standardize tool response formats
+- [ ] Update API endpoints to use tools
+- [ ] Update UI to work with tool responses
+
 ## Upcoming Phases
 
-### Phase 0: Tool Chest Foundation
-- [ ] Integrate Vercel AI SDK tools
-- [ ] Create base agent class with tool calling
-- [ ] Implement response formatting utilities
-- [ ] Add structured output support
+### Phase 3: Persistent Storage
+- [ ] Set up Vercel Postgres
+- [ ] Install pgvector extension
+- [ ] Migrate from in-memory to persistent storage
+- [ ] Add content versioning
 
-### Phase 1: Web Scraping
-- [ ] Install and configure Playwright
-- [ ] Create single-page scraper service
-- [ ] Add URL content extraction
-- [ ] Implement text cleaning and normalization
+### Phase 1: Web Scraping ✅ COMPLETED
+- [x] Install and configure Playwright
+- [x] Create single-page scraper service
+- [x] Add URL content extraction
+- [x] Implement text cleaning and normalization
 
-### Phase 2: Web Crawling
-- [ ] Integrate Crawl4AI
-- [ ] Build multi-page crawler
-- [ ] Add robots.txt compliance
-- [ ] Implement rate limiting
+### Phase 2: Web Crawling ✅ COMPLETED
+- [x] Build multi-page crawler with Playwright
+- [x] Add robots.txt compliance
+- [x] Implement rate limiting
+- [x] Add sitemap.xml support
 
 ### Phase 3: Persistent Storage
 - [ ] Set up Vercel Postgres
