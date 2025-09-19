@@ -400,3 +400,95 @@ describe('BaseAgent.processToolResult', () => {
     expect(processed.metadata.customField).toBe('custom value');
   });
 });
+
+// Phase 6: Knowledge Operations Tests
+describe('BaseAgent.ingestToRAG', () => {
+  it('should call addDocument on RAG service', async () => {
+    const { BaseAgent } = await import('./base-agent');
+    const { RAGService } = await import('../rag');
+
+    const mockAddDocument = vi.fn();
+    const mockRAGService = {
+      addDocument: mockAddDocument,
+      query: vi.fn(),
+      getDocumentCount: vi.fn()
+    };
+
+    const agent = new BaseAgent({
+      name: 'TestAgent',
+      ragService: mockRAGService as any
+    });
+
+    const processed = {
+      content: 'Test content',
+      metadata: { url: 'https://example.com' }
+    };
+
+    await agent.ingestToRAG(processed);
+
+    expect(mockAddDocument).toHaveBeenCalledWith({
+      content: 'Test content',
+      metadata: { url: 'https://example.com' }
+    });
+  });
+
+  it('should handle chunks when ingesting', async () => {
+    const { BaseAgent } = await import('./base-agent');
+
+    const mockAddDocument = vi.fn();
+    const mockRAGService = {
+      addDocument: mockAddDocument,
+      query: vi.fn(),
+      getDocumentCount: vi.fn()
+    };
+
+    const agent = new BaseAgent({
+      name: 'TestAgent',
+      ragService: mockRAGService as any
+    });
+
+    const processed = {
+      content: 'Full content',
+      chunks: ['Chunk 1', 'Chunk 2', 'Chunk 3'],
+      metadata: { url: 'https://example.com' }
+    };
+
+    await agent.ingestToRAG(processed);
+
+    expect(mockAddDocument).toHaveBeenCalledTimes(3);
+    expect(mockAddDocument).toHaveBeenCalledWith({
+      content: 'Chunk 1',
+      metadata: { url: 'https://example.com', chunkIndex: 0, totalChunks: 3 }
+    });
+  });
+});
+
+describe('BaseAgent.searchKnowledge', () => {
+  it('should query RAG service', async () => {
+    const { BaseAgent } = await import('./base-agent');
+
+    const mockQuery = vi.fn().mockResolvedValue({
+      answer: 'Test answer',
+      confidence: 0.85,
+      sources: ['source1'],
+      chunks: []
+    });
+
+    const mockRAGService = {
+      addDocument: vi.fn(),
+      query: mockQuery,
+      getDocumentCount: vi.fn()
+    };
+
+    const agent = new BaseAgent({
+      name: 'TestAgent',
+      ragService: mockRAGService as any
+    });
+
+    const result = await agent.searchKnowledge('Test question');
+
+    expect(mockQuery).toHaveBeenCalledWith('Test question');
+    expect(result.answer).toBe('Test answer');
+    expect(result.confidence).toBe(0.85);
+  });
+});

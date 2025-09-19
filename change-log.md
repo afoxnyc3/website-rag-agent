@@ -59,6 +59,19 @@
 - **Testing**: 3 new tests for extraction, chunking, metadata
 - **Total Tests**: 25/25 passing (100% coverage)
 
+### Phase 6: Knowledge Operations ✅
+- **ingestToRAG Method**: Store content in knowledge base
+  - Adds documents to RAG service
+  - Handles chunked content with chunk metadata
+  - Preserves all metadata for attribution
+  - Throws error if no RAG service configured
+- **searchKnowledge Method**: Query the knowledge base
+  - Queries RAG service with user question
+  - Returns RAGResponse with answer, confidence, sources
+  - Graceful fallback if no RAG service
+- **Testing**: 3 new tests for ingestion and search
+- **Total Tests**: 28/28 passing (100% coverage)
+
 ### Technical Decisions
 - Using TDD approach with granular atomic tests for reliability
 - Mocking RAGService in tests to avoid OpenAI API dependency

@@ -1,5 +1,5 @@
 import { Tool, ToolRegistry, ToolResult } from '../tools/tool';
-import { RAGService } from '../rag';
+import { RAGService, RAGResponse } from '../rag';
 
 // Agent Configuration Interface
 export interface AgentConfig {
@@ -242,5 +242,44 @@ export class BaseAgent {
       chunks,
       metadata
     };
+  }
+
+  async ingestToRAG(processed: ProcessedContent): Promise<void> {
+    if (!this.ragService) {
+      throw new Error('No RAG service configured');
+    }
+
+    // If content is chunked, ingest each chunk separately
+    if (processed.chunks && processed.chunks.length > 0) {
+      for (let i = 0; i < processed.chunks.length; i++) {
+        await this.ragService.addDocument({
+          content: processed.chunks[i],
+          metadata: {
+            ...processed.metadata,
+            chunkIndex: i,
+            totalChunks: processed.chunks.length
+          }
+        });
+      }
+    } else {
+      // Ingest as single document
+      await this.ragService.addDocument({
+        content: processed.content,
+        metadata: processed.metadata
+      });
+    }
+  }
+
+  async searchKnowledge(query: string): Promise<RAGResponse> {
+    if (!this.ragService) {
+      return {
+        answer: "I don't have access to a knowledge base",
+        confidence: 0,
+        sources: [],
+        chunks: []
+      };
+    }
+
+    return this.ragService.query(query);
   }
 }
