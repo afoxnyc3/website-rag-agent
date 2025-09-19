@@ -1,4 +1,4 @@
-import { ToolRegistry } from '../tools/tool';
+import { Tool, ToolRegistry, ToolResult } from '../tools/tool';
 import { RAGService } from '../rag';
 
 // Agent Configuration Interface
@@ -18,6 +18,11 @@ export interface ParsedIntent {
   query: string;
   urls?: string[];
   keywords?: string[];
+}
+
+// Tool Execution Options
+export interface ToolExecutionOptions {
+  timeout?: number;
 }
 
 // Base Agent Class
@@ -131,5 +136,66 @@ export class BaseAgent {
 
     // Default to CrawlTool for domain-level URLs
     return 'CrawlTool';
+  }
+
+  async executeTool(
+    toolName: string,
+    input: any,
+    options: ToolExecutionOptions = {}
+  ): Promise<ToolResult> {
+    // Check if registry exists
+    if (!this.toolRegistry) {
+      return {
+        success: false,
+        error: 'No tool registry configured'
+      };
+    }
+
+    // Get tool from registry
+    const tool = this.toolRegistry.get(toolName);
+    if (!tool) {
+      return {
+        success: false,
+        error: `Tool not found: ${toolName}`
+      };
+    }
+
+    // Execute with timeout if specified
+    if (options.timeout) {
+      return this.executeWithTimeout(tool, input, options.timeout);
+    }
+
+    // Execute normally
+    try {
+      const result = await tool.execute(input);
+
+      // Update cache if this was a URL fetch
+      if (result.success && input.url) {
+        this.urlCache.set(input.url, Date.now());
+      }
+
+      return result;
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Tool execution failed'
+      };
+    }
+  }
+
+  private async executeWithTimeout(
+    tool: Tool,
+    input: any,
+    timeout: number
+  ): Promise<ToolResult> {
+    return Promise.race([
+      tool.execute(input),
+      new Promise<ToolResult>((resolve) =>
+        setTimeout(() => resolve({
+          success: false,
+          error: `Tool execution timeout after ${timeout}ms`
+        }), timeout)
+      )
+    ]);
   }
 }

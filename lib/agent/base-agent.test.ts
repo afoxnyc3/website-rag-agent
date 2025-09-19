@@ -230,3 +230,107 @@ describe('BaseAgent.selectTool', () => {
     expect(tool).toBeNull();
   });
 });
+
+// Phase 4: Tool Execution Tests
+describe('BaseAgent.executeTool', () => {
+  it('should call tool.execute with input', async () => {
+    const { BaseAgent } = await import('./base-agent');
+    const mockTool = {
+      name: 'MockTool',
+      description: 'Test tool',
+      execute: vi.fn().mockResolvedValue({
+        success: true,
+        data: { content: 'test content' }
+      })
+    };
+
+    const registry = new ToolRegistry();
+    registry.register(mockTool as any);
+
+    const agent = new BaseAgent({
+      name: 'TestAgent',
+      toolRegistry: registry
+    });
+
+    const result = await agent.executeTool('MockTool', { url: 'https://example.com' });
+
+    expect(mockTool.execute).toHaveBeenCalledWith({ url: 'https://example.com' });
+    expect(result.success).toBe(true);
+    expect(result.data.content).toBe('test content');
+  });
+
+  it('should handle tool success', async () => {
+    const { BaseAgent } = await import('./base-agent');
+    const mockTool = {
+      name: 'MockTool',
+      description: 'Test tool',
+      execute: vi.fn().mockResolvedValue({
+        success: true,
+        data: { content: 'success data' }
+      })
+    };
+
+    const registry = new ToolRegistry();
+    registry.register(mockTool as any);
+
+    const agent = new BaseAgent({
+      name: 'TestAgent',
+      toolRegistry: registry
+    });
+
+    const result = await agent.executeTool('MockTool', {});
+
+    expect(result.success).toBe(true);
+    expect(result.data.content).toBe('success data');
+  });
+
+  it('should handle tool failure', async () => {
+    const { BaseAgent } = await import('./base-agent');
+    const mockTool = {
+      name: 'MockTool',
+      description: 'Test tool',
+      execute: vi.fn().mockResolvedValue({
+        success: false,
+        error: 'Tool execution failed'
+      })
+    };
+
+    const registry = new ToolRegistry();
+    registry.register(mockTool as any);
+
+    const agent = new BaseAgent({
+      name: 'TestAgent',
+      toolRegistry: registry
+    });
+
+    const result = await agent.executeTool('MockTool', {});
+
+    expect(result.success).toBe(false);
+    expect(result.error).toBe('Tool execution failed');
+  });
+
+  it('should add timeout wrapper', async () => {
+    const { BaseAgent } = await import('./base-agent');
+    const mockTool = {
+      name: 'MockTool',
+      description: 'Test tool',
+      execute: vi.fn().mockImplementation(() =>
+        new Promise(resolve => setTimeout(() => resolve({ success: true }), 2000))
+      )
+    };
+
+    const registry = new ToolRegistry();
+    registry.register(mockTool as any);
+
+    const agent = new BaseAgent({
+      name: 'TestAgent',
+      toolRegistry: registry
+    });
+
+    // Execute with 100ms timeout (should timeout)
+    const result = await agent.executeTool('MockTool', {}, { timeout: 100 });
+
+    expect(result.success).toBe(false);
+    expect(result.error).toContain('timeout');
+  });
+});
