@@ -1,5 +1,19 @@
 # Decision Log
 
+## 2025-09-19 - Agent Integration into Production
+
+### Decision: Replace RAG service with BaseAgent in chat API
+**Rationale**:
+- BaseAgent provides complete orchestration vs direct RAG calls
+- Automatic URL detection and fetching
+- Better separation of concerns
+- More maintainable and extensible
+**Alternatives considered**:
+- Keep both endpoints (/api/chat and /api/agent)
+- Gradual migration with feature flag
+**Trade-offs**: Breaking change for API but better architecture
+**Result**: Successfully integrated, tested by user, working in production!
+
 ## 2025-09-19 - Agent Orchestration Layer
 
 ### Phase 1-7 Complete: Full BaseAgent Implementation ✅
