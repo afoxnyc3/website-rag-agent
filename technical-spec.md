@@ -61,11 +61,11 @@ interface AgentEvaluation {
 - Content sanitization and normalization
 - Error handling for failed scrapes
 
-### Phase 2: Crawl4AI Web Crawling
-- Multi-page site discovery and navigation
-- Respect robots.txt and crawl delays
-- URL deduplication and filtering
-- Batch processing with rate limiting
+### Phase 2: Custom Web Crawling (CrawlTool)
+- Multi-page site discovery with configurable depth
+- Built-in robots.txt compliance and crawl delays
+- URL deduplication and pattern-based filtering
+- Batch processing with Playwright integration
 
 ### Phase 3: Vector Database (Vercel Postgres + pgvector)
 - Persistent vector storage with metadata

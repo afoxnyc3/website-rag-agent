@@ -393,7 +393,6 @@ pnpm format     # Format code
 
 - [Vercel AI SDK RAG Example](https://github.com/vercel-labs/ai-sdk-preview-rag)
 - [Playwright Docs](https://playwright.dev/docs/scraping)
-- [Crawl4AI](https://crawl4ai.com/mkdocs/)
 - [Vercel Postgres + pgvector](https://vercel.com/docs/storage/vercel-postgres)
 
 ## 📄 License

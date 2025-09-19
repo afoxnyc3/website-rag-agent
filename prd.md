@@ -25,10 +25,10 @@ Create an intelligent knowledge assistant that automatically ingests website con
 - Store scraped content for embedding
 
 ### **Phase 2: Web Crawling**
-- Multi-page site crawling using Crawl4AI
-- Intelligent site navigation and discovery
+- Multi-page site crawling using custom CrawlTool
+- Intelligent site navigation with depth control
 - Respect robots.txt and rate limiting
-- Batch processing of discovered pages
+- Batch processing with Playwright integration
 
 ### **Phase 3: Persistent Storage**
 - Vercel Postgres + pgvector for vector storage
@@ -45,7 +45,6 @@ Create an intelligent knowledge assistant that automatically ingests website con
 ## Key Resources & Dependencies
 - [Vercel AI SDK RAG Example](https://github.com/vercel-labs/ai-sdk-preview-rag)
 - [Playwright Scraping](https://playwright.dev/docs/scraping)
-- [Crawl4AI](https://crawl4ai.com/mkdocs/)
 - [Vercel Postgres + pgvector](https://vercel.com/docs/storage/vercel-postgres)
 
 ## Deliverables

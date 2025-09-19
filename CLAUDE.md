@@ -87,10 +87,11 @@ This is a TypeScript Next.js 15 starter template for AI-powered applications:
 - Clean text extraction from URLs
 - Content sanitization
 
-### Phase 2: Web Crawling (Crawl4AI)
-- Multi-page site discovery
-- Respect robots.txt
-- Batch processing
+### Phase 2: Web Crawling (Custom CrawlTool)
+- Multi-page site discovery with depth control
+- Respect robots.txt compliance
+- Rate limiting and batch processing
+- Integrated with Playwright for JavaScript sites
 
 ### Phase 3: Persistent Storage
 - Vercel Postgres + pgvector
@@ -292,7 +293,6 @@ The project uses a pnpm workspace with specific built dependencies:
 ## Key Resources
 - [Vercel AI SDK RAG Example](https://github.com/vercel-labs/ai-sdk-preview-rag)
 - [Playwright Docs](https://playwright.dev/docs/scraping)
-- [Crawl4AI](https://crawl4ai.com/mkdocs/)
 - [Vercel Postgres + pgvector](https://vercel.com/docs/storage/vercel-postgres)
 
 ## Development Checklist
