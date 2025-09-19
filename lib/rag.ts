@@ -12,7 +12,7 @@ export interface RAGResponse {
 
 export class RAGService {
   private storage: StorageStrategy;
-  private readonly confidenceThreshold = 0.5;
+  private readonly confidenceThreshold = 0.3;  // Lowered from 0.5 to 0.3
   private initialized = false;
 
   constructor(options?: { forceMemory?: boolean; forcePersistent?: boolean }) {
@@ -119,7 +119,7 @@ Answer:`;
     return {
       answer: text,
       confidence: maxConfidence,
-      sources: relevantResults.map(r => r.id),
+      sources: relevantResults.map(r => r.metadata?.url || r.metadata?.source || r.id),
       chunks: relevantResults
     };
   }
@@ -128,6 +128,12 @@ Answer:`;
     await this.ensureInitialized();
     const docs = await this.storage.listDocuments();
     return docs.length;
+  }
+
+  async getAllDocuments(): Promise<any[]> {
+    await this.ensureInitialized();
+    const docs = await this.storage.listDocuments();
+    return docs;
   }
 
   async clearDocuments(): Promise<void> {

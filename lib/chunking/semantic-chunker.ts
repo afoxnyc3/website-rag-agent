@@ -92,7 +92,7 @@ export class SemanticChunker {
       }];
     }
 
-    // Text needs multiple chunks
+    // Text needs multiple chunks with overlap support
     while (currentPos < text.length) {
       const chunkSize = Math.min(config.maxSize, text.length - currentPos);
       const content = text.slice(currentPos, currentPos + chunkSize);
@@ -105,11 +105,16 @@ export class SemanticChunker {
         totalChunks: 0, // Will be updated
         metadata: {
           strategy: 'fixed',
-          hasOverlap: false
+          hasOverlap: config.overlap > 0 && chunks.length > 0
         }
       });
 
-      currentPos += chunkSize;
+      // Move position considering overlap
+      if (config.overlap > 0 && currentPos + chunkSize < text.length) {
+        currentPos += chunkSize - Math.min(config.overlap, chunkSize);
+      } else {
+        currentPos += chunkSize;
+      }
     }
 
     // Update totalChunks
@@ -145,18 +150,21 @@ export class SemanticChunker {
       // Check if adding this segment would exceed maxSize
       if (currentChunk && currentChunk.length + segment.length > config.maxSize) {
         // Save current chunk
-        chunks.push(this.createChunk(
-          currentChunk.trim(),
-          chunks.length,
-          currentStartOffset,
-          currentStartOffset + currentChunk.trim().length,
-          'semantic',
-          false
-        ));
+        const trimmedChunk = currentChunk.trim();
+        if (trimmedChunk) {
+          chunks.push(this.createChunk(
+            trimmedChunk,
+            chunks.length,
+            currentStartOffset,
+            currentStartOffset + currentChunk.length,
+            'semantic',
+            config.overlap > 0 && previousChunkEnd.length > 0
+          ));
+        }
 
         // Handle overlap
         if (config.overlap > 0) {
-          previousChunkEnd = currentChunk.slice(-Math.min(config.overlap, currentChunk.length));
+          previousChunkEnd = currentChunk.slice(-Math.min(config.overlap, currentChunk.length)).trim();
           currentChunk = previousChunkEnd + segment;
           currentStartOffset = lastIndex - previousChunkEnd.length;
         } else {
@@ -173,41 +181,33 @@ export class SemanticChunker {
     }
 
     // Add final chunk if there's content
-    if (currentChunk.trim()) {
+    const finalTrimmed = currentChunk.trim();
+    if (finalTrimmed) {
       chunks.push(this.createChunk(
-        currentChunk.trim(),
+        finalTrimmed,
         chunks.length,
         currentStartOffset,
-        currentStartOffset + currentChunk.trim().length,
+        currentStartOffset + currentChunk.length,
         'semantic',
         config.overlap > 0 && chunks.length > 0
       ));
     }
 
-    // Update totalChunks and fix offsets
-    chunks.forEach((chunk, i) => {
+    // Update totalChunks
+    chunks.forEach((chunk) => {
       chunk.totalChunks = chunks.length;
-      // Recalculate offsets for simple cases
-      if (i === 0) {
-        chunk.startOffset = 0;
-        chunk.endOffset = chunk.content.length;
-      } else if (!chunk.metadata?.hasOverlap) {
-        const prevChunk = chunks[i - 1];
-        chunk.startOffset = prevChunk.endOffset;
-        chunk.endOffset = chunk.startOffset + chunk.content.length;
-      }
     });
 
     return chunks;
   }
 
   private chunkMarkdown(text: string, config: Required<ChunkOptions>): Chunk[] {
-    // Extract code blocks first if preserving them
-    const codeBlocks: Array<{ start: number; end: number; content: string }> = [];
-
+    // Handle code blocks specially if preserving them
     if (config.preserveCodeBlocks) {
       const codeBlockRegex = /```[\s\S]*?```/g;
+      const codeBlocks: Array<{ start: number; end: number; content: string }> = [];
       let match;
+
       while ((match = codeBlockRegex.exec(text)) !== null) {
         codeBlocks.push({
           start: match.index,
@@ -215,10 +215,74 @@ export class SemanticChunker {
           content: match[0]
         });
       }
+
+      // If we have code blocks and they're too big, treat as single chunks
+      if (codeBlocks.length > 0) {
+        const chunks: Chunk[] = [];
+        let lastEnd = 0;
+
+        for (const block of codeBlocks) {
+          // Add text before code block
+          if (block.start > lastEnd) {
+            const beforeText = text.slice(lastEnd, block.start).trim();
+            if (beforeText) {
+              const subChunks = this.chunkSemantic(beforeText, { ...config, strategy: 'semantic' });
+              subChunks.forEach(sc => {
+                chunks.push(this.createChunk(
+                  sc.content,
+                  chunks.length,
+                  lastEnd + sc.startOffset,
+                  lastEnd + sc.endOffset,
+                  'markdown',
+                  false
+                ));
+              });
+            }
+          }
+
+          // Add code block as single chunk
+          chunks.push(this.createChunk(
+            block.content,
+            chunks.length,
+            block.start,
+            block.end,
+            'markdown',
+            false
+          ));
+
+          lastEnd = block.end;
+        }
+
+        // Add remaining text after last code block
+        if (lastEnd < text.length) {
+          const afterText = text.slice(lastEnd).trim();
+          if (afterText) {
+            const subChunks = this.chunkSemantic(afterText, { ...config, strategy: 'semantic' });
+            subChunks.forEach(sc => {
+              chunks.push(this.createChunk(
+                sc.content,
+                chunks.length,
+                lastEnd + sc.startOffset,
+                lastEnd + sc.endOffset,
+                'markdown',
+                false
+              ));
+            });
+          }
+        }
+
+        // Update totalChunks
+        chunks.forEach(chunk => {
+          chunk.totalChunks = chunks.length;
+        });
+
+        return chunks;
+      }
     }
 
+    // If not preserving code blocks, use section-based splitting
     const chunks: Chunk[] = [];
-    const sections = this.splitByMarkdownSections(text, codeBlocks);
+    const sections = this.splitByMarkdownSections(text, []);
 
     sections.forEach((section) => {
       if (section.content.length <= config.maxSize) {

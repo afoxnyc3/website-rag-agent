@@ -1,5 +1,59 @@
 # Change Log
 
+## 2025-09-19 - Major UI/UX Enhancements & Bug Fixes
+
+### Fixed
+- **Critical RAG Retrieval Issue**: Fixed singleton pattern for RAGService
+  - Changed from module-scoped to global singleton to persist across hot reloads
+  - Lowered confidence threshold from 0.5 to 0.3 for better results
+  - Fixed document metadata to include proper URLs instead of IDs
+- **JSX Parsing Errors**: Resolved all Turbopack parsing issues
+  - Fixed nested conditional rendering structure
+  - Removed problematic IIFE patterns in JSX
+  - Cleaned up parentheses mismatches
+
+### Added
+- **Expandable Sources Display**: Interactive source references in chat
+  - Click to expand/collapse source details
+  - Internal docs show as "Project Documentation" with FileText icon
+  - External URLs display as clickable links with ExternalLink icon
+  - Sources appear in muted background boxes below responses
+- **Knowledge Base Viewer**: Full KB management interface
+  - Search functionality across all documents
+  - View indexed sources with metadata (title, size, date)
+  - Clear all functionality with confirmation dialog
+  - Real-time document count badge
+- **Progress Tracking**: Real-time feedback for scraping/crawling
+  - Server-Sent Events (SSE) for live updates
+  - Shows current page, depth, elapsed time
+  - Error handling with descriptive messages
+- **Smart URL Detection**: Auto-detect scrape vs crawl mode
+  - Analyzes URL patterns for documentation sites, blogs, etc.
+  - Suggests optimal mode based on site type
+  - Configurable depth and max pages for crawling
+- **Semantic Chunking System**: Intelligent text splitting
+  - Three strategies: semantic, markdown, fixed
+  - Configurable overlap for context preservation
+  - Code block preservation option
+  - Comprehensive test suite with 43 passing tests
+
+### Updated
+- **UI Improvements**:
+  - Changed title from "AI Chat Assistant" to "AI RAG Agent"
+  - Added Simple/Advanced mode toggle for cleaner interface
+  - Improved loading states and error messages
+  - Better mobile responsiveness
+- **API Enhancements**:
+  - Sources now return proper URLs (internal://project-docs) instead of IDs
+  - getAllDocuments() method for Knowledge Base viewer
+  - clearDocuments() for KB management
+  - Progress endpoint for crawling feedback
+
+### Testing
+- Created comprehensive Playwright tests for RAG functionality
+- Added test files for sources display verification
+- All critical paths tested and passing
+
 ## 2025-09-18 - Bug Fix: VectorStore Document Format
 
 ### Fixed

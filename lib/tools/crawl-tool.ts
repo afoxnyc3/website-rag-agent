@@ -79,6 +79,13 @@ export class CrawlTool extends Tool {
   }
 
   async execute(input: CrawlInput): Promise<ToolResult> {
+    return this.executeWithProgress(input);
+  }
+
+  async executeWithProgress(
+    input: CrawlInput,
+    progressCallback?: (update: any) => void
+  ): Promise<ToolResult> {
     const {
       url,
       maxDepth = 2,  // Increased default depth
@@ -155,6 +162,16 @@ export class CrawlTool extends Tool {
         // Enforce rate limiting
         if (crawlDelay > 0) {
           await this.enforceRateLimit(crawlDelay);
+        }
+
+        // Send progress update if callback provided
+        if (progressCallback) {
+          progressCallback({
+            currentUrl,
+            depth,
+            pagesVisited: result.pagesVisited,
+            totalQueued: this.urlQueue.length
+          });
         }
 
         // Scrape the page

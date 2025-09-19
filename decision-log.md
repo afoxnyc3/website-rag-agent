@@ -1,5 +1,61 @@
 # Decision Log
 
+## 2025-09-19 - UI/UX Improvements & Sources Display
+
+### Decision: Implement expandable sources display
+**Rationale**:
+- Users need to verify information sources for trust
+- Collapsible design keeps interface clean
+- Interactive elements improve user experience
+**Alternatives considered**:
+- Always show sources inline
+- Modal dialog for sources
+- Tooltip on hover
+**Trade-offs**: Extra click vs cleaner interface
+**Result**: Click-to-expand button with chevron indicator
+
+### Decision: Use global singleton pattern for RAGService
+**Rationale**:
+- Module-scoped singleton lost during hot reloads
+- Global persists across Next.js recompilations
+- Prevents knowledge base re-initialization
+**Alternatives considered**:
+- Module singleton with cache
+- Database-backed persistence
+**Trade-offs**: Global namespace pollution vs persistence
+**Result**: Fixed RAG retrieval issues completely
+
+### Decision: Lower confidence threshold to 0.3
+**Rationale**:
+- Original 0.5 was too restrictive
+- Many relevant results scored 0.3-0.5
+- Better to show results with lower confidence than none
+**Alternatives considered**: 0.4, 0.35
+**Trade-offs**: More results vs potential noise
+**Result**: Improved retrieval without sacrificing quality
+
+### Decision: Fix JSX parsing without IIFE
+**Rationale**:
+- Turbopack has issues with IIFEs in JSX
+- Simpler conditional rendering works better
+- Cleaner code structure
+**Alternatives considered**:
+- Using React.Fragment
+- Extracting to separate component
+**Trade-offs**: Slightly more verbose vs no parsing errors
+**Result**: Clean builds with no errors
+
+### Decision: Implement semantic chunking system
+**Rationale**:
+- Better context preservation across boundaries
+- Multiple strategies for different content types
+- Configurable overlap prevents information loss
+**Alternatives considered**:
+- Fixed-size chunks only
+- Sentence-based splitting
+**Trade-offs**: Complexity vs quality
+**Result**: Three strategies (semantic, markdown, fixed) with overlap
+
 ## 2025-09-18 - Bug Fix Resolution
 
 ### Decision: Fix VectorStore integration without modifying core VectorStore class

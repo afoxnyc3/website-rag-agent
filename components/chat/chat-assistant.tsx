@@ -17,8 +17,11 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Brain, Database, Sparkles, Globe, Loader2, Network, Settings } from "lucide-react";
+import { Brain, Database, Sparkles, Globe, Loader2, Network, Settings, Eye, ToggleLeft, ToggleRight, ChevronDown, ChevronUp, FileText, ExternalLink } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ProgressTracker, type ProgressUpdate } from "@/components/ui/progress-tracker";
+import { KnowledgeBaseViewer } from "@/components/ui/knowledge-base-viewer";
+import { analyzeUrl } from "@/lib/utils/url-detector";
 
 type ChatMessage = {
   id: string;
@@ -39,6 +42,10 @@ export default function ChatAssistant() {
   const [crawlDepth, setCrawlDepth] = useState("1");
   const [maxPages, setMaxPages] = useState("10");
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [progressUpdate, setProgressUpdate] = useState<ProgressUpdate | null>(null);
+  const [showKnowledgeBase, setShowKnowledgeBase] = useState(false);
+  const [uiMode, setUiMode] = useState<"simple" | "advanced">("simple");
+  const [expandedSources, setExpandedSources] = useState<Set<string>>(new Set());
 
   const handleSubmit = async (
     message: { text?: string; files?: any[] },
@@ -100,75 +107,186 @@ export default function ChatAssistant() {
     return `${(confidence * 100).toFixed(1)}%`;
   };
 
+  const toggleSourceExpanded = (messageId: string) => {
+    setExpandedSources(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(messageId)) {
+        newSet.delete(messageId);
+      } else {
+        newSet.add(messageId);
+      }
+      return newSet;
+    });
+  };
+
   const handleScrapeUrl = async () => {
     if (!urlInput.trim() || isScraping) return;
 
     setIsScraping(true);
+    const startTime = Date.now();
 
     try {
-      let response;
-      let endpoint;
-      let body;
-
       if (crawlMode === "single") {
-        endpoint = "/api/scrape";
-        body = { url: urlInput };
-      } else {
-        endpoint = "/api/crawl";
-        body = {
-          url: urlInput,
-          options: {
-            maxDepth: parseInt(crawlDepth),
-            maxPages: parseInt(maxPages),
-            respectRobotsTxt: true,
-            crawlDelay: 1000,
-          },
-        };
-      }
+        // Simple scrape without progress tracking
+        setProgressUpdate({
+          type: 'scrape',
+          status: 'starting',
+          message: 'Scraping page...',
+          startTime
+        });
 
-      response = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
+        const response = await fetch("/api/scrape", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: urlInput }),
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (response.ok) {
-        let message = "";
-        let docsAdded = 1;
+        if (response.ok) {
+          setProgressUpdate({
+            type: 'scrape',
+            status: 'completed',
+            message: data.message || `Successfully added content from ${urlInput} to knowledge base`,
+            startTime
+          });
 
-        if (crawlMode === "crawl") {
-          message = `🕷️ Crawled ${data.pagesVisited} pages in ${(data.crawlTime / 1000).toFixed(1)}s\n`;
-          message += `📄 Added ${data.documentsAdded} documents to knowledge base\n`;
-          if (data.details?.pages) {
-            message += `\nPages crawled:\n`;
-            data.details.pages.forEach((p: any) => {
-              message += `• ${p.title || p.url} (${p.linksFound} links found)\n`;
-            });
-          }
-          docsAdded = data.documentsAdded || 0;
+          const successMessage: ChatMessage = {
+            id: Date.now().toString(),
+            role: "assistant",
+            content: data.message || `Successfully added content from ${urlInput} to knowledge base`,
+          };
+          setMessages((prev) => [...prev, successMessage]);
+          setKnowledgeBaseCount(prev => prev + 1);
+          setUrlInput("");
         } else {
-          message = data.message || `Successfully added content from ${urlInput} to knowledge base`;
-        }
+          setProgressUpdate({
+            type: 'scrape',
+            status: 'error',
+            message: data.error || "Unknown error",
+            startTime
+          });
 
-        const successMessage: ChatMessage = {
-          id: Date.now().toString(),
-          role: "assistant",
-          content: message,
-        };
-        setMessages((prev) => [...prev, successMessage]);
-        setKnowledgeBaseCount(prev => prev + docsAdded);
-        setUrlInput("");
+          const errorMessage: ChatMessage = {
+            id: Date.now().toString(),
+            role: "assistant",
+            content: `Failed to scrape URL: ${data.error || "Unknown error"}`,
+          };
+          setMessages((prev) => [...prev, errorMessage]);
+        }
       } else {
-        const errorMessage: ChatMessage = {
-          id: Date.now().toString(),
-          role: "assistant",
-          content: `Failed to ${crawlMode === "crawl" ? "crawl" : "scrape"} URL: ${data.error || "Unknown error"}`,
-        };
-        setMessages((prev) => [...prev, errorMessage]);
+        // Crawl with SSE progress tracking
+        setProgressUpdate({
+          type: 'crawl',
+          status: 'starting',
+          message: 'Initializing crawler...',
+          startTime
+        });
+
+        const eventSource = new EventSource('/api/crawl/progress');
+
+        // Send crawl request
+        fetch('/api/crawl/progress', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            url: urlInput,
+            options: {
+              maxDepth: parseInt(crawlDepth),
+              maxPages: parseInt(maxPages),
+              respectRobotsTxt: true,
+              crawlDelay: 1000,
+            },
+          }),
+        }).then(async response => {
+          const reader = response.body?.getReader();
+          const decoder = new TextDecoder();
+
+          if (reader) {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+
+              const text = decoder.decode(value);
+              const lines = text.split('\n');
+
+              for (const line of lines) {
+                if (line.startsWith('data: ')) {
+                  const data = JSON.parse(line.slice(6));
+
+                  if (data.type === 'progress') {
+                    setProgressUpdate({
+                      type: 'crawl',
+                      status: data.status,
+                      currentPage: data.currentPage,
+                      pagesProcessed: data.pagesProcessed,
+                      totalPages: data.totalPages,
+                      currentDepth: data.currentDepth,
+                      maxDepth: data.maxDepth,
+                      message: data.message,
+                      startTime
+                    });
+                  } else if (data.type === 'complete') {
+                    setProgressUpdate({
+                      type: 'crawl',
+                      status: 'completed',
+                      pagesProcessed: data.pagesVisited,
+                      totalPages: data.pagesVisited,
+                      message: data.message,
+                      startTime
+                    });
+
+                    const successMessage: ChatMessage = {
+                      id: Date.now().toString(),
+                      role: "assistant",
+                      content: data.message,
+                    };
+                    setMessages((prev) => [...prev, successMessage]);
+                    setKnowledgeBaseCount(prev => prev + (data.documentsAdded || 0));
+                    setUrlInput("");
+                  } else if (data.type === 'error') {
+                    setProgressUpdate({
+                      type: 'crawl',
+                      status: 'error',
+                      message: data.message,
+                      startTime
+                    });
+
+                    const errorMessage: ChatMessage = {
+                      id: Date.now().toString(),
+                      role: "assistant",
+                      content: `Failed to crawl URL: ${data.message}`,
+                    };
+                    setMessages((prev) => [...prev, errorMessage]);
+                  }
+                }
+              }
+            }
+          }
+        }).catch(error => {
+          setProgressUpdate({
+            type: 'crawl',
+            status: 'error',
+            message: 'Failed to connect to server',
+            startTime
+          });
+
+          const errorMessage: ChatMessage = {
+            id: Date.now().toString(),
+            role: "assistant",
+            content: `Failed to crawl URL. Please check the URL and try again.`,
+          };
+          setMessages((prev) => [...prev, errorMessage]);
+        });
       }
     } catch (error) {
+      setProgressUpdate({
+        type: crawlMode === 'crawl' ? 'crawl' : 'scrape',
+        status: 'error',
+        message: 'An unexpected error occurred',
+        startTime
+      });
+
       const errorMessage: ChatMessage = {
         id: Date.now().toString(),
         role: "assistant",
@@ -177,6 +295,12 @@ export default function ChatAssistant() {
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsScraping(false);
+      // Clear progress after 5 seconds if completed
+      setTimeout(() => {
+        setProgressUpdate(prev =>
+          prev?.status === 'completed' ? null : prev
+        );
+      }, 5000);
     }
   };
 
@@ -229,13 +353,59 @@ export default function ChatAssistant() {
 
                     {/* Sources Badge */}
                     {message.sources && message.sources.length > 0 && (
-                      <Badge
-                        variant="outline"
-                        className="bg-purple-500/10 text-purple-700 border-purple-500/20"
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => toggleSourceExpanded(message.id)}
+                        className="h-auto py-1 px-2 bg-purple-500/10 text-purple-700 border border-purple-500/20 hover:bg-purple-500/20"
                       >
+                        <FileText className="w-3 h-3 mr-1" />
                         {message.sources.length} source{message.sources.length !== 1 ? 's' : ''}
-                      </Badge>
+                        {expandedSources.has(message.id) ? (
+                          <ChevronUp className="w-3 h-3 ml-1" />
+                        ) : (
+                          <ChevronDown className="w-3 h-3 ml-1" />
+                        )}
+                      </Button>
                     )}
+                  </div>
+                )}
+
+                {/* Expanded Sources Section - moved inside message block */}
+                {message.role === "assistant" && message.sources && message.sources.length > 0 && expandedSources.has(message.id) && (
+                  <div className="ml-12 mt-2 p-3 bg-muted/50 rounded-lg border border-border/50">
+                    <div className="text-xs font-medium text-muted-foreground mb-2">Referenced Sources:</div>
+                    <div className="space-y-2">
+                      {message.sources.map((source, idx) => {
+                        const sourceStr = String(source);
+                        const isInternal = sourceStr.includes('internal://');
+                        const isUrl = sourceStr.includes('http://') || sourceStr.includes('https://');
+
+                        return (
+                          <div key={idx} className="flex items-start gap-2 text-xs">
+                            <span className="text-muted-foreground">{idx + 1}.</span>
+                            {isInternal ? (
+                              <div className="flex items-center gap-1 text-purple-700">
+                                <FileText className="w-3 h-3" />
+                                <span>Project Documentation</span>
+                              </div>
+                            ) : isUrl ? (
+                              <a
+                                href={sourceStr}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-1 text-blue-600 hover:underline"
+                              >
+                                <ExternalLink className="w-3 h-3" />
+                                <span className="truncate max-w-md">{sourceStr}</span>
+                              </a>
+                            ) : (
+                              <span className="text-muted-foreground">{sourceStr}</span>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 )}
               </div>
@@ -255,12 +425,70 @@ export default function ChatAssistant() {
       </Conversation>
 
       <div className="p-4 border-t bg-muted/50 space-y-4">
-        <div className="space-y-3">
+        {progressUpdate && (
+          <ProgressTracker
+            update={progressUpdate}
+            onClose={() => setProgressUpdate(null)}
+          />
+        )}
+
+        {/* UI Mode Toggle */}
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <span className="flex items-center gap-2">
+            <Database className="w-3 h-3" />
+            RAG System Active • {knowledgeBaseCount} documents
+          </span>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setUiMode(uiMode === "simple" ? "advanced" : "simple")}
+              className="h-6 px-2 text-xs"
+            >
+              {uiMode === "simple" ? (
+                <>
+                  <ToggleLeft className="w-3 h-3 mr-1" />
+                  Simple
+                </>
+              ) : (
+                <>
+                  <ToggleRight className="w-3 h-3 mr-1" />
+                  Advanced
+                </>
+              )}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowKnowledgeBase(true)}
+              className="h-6 px-2 text-xs"
+            >
+              <Eye className="w-3 h-3 mr-1" />
+              View KB
+            </Button>
+          </div>
+        </div>
+
+        {/* Advanced Mode Controls */}
+        {uiMode === "advanced" && (
+          <div className="space-y-3">
           <div className="flex gap-2">
             <Input
               placeholder="Enter URL to add to knowledge base..."
               value={urlInput}
-              onChange={(e) => setUrlInput(e.target.value)}
+              onChange={(e) => {
+                setUrlInput(e.target.value);
+                // Auto-detect crawl mode
+                if (e.target.value.trim()) {
+                  const analysis = analyzeUrl(e.target.value);
+                  if (analysis.confidence > 0.7) {
+                    setCrawlMode(analysis.suggestedMode);
+                    if (analysis.suggestedMode === 'crawl' && analysis.estimatedPages) {
+                      setMaxPages(Math.min(analysis.estimatedPages, 50).toString());
+                    }
+                  }
+                }
+              }}
               onKeyPress={(e) => {
                 if (e.key === "Enter") {
                   handleScrapeUrl();
@@ -346,13 +574,11 @@ export default function ChatAssistant() {
               </div>
             </div>
           )}
-        </div>
-
-        <div>
-          <div className="text-xs text-muted-foreground mb-2 flex items-center gap-2">
-            <Database className="w-3 h-3" />
-            RAG System Active • {knowledgeBaseCount} documents in knowledge base
           </div>
+        )}
+
+        {/* Chat Input - Always Visible */}
+        <div>
           <PromptInput onSubmit={handleSubmit}>
             <PromptInputBody>
               <PromptInputTextarea placeholder="Ask about our RAG system, embeddings, or architecture..." />
@@ -364,6 +590,12 @@ export default function ChatAssistant() {
           </PromptInput>
         </div>
       </div>
+
+      <KnowledgeBaseViewer
+        isOpen={showKnowledgeBase}
+        onClose={() => setShowKnowledgeBase(false)}
+        onClear={() => setKnowledgeBaseCount(0)}
+      />
     </div>
   );
 }
