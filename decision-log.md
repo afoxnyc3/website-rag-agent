@@ -1,5 +1,30 @@
 # Decision Log
 
+## 2025-09-19 - Agent Orchestration Layer
+
+### Decision: Implement Agent using strict TDD with 57 granular tasks
+**Rationale**:
+- Per user request to increase probability of success
+- Small atomic tests prevent big leaps that could fail
+- Each test validates ONE specific behavior
+- Immediate feedback loop catches issues early
+**Alternatives considered**:
+- Build entire Agent class then test (high risk of complex failures)
+- Fewer, larger tests (harder to debug when they fail)
+**Trade-offs**: More upfront time writing tests vs higher success rate
+**Result**: Phase 1 complete with 100% test coverage
+
+### Decision: Mock RAGService in tests to avoid OpenAI dependency
+**Rationale**:
+- Tests should run without API keys
+- Faster test execution without network calls
+- Predictable test behavior without external dependencies
+**Alternatives considered**:
+- Use test API keys (security risk, slower)
+- Create test-specific RAG implementation (more complexity)
+**Trade-offs**: Less integration testing vs faster, more reliable unit tests
+**Result**: Tests run instantly without configuration
+
 ## 2025-09-19 - Documentation Cleanup
 
 ### Decision: Remove all Crawl4AI references from documentation

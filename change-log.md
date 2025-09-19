@@ -1,5 +1,20 @@
 # Change Log
 
+## 2025-09-19 - Agent Orchestration Layer (TDD Implementation)
+
+### Added
+- **BaseAgent Class**: Foundation for intelligent agent system
+  - Created `AgentConfig` interface with name, description, toolRegistry, ragService, confidenceThreshold
+  - Implemented `BaseAgent` constructor with proper initialization
+  - All properties stored with appropriate defaults (confidenceThreshold = 0.5)
+  - Following strict TDD: 9 tests written before implementation
+  - Tests passing 100% for Phase 1: Agent Configuration
+
+### Technical Decisions
+- Using TDD approach with granular atomic tests for reliability
+- Mocking RAGService in tests to avoid OpenAI API dependency
+- BaseAgent designed as extensible foundation for RAGAgent specialization
+
 ## 2025-09-19 - Documentation Cleanup & Final Polish
 
 ### Documentation
