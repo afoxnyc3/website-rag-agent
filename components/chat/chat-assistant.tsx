@@ -39,8 +39,8 @@ export default function ChatAssistant() {
   const [urlInput, setUrlInput] = useState("");
   const [knowledgeBaseCount, setKnowledgeBaseCount] = useState(10);
   const [crawlMode, setCrawlMode] = useState<"single" | "crawl">("single");
-  const [crawlDepth, setCrawlDepth] = useState("1");
-  const [maxPages, setMaxPages] = useState("10");
+  const [crawlDepth, setCrawlDepth] = useState("2");
+  const [maxPages, setMaxPages] = useState("20");
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [progressUpdate, setProgressUpdate] = useState<ProgressUpdate | null>(null);
   const [showKnowledgeBase, setShowKnowledgeBase] = useState(false);
@@ -497,7 +497,13 @@ export default function ChatAssistant() {
               disabled={isScraping}
               className="flex-1"
             />
-            <Select value={crawlMode} onValueChange={(v) => setCrawlMode(v as "single" | "crawl")}>
+            <Select value={crawlMode} onValueChange={(v) => {
+              setCrawlMode(v as "single" | "crawl");
+              // Auto-show advanced settings when crawl mode is selected
+              if (v === "crawl") {
+                setShowAdvanced(true);
+              }
+            }}>
               <SelectTrigger className="w-[140px]">
                 <SelectValue />
               </SelectTrigger>
