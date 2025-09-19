@@ -106,8 +106,12 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Crawling error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: 'Failed to crawl website' },
+      {
+        error: 'Failed to crawl website',
+        details: errorMessage
+      },
       { status: 500 }
     );
   }

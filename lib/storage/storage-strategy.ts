@@ -38,13 +38,11 @@ export class MemoryStorage implements StorageStrategy {
       throw new Error('Storage not initialized');
     }
 
-    // Create a document with the embedding pre-calculated
+    // Create a document with the correct format for VectorStore
     const docWithEmbedding = {
-      pageContent: document.content,
-      metadata: {
-        id: document.id,
-        ...document.metadata,
-      },
+      id: document.id,
+      content: document.content,
+      metadata: document.metadata,
       embedding,
     };
 
@@ -57,13 +55,13 @@ export class MemoryStorage implements StorageStrategy {
       throw new Error('Storage not initialized');
     }
 
-    const results = await this.vectorStore.similaritySearchWithScore(embedding, limit);
+    const results = await this.vectorStore.search(embedding, limit, 0.0);
 
-    return results.map(([doc, score]) => ({
-      id: doc.metadata.id,
-      content: doc.pageContent,
-      metadata: doc.metadata,
-      similarity: score,
+    return results.map(result => ({
+      id: result.document.id,
+      content: result.document.content,
+      metadata: result.document.metadata,
+      similarity: result.similarity,
     }));
   }
 
@@ -72,7 +70,14 @@ export class MemoryStorage implements StorageStrategy {
       throw new Error('Storage not initialized');
     }
 
-    await this.vectorStore.delete({ ids: [id] });
+    // VectorStore doesn't have a delete method, we'll need to rebuild without the document
+    const allDocs = this.vectorStore.getAllDocuments();
+    this.vectorStore.clear();
+    for (const doc of allDocs) {
+      if (doc.id !== id) {
+        this.vectorStore.addDocument(doc);
+      }
+    }
   }
 
   async listDocuments(): Promise<Document[]> {
@@ -80,10 +85,10 @@ export class MemoryStorage implements StorageStrategy {
       throw new Error('Storage not initialized');
     }
 
-    const docs = this.vectorStore.getDocuments();
+    const docs = this.vectorStore.getAllDocuments();
     return docs.map(doc => ({
-      id: doc.metadata.id,
-      content: doc.pageContent,
+      id: doc.id,
+      content: doc.content,
       metadata: doc.metadata,
     }));
   }
