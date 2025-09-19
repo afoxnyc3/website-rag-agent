@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { CrawlTool } from '@/lib/tools/crawl-tool';
 import { getRAGService } from '@/app/api/chat/route';
+import { SemanticChunker } from '@/lib/chunking/semantic-chunker';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,12 +14,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Use CrawlTool with default options
+    // Use CrawlTool with improved default limits
     const crawlTool = new CrawlTool();
     const result = await crawlTool.execute({
       url,
-      maxDepth: options.maxDepth !== undefined ? options.maxDepth : 1,
-      maxPages: options.maxPages || 10,
+      maxDepth: options.maxDepth !== undefined ? options.maxDepth : 2,  // Increased from 1
+      maxPages: options.maxPages || 50,  // Increased from 10
       respectRobotsTxt: options.respectRobotsTxt !== false,
       crawlDelay: options.crawlDelay || 1000,
       followSitemap: options.followSitemap || false,
@@ -36,50 +37,38 @@ export async function POST(request: NextRequest) {
     const crawlResult = result.data;
 
     // Add crawled pages to RAG knowledge base
+    const chunker = new SemanticChunker();
     const ragService = await getRAGService();
     let documentsAdded = 0;
 
     for (const page of crawlResult.pages) {
-      // Chunk content if needed
-      const MAX_CHUNK_SIZE = 3000;
+      // Use semantic chunking for better context preservation
+      const isMarkdown = page.content.includes('```') || page.content.includes('#');
+      const chunkOptions = {
+        maxSize: options.chunkSize || 3000,
+        minSize: 500,
+        overlap: 200,
+        strategy: isMarkdown ? 'markdown' as const : 'semantic' as const,
+        preserveCodeBlocks: true
+      };
 
-      if (page.content.length > MAX_CHUNK_SIZE) {
-        // Split into chunks
-        let currentPosition = 0;
-        let chunkIndex = 0;
+      const chunks = chunker.chunk(page.content, chunkOptions);
 
-        while (currentPosition < page.content.length) {
-          const chunk = page.content.slice(currentPosition, currentPosition + MAX_CHUNK_SIZE);
-
-          await ragService.addDocument({
-            id: `crawled-${Date.now()}-${documentsAdded}-${chunkIndex}`,
-            content: chunk,
-            metadata: {
-              url: page.url,
-              title: page.title,
-              depth: page.depth,
-              crawledAt: new Date(),
-              source: 'web-crawler',
-              chunkIndex,
-              totalChunks: Math.ceil(page.content.length / MAX_CHUNK_SIZE),
-            }
-          });
-
-          currentPosition += MAX_CHUNK_SIZE;
-          chunkIndex++;
-          documentsAdded++;
-        }
-      } else {
-        // Content is small enough, add as single document
+      // Add each chunk as a separate document
+      for (const chunk of chunks) {
         await ragService.addDocument({
-          id: `crawled-${Date.now()}-${documentsAdded}`,
-          content: page.content,
+          id: `crawled-${Date.now()}-${documentsAdded}-${chunk.index}`,
+          content: chunk.content,
           metadata: {
             url: page.url,
             title: page.title,
             depth: page.depth,
             crawledAt: new Date(),
             source: 'web-crawler',
+            chunkIndex: chunk.index,
+            totalChunks: chunk.totalChunks,
+            chunkStrategy: chunk.metadata?.strategy,
+            hasOverlap: chunk.metadata?.hasOverlap
           }
         });
         documentsAdded++;

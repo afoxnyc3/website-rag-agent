@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ScrapeTool } from '@/lib/tools/scrape-tool';
 import { getRAGService } from '@/app/api/chat/route';
+import { SemanticChunker } from '@/lib/chunking/semantic-chunker';
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,47 +32,37 @@ export async function POST(request: NextRequest) {
 
     const scraperUsed = result.metadata?.strategy || 'unknown';
 
-      // Chunk content if it's too large (max 3000 chars per chunk for embeddings)
-      const MAX_CHUNK_SIZE = 3000;
+      // Use semantic chunking for better context preservation
+      const chunker = new SemanticChunker();
       const ragService = await getRAGService();
       const { url: scrapedUrl, title, content, scrapedAt } = result.data;
 
-      if (content.length > MAX_CHUNK_SIZE) {
-        // Split into chunks
-        const chunks: string[] = [];
-        let currentPosition = 0;
+      // Determine strategy based on content type
+      const isMarkdown = content.includes('```') || content.includes('#');
+      const chunkOptions = {
+        maxSize: options.chunkSize || 3000,
+        minSize: 500,
+        overlap: 200,
+        strategy: isMarkdown ? 'markdown' as const : 'semantic' as const,
+        preserveCodeBlocks: true
+      };
 
-        while (currentPosition < content.length) {
-          const chunk = content.slice(currentPosition, currentPosition + MAX_CHUNK_SIZE);
-          chunks.push(chunk);
-          currentPosition += MAX_CHUNK_SIZE;
-        }
+      const chunks = chunker.chunk(content, chunkOptions);
 
-        // Add each chunk as a separate document
-        for (let i = 0; i < chunks.length; i++) {
-          await ragService.addDocument({
-            id: `scraped-${Date.now()}-${i}`,
-            content: chunks[i],
-            metadata: {
-              url: scrapedUrl,
-              title,
-              scrapedAt,
-              source: 'web-scraper',
-              chunkIndex: i,
-              totalChunks: chunks.length
-            }
-          });
-        }
-      } else {
-        // Content is small enough, add as single document
+      // Add each chunk as a separate document
+      for (const chunk of chunks) {
         await ragService.addDocument({
-          id: `scraped-${Date.now()}`,
-          content,
+          id: `scraped-${Date.now()}-${chunk.index}`,
+          content: chunk.content,
           metadata: {
             url: scrapedUrl,
             title,
             scrapedAt,
-            source: 'web-scraper'
+            source: 'web-scraper',
+            chunkIndex: chunk.index,
+            totalChunks: chunk.totalChunks,
+            chunkStrategy: chunk.metadata?.strategy,
+            hasOverlap: chunk.metadata?.hasOverlap
           }
         });
       }

@@ -81,8 +81,8 @@ export class CrawlTool extends Tool {
   async execute(input: CrawlInput): Promise<ToolResult> {
     const {
       url,
-      maxDepth = 1,
-      maxPages = 10,
+      maxDepth = 2,  // Increased default depth
+      maxPages = 50, // Increased default page limit
       includePatterns = [],
       excludePatterns = [],
       respectRobotsTxt = true,
