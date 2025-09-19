@@ -492,3 +492,143 @@ describe('BaseAgent.searchKnowledge', () => {
     expect(result.confidence).toBe(0.85);
   });
 });
+
+// Phase 7: Orchestration Tests
+describe('BaseAgent.execute', () => {
+  it('should orchestrate full pipeline for URL intent', async () => {
+    const { BaseAgent } = await import('./base-agent');
+
+    // Mock tool
+    const mockTool = {
+      name: 'ScrapeTool',
+      description: 'Scrape tool',
+      execute: vi.fn().mockResolvedValue({
+        success: true,
+        data: { content: 'Scraped content', url: 'https://example.com/page' }
+      })
+    };
+
+    const registry = new ToolRegistry();
+    registry.register(mockTool as any);
+
+    // Mock RAG service
+    const mockAddDocument = vi.fn();
+    const mockQuery = vi.fn().mockResolvedValue({
+      answer: 'Based on the content...',
+      confidence: 0.9,
+      sources: ['https://example.com/page'],
+      chunks: []
+    });
+
+    const mockRAGService = {
+      addDocument: mockAddDocument,
+      query: mockQuery,
+      getDocumentCount: vi.fn()
+    };
+
+    const agent = new BaseAgent({
+      name: 'TestAgent',
+      toolRegistry: registry,
+      ragService: mockRAGService as any
+    });
+
+    const result = await agent.execute('Check https://example.com/page and tell me about it');
+
+    expect(mockTool.execute).toHaveBeenCalled();
+    expect(mockAddDocument).toHaveBeenCalled();
+    expect(mockQuery).toHaveBeenCalled();
+    expect(result.answer).toContain('Based on the content');
+    expect(result.confidence).toBe(0.9);
+  });
+
+  it('should handle fetch-and-respond flow', async () => {
+    const { BaseAgent } = await import('./base-agent');
+
+    // Mock tool for fetching
+    const mockTool = {
+      name: 'ScrapeTool',
+      description: 'Scrape tool',
+      execute: vi.fn().mockResolvedValue({
+        success: true,
+        data: {
+          content: 'New article about AI trends in 2025',
+          url: 'https://techblog.com/ai-trends',
+          title: 'AI Trends 2025'
+        }
+      })
+    };
+
+    const registry = new ToolRegistry();
+    registry.register(mockTool as any);
+
+    // Mock RAG service
+    const mockAddDocument = vi.fn();
+    const mockQuery = vi.fn().mockResolvedValue({
+      answer: 'According to the article, AI will focus on...',
+      confidence: 0.95,
+      sources: ['https://techblog.com/ai-trends'],
+      chunks: []
+    });
+
+    const mockRAGService = {
+      addDocument: mockAddDocument,
+      query: mockQuery,
+      getDocumentCount: vi.fn()
+    };
+
+    const agent = new BaseAgent({
+      name: 'TestAgent',
+      toolRegistry: registry,
+      ragService: mockRAGService as any
+    });
+
+    // First time asking about this URL - should fetch
+    const result = await agent.execute('What does https://techblog.com/ai-trends say about AI?');
+
+    // Verify full flow executed
+    expect(mockTool.execute).toHaveBeenCalledWith({ url: 'https://techblog.com/ai-trends' });
+    expect(mockAddDocument).toHaveBeenCalledWith(expect.objectContaining({
+      content: 'New article about AI trends in 2025'
+    }));
+    expect(mockQuery).toHaveBeenCalledWith('What does https://techblog.com/ai-trends say about AI?');
+    expect(result.answer).toContain('According to the article');
+    expect(result.confidence).toBe(0.95);
+  });
+
+  it('should handle query-only flow without fetching', async () => {
+    const { BaseAgent } = await import('./base-agent');
+
+    // No tool needed for query-only
+    const registry = new ToolRegistry();
+
+    // Mock RAG service that already has knowledge
+    const mockQuery = vi.fn().mockResolvedValue({
+      answer: 'Based on my knowledge, the answer is...',
+      confidence: 0.88,
+      sources: ['internal://doc1', 'internal://doc2'],
+      chunks: []
+    });
+
+    const mockRAGService = {
+      addDocument: vi.fn(),
+      query: mockQuery,
+      getDocumentCount: vi.fn()
+    };
+
+    const agent = new BaseAgent({
+      name: 'TestAgent',
+      toolRegistry: registry,
+      ragService: mockRAGService as any
+    });
+
+    // Ask a general question without URLs
+    const result = await agent.execute('What are the benefits of using RAG systems?');
+
+    // Should NOT fetch anything, just query knowledge
+    expect(mockRAGService.addDocument).not.toHaveBeenCalled();
+    expect(mockQuery).toHaveBeenCalledWith('What are the benefits of using RAG systems?');
+    expect(result.answer).toContain('Based on my knowledge');
+    expect(result.confidence).toBe(0.88);
+    expect(result.sources).toHaveLength(2);
+  });
+});

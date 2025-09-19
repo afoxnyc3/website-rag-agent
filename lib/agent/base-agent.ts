@@ -282,4 +282,36 @@ export class BaseAgent {
 
     return this.ragService.query(query);
   }
+
+  // Main orchestration method - brings everything together!
+  async execute(query: string): Promise<RAGResponse> {
+    // Step 1: Parse intent
+    const intent = this.parseIntent(query);
+
+    // Step 2: Check if we need to fetch new data
+    const shouldFetch = await this.shouldFetchNewData(intent);
+
+    if (shouldFetch && intent.urls && intent.urls.length > 0) {
+      // Step 3: Select appropriate tool
+      const toolName = this.selectTool(intent);
+
+      if (toolName) {
+        // Step 4: Execute tool to fetch content
+        const toolResult = await this.executeTool(toolName, {
+          url: intent.urls[0]
+        });
+
+        if (toolResult.success) {
+          // Step 5: Process the result
+          const processed = await this.processToolResult(toolResult);
+
+          // Step 6: Ingest into RAG
+          await this.ingestToRAG(processed);
+        }
+      }
+    }
+
+    // Step 7: Search knowledge base for answer
+    return this.searchKnowledge(query);
+  }
 }

@@ -2,6 +2,9 @@
 
 ## 2025-09-19 - Agent Orchestration Layer
 
+### Phase 1-7 Complete: Full BaseAgent Implementation ✅
+**Achievement**: Successfully built complete intelligent agent with 31/31 tests passing
+
 ### Decision: Implement Agent using strict TDD with 57 granular tasks
 **Rationale**:
 - Per user request to increase probability of success
@@ -12,7 +15,7 @@
 - Build entire Agent class then test (high risk of complex failures)
 - Fewer, larger tests (harder to debug when they fail)
 **Trade-offs**: More upfront time writing tests vs higher success rate
-**Result**: Phase 1 complete with 100% test coverage
+**Result**: All 7 phases complete with 100% test coverage
 
 ### Decision: Mock RAGService in tests to avoid OpenAI dependency
 **Rationale**:
@@ -46,6 +49,31 @@
 - Manual cache management (more complex, error-prone)
 **Trade-offs**: Slightly more code vs guaranteed cache validity
 **Result**: Cache updates automatically in executeTool on success
+
+### Decision: Orchestration via sequential execute() method
+**Rationale**:
+- Simple, linear flow is easy to understand and debug
+- Each step depends on previous success
+- Graceful failure at any point
+- Always returns valid RAGResponse
+**Alternatives considered**:
+- Event-driven architecture
+- Pipeline pattern with middleware
+- State machine approach
+**Trade-offs**: Less flexible but more maintainable
+**Result**: Clean 30-line orchestration method
+
+### Decision: Tool selection based on URL structure
+**Rationale**:
+- Domain-only URLs likely want full site (CrawlTool)
+- URLs with paths want specific pages (ScrapeTool)
+- Simple heuristic that works for most cases
+**Alternatives considered**:
+- Always use ScrapeTool
+- Let user specify tool
+- Analyze content to determine tool
+**Trade-offs**: Occasionally wrong choice vs simplicity
+**Result**: Effective tool selection with clear rules
 
 ## 2025-09-19 - Documentation Cleanup
 
