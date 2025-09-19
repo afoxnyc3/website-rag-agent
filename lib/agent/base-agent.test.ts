@@ -334,3 +334,69 @@ describe('BaseAgent.executeTool', () => {
     expect(result.error).toContain('timeout');
   });
 });
+
+// Phase 5: Data Processing Tests
+describe('BaseAgent.processToolResult', () => {
+  it('should extract content from tool result', async () => {
+    const { BaseAgent } = await import('./base-agent');
+    const agent = new BaseAgent({ name: 'TestAgent' });
+
+    const toolResult = {
+      success: true,
+      data: {
+        content: 'This is the extracted content from the webpage',
+        url: 'https://example.com',
+        title: 'Example Page'
+      }
+    };
+
+    const processed = await agent.processToolResult(toolResult);
+
+    expect(processed.content).toBe('This is the extracted content from the webpage');
+    expect(processed.metadata.url).toBe('https://example.com');
+    expect(processed.metadata.title).toBe('Example Page');
+  });
+
+  it('should chunk large content', async () => {
+    const { BaseAgent } = await import('./base-agent');
+    const agent = new BaseAgent({ name: 'TestAgent' });
+
+    const largeContent = 'A'.repeat(4000); // 4000 chars
+    const toolResult = {
+      success: true,
+      data: {
+        content: largeContent,
+        url: 'https://example.com'
+      }
+    };
+
+    const processed = await agent.processToolResult(toolResult);
+
+    expect(processed.chunks).toBeDefined();
+    expect(processed.chunks.length).toBeGreaterThan(1);
+    expect(processed.chunks[0].length).toBeLessThanOrEqual(3000);
+  });
+
+  it('should preserve metadata', async () => {
+    const { BaseAgent } = await import('./base-agent');
+    const agent = new BaseAgent({ name: 'TestAgent' });
+
+    const toolResult = {
+      success: true,
+      data: {
+        content: 'Content',
+        url: 'https://example.com',
+        title: 'Test Page',
+        scrapedAt: '2025-01-01',
+        customField: 'custom value'
+      }
+    };
+
+    const processed = await agent.processToolResult(toolResult);
+
+    expect(processed.metadata.url).toBe('https://example.com');
+    expect(processed.metadata.title).toBe('Test Page');
+    expect(processed.metadata.scrapedAt).toBe('2025-01-01');
+    expect(processed.metadata.customField).toBe('custom value');
+  });
+});

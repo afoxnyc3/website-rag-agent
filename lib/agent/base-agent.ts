@@ -25,6 +25,13 @@ export interface ToolExecutionOptions {
   timeout?: number;
 }
 
+// Processed content from tool results
+export interface ProcessedContent {
+  content: string;
+  chunks?: string[];
+  metadata: Record<string, any>;
+}
+
 // Base Agent Class
 export class BaseAgent {
   public readonly name: string;
@@ -197,5 +204,43 @@ export class BaseAgent {
         }), timeout)
       )
     ]);
+  }
+
+  async processToolResult(toolResult: ToolResult): Promise<ProcessedContent> {
+    // Handle failed results
+    if (!toolResult.success || !toolResult.data) {
+      return {
+        content: '',
+        metadata: { error: toolResult.error || 'No data returned' }
+      };
+    }
+
+    const data = toolResult.data;
+    const content = data.content || '';
+
+    // Extract all metadata from the result
+    const metadata: Record<string, any> = {};
+    for (const key in data) {
+      if (key !== 'content') {
+        metadata[key] = data[key];
+      }
+    }
+
+    // Chunk large content (> 3000 chars)
+    const CHUNK_SIZE = 3000;
+    let chunks: string[] | undefined;
+
+    if (content.length > CHUNK_SIZE) {
+      chunks = [];
+      for (let i = 0; i < content.length; i += CHUNK_SIZE) {
+        chunks.push(content.slice(i, i + CHUNK_SIZE));
+      }
+    }
+
+    return {
+      content,
+      chunks,
+      metadata
+    };
   }
 }
