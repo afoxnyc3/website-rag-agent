@@ -25,6 +25,28 @@
 **Trade-offs**: Less integration testing vs faster, more reliable unit tests
 **Result**: Tests run instantly without configuration
 
+### Decision: Implement timeout protection in executeTool
+**Rationale**:
+- Prevent hanging operations that block the agent
+- Provide predictable response times for users
+- Clean failure handling for slow/unresponsive tools
+**Alternatives considered**:
+- Let tools handle their own timeouts (inconsistent)
+- Use global timeout for all operations (less flexible)
+**Trade-offs**: Additional complexity vs better reliability
+**Result**: Promise.race pattern provides clean timeout with per-call configuration
+
+### Decision: Cache URLs only after successful execution
+**Rationale**:
+- Prevents marking failed fetches as cached
+- Ensures cache integrity - only valid data cached
+- Automatic cache management without manual tracking
+**Alternatives considered**:
+- Cache before execution (could cache failures)
+- Manual cache management (more complex, error-prone)
+**Trade-offs**: Slightly more code vs guaranteed cache validity
+**Result**: Cache updates automatically in executeTool on success
+
 ## 2025-09-19 - Documentation Cleanup
 
 ### Decision: Remove all Crawl4AI references from documentation

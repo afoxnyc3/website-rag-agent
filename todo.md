@@ -67,41 +67,41 @@
 
 **Note:** Per user request, breaking down Agent implementation into granular TDD tasks to increase probability of success.
 
-### Phase 1: Agent Configuration (Tests → Implementation)
-- [ ] Test: AgentConfig interface accepts name property
-- [ ] Test: AgentConfig interface accepts description property
-- [ ] Test: AgentConfig interface accepts toolRegistry property
-- [ ] Test: AgentConfig interface accepts ragService property
-- [ ] Test: AgentConfig interface accepts confidenceThreshold property
-- [ ] Implement: Create AgentConfig interface
-- [ ] Test: BaseAgent constructor accepts AgentConfig
-- [ ] Test: BaseAgent stores name from config
-- [ ] Test: BaseAgent stores description from config
-- [ ] Test: BaseAgent defaults confidenceThreshold to 0.5
-- [ ] Implement: Create BaseAgent constructor
+### Phase 1: Agent Configuration (Tests → Implementation) ✅
+- [x] Test: AgentConfig interface accepts name property
+- [x] Test: AgentConfig interface accepts description property
+- [x] Test: AgentConfig interface accepts toolRegistry property
+- [x] Test: AgentConfig interface accepts ragService property
+- [x] Test: AgentConfig interface accepts confidenceThreshold property
+- [x] Implement: Create AgentConfig interface
+- [x] Test: BaseAgent constructor accepts AgentConfig
+- [x] Test: BaseAgent stores name from config
+- [x] Test: BaseAgent stores description from config
+- [x] Test: BaseAgent defaults confidenceThreshold to 0.5
+- [x] Implement: Create BaseAgent constructor
 
-### Phase 2: Intent Recognition
-- [ ] Test: BaseAgent.parseIntent identifies URL in query
-- [ ] Test: BaseAgent.parseIntent identifies question in query
-- [ ] Test: BaseAgent.parseIntent identifies command in query
-- [ ] Implement: Create parseIntent method
+### Phase 2: Intent Recognition ✅
+- [x] Test: BaseAgent.parseIntent identifies URL in query
+- [x] Test: BaseAgent.parseIntent identifies question in query
+- [x] Test: BaseAgent.parseIntent identifies command in query
+- [x] Implement: Create parseIntent method
 
-### Phase 3: Decision Logic
-- [ ] Test: BaseAgent.shouldFetchNewData returns true for URLs
-- [ ] Test: BaseAgent.shouldFetchNewData returns false for questions
-- [ ] Test: BaseAgent.shouldFetchNewData checks cache expiry
-- [ ] Implement: Create shouldFetchNewData method
-- [ ] Test: BaseAgent.selectTool returns ScrapeTool for single URL
-- [ ] Test: BaseAgent.selectTool returns CrawlTool for site URL
-- [ ] Test: BaseAgent.selectTool returns null for non-URL
-- [ ] Implement: Create selectTool method
+### Phase 3: Decision Logic ✅
+- [x] Test: BaseAgent.shouldFetchNewData returns true for URLs
+- [x] Test: BaseAgent.shouldFetchNewData returns false for questions
+- [x] Test: BaseAgent.shouldFetchNewData checks cache expiry
+- [x] Implement: Create shouldFetchNewData method
+- [x] Test: BaseAgent.selectTool returns ScrapeTool for single URL
+- [x] Test: BaseAgent.selectTool returns CrawlTool for site URL
+- [x] Test: BaseAgent.selectTool returns null for non-URL
+- [x] Implement: Create selectTool method
 
-### Phase 4: Tool Execution
-- [ ] Test: BaseAgent.executeTool calls tool.execute
-- [ ] Test: BaseAgent.executeTool handles tool success
-- [ ] Test: BaseAgent.executeTool handles tool failure
-- [ ] Test: BaseAgent.executeTool adds timeout wrapper
-- [ ] Implement: Create executeTool method
+### Phase 4: Tool Execution ✅
+- [x] Test: BaseAgent.executeTool calls tool.execute
+- [x] Test: BaseAgent.executeTool handles tool success
+- [x] Test: BaseAgent.executeTool handles tool failure
+- [x] Test: BaseAgent.executeTool adds timeout wrapper
+- [x] Implement: Create executeTool method
 
 ### Phase 5: Data Processing
 - [ ] Test: BaseAgent.processToolResult extracts content
