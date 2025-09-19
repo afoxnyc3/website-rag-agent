@@ -1,5 +1,25 @@
 # Decision Log
 
+## 2025-09-19 - Crawling Defaults Fix
+
+### Decision: Change default crawl depth from 1 to 2
+**Rationale**:
+- Depth 1 only crawls the initial page (confusing for users)
+- Depth 2 captures main page + all linked pages (typical site structure)
+- Most documentation sites have key content within 2 levels
+**Alternatives considered**:
+- Depth 3 (too many pages for initial crawl)
+- Keep depth 1 but educate users (poor UX)
+**Trade-offs**: More pages crawled vs better default experience
+**Result**: Users now get multi-page crawling by default
+
+### Decision: Auto-show advanced settings in crawl mode
+**Rationale**:
+- Users need to see depth/max pages controls
+- Hidden settings caused confusion
+- Transparency improves user control
+**Result**: Advanced settings appear automatically when crawl selected
+
 ## 2025-09-19 - UI/UX Improvements & Sources Display
 
 ### Decision: Implement expandable sources display

@@ -1,5 +1,14 @@
 # Change Log
 
+## 2025-09-19 - Crawling Fix & Final Polish
+
+### Fixed
+- **Crawling Depth Issue**: Fixed crawler only visiting single page
+  - Changed default depth from 1 to 2 for multi-page crawling
+  - Increased default max pages from 10 to 20
+  - Auto-show advanced settings when crawl mode selected
+  - Users can now easily see and adjust crawl parameters
+
 ## 2025-09-19 - Major UI/UX Enhancements & Bug Fixes
 
 ### Fixed

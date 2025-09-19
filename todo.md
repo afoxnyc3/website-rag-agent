@@ -36,6 +36,11 @@
 
 ## 📅 Today's Accomplishments (2025-09-19)
 
+### Latest Fix
+- [x] Fixed crawling only visiting single page (depth default was 1)
+- [x] Improved crawl defaults for better multi-page capture
+- [x] Auto-show advanced settings for transparency
+
 ### Critical Bug Fixes
 - [x] Fixed RAG retrieval with global singleton pattern
 - [x] Lowered confidence threshold to 0.3 for better results
