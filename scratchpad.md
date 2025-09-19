@@ -1,5 +1,33 @@
 # Scratchpad - Planning & Notes
 
+## 2025-09-18 - Bug Fix: VectorStore Integration Issue
+
+### Problem Discovered
+- Web scraping/crawling completely broken
+- Error: "Document must have id and content"
+- Both `/api/scrape` and `/api/crawl` endpoints failing
+
+### Root Cause Analysis
+1. **Mismatch in document format between layers**:
+   - MemoryStorage was passing: `{ pageContent, metadata, embedding }`
+   - VectorStore expected: `{ id, content, metadata, embedding }`
+2. **Incorrect method calls**:
+   - MemoryStorage called non-existent VectorStore methods
+   - `similaritySearchWithScore()` doesn't exist → use `search()`
+   - `getDocuments()` doesn't exist → use `getAllDocuments()`
+
+### Lessons Learned
+1. **Always verify interface contracts between layers**
+2. **Test integration points after refactoring**
+3. **Add detailed error logging for debugging production issues**
+4. **Document expected formats in interfaces**
+
+### Solution Applied
+- Fixed MemoryStorage adapter to match VectorStore's expected format
+- Updated all method calls to use actual VectorStore API
+- Implemented workaround for missing delete functionality
+- Enhanced error reporting in API endpoints
+
 ## Phase 1 Web Scraping COMPLETE ✅
 
 ### What We Built

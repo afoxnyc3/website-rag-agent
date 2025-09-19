@@ -1,5 +1,25 @@
 # Change Log
 
+## 2025-09-18 - Bug Fix: VectorStore Document Format
+
+### Fixed
+- **Critical Bug in MemoryStorage**: Resolved document format mismatch
+  - Issue: MemoryStorage was passing `pageContent` field to VectorStore
+  - VectorStore expected `content` field, causing "Document must have id and content" errors
+  - Fixed document structure to use `{ id, content, metadata, embedding }`
+- **Storage Method Corrections**:
+  - Updated `search()` to use VectorStore's actual API methods
+  - Implemented workaround for `deleteDocument()` (VectorStore lacks delete method)
+  - Fixed `listDocuments()` to use `getAllDocuments()` method
+- **Enhanced Error Reporting**:
+  - Added detailed error messages to scrape/crawl API endpoints
+  - Improved debugging visibility for production issues
+
+### Impact
+- Web scraping and crawling now work correctly
+- Content properly added to knowledge base
+- RAG queries can access scraped content
+
 ## 2025-09-18 - Phase 3: Persistent Storage (feature/persistent-storage)
 
 ### Completed

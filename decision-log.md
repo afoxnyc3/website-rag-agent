@@ -1,5 +1,29 @@
 # Decision Log
 
+## 2025-09-18 - Bug Fix Resolution
+
+### Decision: Fix VectorStore integration without modifying core VectorStore class
+**Rationale**:
+- VectorStore is a stable, working component
+- Adapters should handle format translation
+- Maintains separation of concerns
+**Alternatives considered**:
+- Modifying VectorStore to accept multiple formats
+- Creating a new VectorStore implementation
+**Trade-offs**: Adapter complexity vs core stability
+**Result**: Fixed MemoryStorage adapter to match VectorStore's expected format
+
+### Decision: Implement workaround for missing delete method
+**Rationale**:
+- VectorStore lacks a delete method
+- Needed for storage strategy compliance
+- Clear and rebuild approach works for in-memory store
+**Alternatives considered**:
+- Adding delete method to VectorStore
+- Throwing not-implemented error
+**Trade-offs**: Performance impact vs functionality
+**Result**: Functional delete through rebuild strategy
+
 ## 2025-09-18
 
 ### Decision: Use Vercel Postgres with Neon for persistent storage
