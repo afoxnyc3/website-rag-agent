@@ -1,5 +1,13 @@
 # Change Log
 
+## 2025-09-19 - Documentation Cleanup & Final Polish
+
+### Documentation
+- **Removed Crawl4AI References**: Cleaned up outdated library references
+  - Updated README.md, CLAUDE.md, prd.md, technical-spec.md
+  - Documentation now accurately reflects custom CrawlTool implementation
+  - Prevents confusion about non-existent dependencies
+
 ## 2025-09-19 - Crawling Fix & Final Polish
 
 ### Fixed

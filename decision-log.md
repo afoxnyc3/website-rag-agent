@@ -1,5 +1,18 @@
 # Decision Log
 
+## 2025-09-19 - Documentation Cleanup
+
+### Decision: Remove all Crawl4AI references from documentation
+**Rationale**:
+- We built custom CrawlTool instead of using Crawl4AI (see Phase 2 decision)
+- Documentation was misleading developers to look for non-existent dependency
+- Accurate documentation prevents confusion and wasted time
+**Alternatives considered**:
+- Keep references as "considered but not used" notes
+- Add explanation of why we didn't use it
+**Trade-offs**: Historical accuracy vs current clarity
+**Result**: Clean documentation reflecting actual implementation
+
 ## 2025-09-19 - Crawling Defaults Fix
 
 ### Decision: Change default crawl depth from 1 to 2

@@ -300,7 +300,7 @@ graph LR
 - **Phase 0**: Tool Chest Foundation - Base Tool architecture
 - **Phase 0.5**: Tool Migration - Converted scrapers/crawlers to Tools
 - **Phase 1**: Web Scraping - Playwright integration
-- **Phase 2**: Web Crawling - Multi-page with robots.txt compliance
+- **Phase 2**: Web Crawling - Custom CrawlTool with depth control & robots.txt
 - **Phase 3**: Persistent Storage - Vercel Postgres with pgvector
 
 ### Current Features

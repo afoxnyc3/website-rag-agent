@@ -36,10 +36,12 @@
 
 ## 📅 Today's Accomplishments (2025-09-19)
 
-### Latest Fix
+### Latest Updates
 - [x] Fixed crawling only visiting single page (depth default was 1)
 - [x] Improved crawl defaults for better multi-page capture
 - [x] Auto-show advanced settings for transparency
+- [x] Removed outdated Crawl4AI references from all documentation
+- [x] Documentation now accurately reflects custom CrawlTool implementation
 
 ### Critical Bug Fixes
 - [x] Fixed RAG retrieval with global singleton pattern
