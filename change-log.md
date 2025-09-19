@@ -20,6 +20,19 @@
   - Command detection with keyword extraction
   - 3 new tests, 12/12 total tests passing
 
+### Phase 3: Decision Logic ✅
+- **shouldFetchNewData Method**: Smart caching and fetch decisions
+  - Only fetches for URL intents, not questions/commands
+  - Implements 5-minute cache TTL to prevent redundant fetches
+  - Cache check prevents unnecessary API calls
+  - Returns boolean for fetch decision
+- **selectTool Method**: Intelligent tool selection
+  - ScrapeTool for specific pages (URLs with paths)
+  - CrawlTool for entire sites or crawl keywords
+  - Returns null for non-URL intents
+  - URL parsing with error handling
+- **Testing**: 6 new tests, 18/18 total passing
+
 ### Technical Decisions
 - Using TDD approach with granular atomic tests for reliability
 - Mocking RAGService in tests to avoid OpenAI API dependency

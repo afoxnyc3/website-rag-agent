@@ -130,3 +130,103 @@ describe('BaseAgent.parseIntent', () => {
     expect(result.keywords).toContain('clear');
   });
 });
+
+// Phase 3: Decision Logic Tests - shouldFetchNewData
+describe('BaseAgent.shouldFetchNewData', () => {
+  it('should return true for URL intents', async () => {
+    const { BaseAgent } = await import('./base-agent');
+    const agent = new BaseAgent({ name: 'TestAgent' });
+
+    const intent = {
+      type: 'url' as const,
+      query: 'Check https://example.com',
+      urls: ['https://example.com']
+    };
+
+    const result = await agent.shouldFetchNewData(intent);
+    expect(result).toBe(true);
+  });
+
+  it('should return false for question intents', async () => {
+    const { BaseAgent } = await import('./base-agent');
+    const agent = new BaseAgent({ name: 'TestAgent' });
+
+    const intent = {
+      type: 'question' as const,
+      query: 'What is the pricing?'
+    };
+
+    const result = await agent.shouldFetchNewData(intent);
+    expect(result).toBe(false);
+  });
+
+  it('should check cache expiry for URLs', async () => {
+    const { BaseAgent } = await import('./base-agent');
+    const agent = new BaseAgent({ name: 'TestAgent' });
+
+    // Mock cache with expired entry
+    const expiredUrl = 'https://cached.com';
+    agent.setCacheEntry(expiredUrl, Date.now() - 6 * 60 * 1000); // 6 minutes ago
+
+    const intent = {
+      type: 'url' as const,
+      query: 'Check https://cached.com',
+      urls: [expiredUrl]
+    };
+
+    const result = await agent.shouldFetchNewData(intent);
+    expect(result).toBe(true); // Should fetch because cache expired
+  });
+});
+
+// Phase 3: Decision Logic Tests - selectTool
+describe('BaseAgent.selectTool', () => {
+  it('should return ScrapeTool for single page URL', async () => {
+    const { BaseAgent } = await import('./base-agent');
+    const registry = new ToolRegistry();
+    const agent = new BaseAgent({
+      name: 'TestAgent',
+      toolRegistry: registry
+    });
+
+    const intent = {
+      type: 'url' as const,
+      query: 'Check https://example.com/page',
+      urls: ['https://example.com/page']
+    };
+
+    const tool = agent.selectTool(intent);
+    expect(tool).toBe('ScrapeTool');
+  });
+
+  it('should return CrawlTool for site URL', async () => {
+    const { BaseAgent } = await import('./base-agent');
+    const registry = new ToolRegistry();
+    const agent = new BaseAgent({
+      name: 'TestAgent',
+      toolRegistry: registry
+    });
+
+    const intent = {
+      type: 'url' as const,
+      query: 'Crawl https://example.com',
+      urls: ['https://example.com']
+    };
+
+    const tool = agent.selectTool(intent);
+    expect(tool).toBe('CrawlTool');
+  });
+
+  it('should return null for non-URL intent', async () => {
+    const { BaseAgent } = await import('./base-agent');
+    const agent = new BaseAgent({ name: 'TestAgent' });
+
+    const intent = {
+      type: 'question' as const,
+      query: 'What is the pricing?'
+    };
+
+    const tool = agent.selectTool(intent);
+    expect(tool).toBeNull();
+  });
+});
