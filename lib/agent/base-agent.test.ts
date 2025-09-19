@@ -95,3 +95,38 @@ describe('BaseAgent', () => {
     expect(agent.confidenceThreshold).toBe(0.5);
   });
 });
+
+// Phase 2: Intent Recognition Tests
+describe('BaseAgent.parseIntent', () => {
+  it('should identify URL in query', async () => {
+    const { BaseAgent } = await import('./base-agent');
+    const agent = new BaseAgent({ name: 'TestAgent' });
+
+    const result = agent.parseIntent('Check https://example.com for information');
+
+    expect(result.type).toBe('url');
+    expect(result.urls).toContain('https://example.com');
+    expect(result.query).toBe('Check https://example.com for information');
+  });
+
+  it('should identify question in query', async () => {
+    const { BaseAgent } = await import('./base-agent');
+    const agent = new BaseAgent({ name: 'TestAgent' });
+
+    const result = agent.parseIntent('What is the pricing for the premium plan?');
+
+    expect(result.type).toBe('question');
+    expect(result.query).toBe('What is the pricing for the premium plan?');
+  });
+
+  it('should identify command in query', async () => {
+    const { BaseAgent } = await import('./base-agent');
+    const agent = new BaseAgent({ name: 'TestAgent' });
+
+    const result = agent.parseIntent('Clear the knowledge base');
+
+    expect(result.type).toBe('command');
+    expect(result.query).toBe('Clear the knowledge base');
+    expect(result.keywords).toContain('clear');
+  });
+});

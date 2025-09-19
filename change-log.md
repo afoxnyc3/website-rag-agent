@@ -2,7 +2,7 @@
 
 ## 2025-09-19 - Agent Orchestration Layer (TDD Implementation)
 
-### Added
+### Phase 1: Agent Configuration ✅
 - **BaseAgent Class**: Foundation for intelligent agent system
   - Created `AgentConfig` interface with name, description, toolRegistry, ragService, confidenceThreshold
   - Implemented `BaseAgent` constructor with proper initialization
@@ -10,10 +10,21 @@
   - Following strict TDD: 9 tests written before implementation
   - Tests passing 100% for Phase 1: Agent Configuration
 
+### Phase 2: Intent Recognition ✅
+- **parseIntent Method**: Query understanding and classification
+  - Added `IntentType` enum: 'url' | 'question' | 'command' | 'unknown'
+  - Created `ParsedIntent` interface with type, query, urls, keywords
+  - Implemented cascading pattern matching (URLs → Questions → Commands)
+  - URL detection using regex for http://, https://, www.
+  - Question detection for what/who/where/when/why/how queries
+  - Command detection with keyword extraction
+  - 3 new tests, 12/12 total tests passing
+
 ### Technical Decisions
 - Using TDD approach with granular atomic tests for reliability
 - Mocking RAGService in tests to avoid OpenAI API dependency
 - BaseAgent designed as extensible foundation for RAGAgent specialization
+- Pattern matching over AI for intent detection (faster, free, predictable)
 
 ## 2025-09-19 - Documentation Cleanup & Final Polish
 
