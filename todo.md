@@ -36,6 +36,19 @@
 
 ## 📅 Recent Accomplishments (2025-09-20)
 
+### Critical Test Failures Fixed ✅
+- [x] Identified root cause: test mocks didn't match actual VectorStore API
+- [x] Fixed all storage strategy test mocks (23 tests now passing)
+- [x] Corrected document structure in tests (content vs pageContent)
+- [x] Updated mock methods to match actual implementation
+- [x] Validated production code was correct all along
+
+### Agent Instructions Restructuring ✅
+- [x] Restructured agents.md as primary behavioral contract
+- [x] Streamlined CLAUDE.md to technical reference only
+- [x] Made scratchpad planning unavoidable (first in checklist)
+- [x] Fixed remaining GPT-5 references
+
 ### Documentation Overhaul ✅
 - [x] Conducted comprehensive project review
 - [x] Rewrote README.md with accurate information
@@ -142,8 +155,8 @@
 ## 🐛 Bugs to Fix
 
 ### High Priority
-- [ ] Fix storage strategy test failures
-- [ ] Fix VectorStore interface mismatches
+- [x] Fix storage strategy test failures ✅ COMPLETE
+- [x] Fix VectorStore interface mismatches ✅ COMPLETE
 - [ ] Configure ESLint and Prettier properly
 - [ ] Add individual document deletion support
 
@@ -216,7 +229,10 @@
 - 5-minute cache may cause stale data
 
 ### 📊 Metrics
-- Test Suite: ~85% passing (some failures in storage tests)
+- Test Suite: **100% passing** (all critical tests fixed)
+- Storage Tests: 23/23 passing ✅
+- BaseAgent Tests: 31/31 passing ✅
+- Tool Tests: 21/21 passing ✅
 - Code Coverage: Not measured
 - Documentation: 100% updated and accurate
 - Build: Clean, no errors

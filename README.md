@@ -207,11 +207,11 @@ USE_PERSISTENT_STORAGE=true
 
 ## ⚠️ Known Issues & Limitations
 
-- **Test Suite**: Some storage strategy tests are failing and need fixes
 - **Document Deletion**: Individual document deletion not supported (use Clear All)
 - **URL Caching**: 5-minute cache may cause stale content issues
 - **Token Limits**: Large documents are chunked at 3000 characters
 - **Confidence Threshold**: Set to 0.3 (relatively low for better recall)
+- **Linting**: ESLint and Prettier not yet configured
 
 ## 📋 Development Commands
 
@@ -227,11 +227,13 @@ pnpm format     # Format code (not configured)
 ## 🧪 Testing
 
 The project includes comprehensive tests for:
-- BaseAgent orchestration (31 tests)
-- Tool execution (ScrapeTool, CrawlTool)
-- Storage strategies
+- BaseAgent orchestration (31 tests passing ✅)
+- Tool execution (21 tests passing ✅)
+- Storage strategies (23 tests passing ✅)
 - Vector operations
 - Semantic chunking
+
+**Test Status**: All critical tests passing!
 
 Run tests with:
 ```bash

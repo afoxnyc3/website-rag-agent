@@ -1,5 +1,30 @@
 # Decision Log
 
+## 2025-09-20 - Fix Tests Instead of Production Code
+
+### Decision: Fix test mocks rather than change working production code
+**Rationale**:
+- Investigation revealed production code was working correctly
+- Test mocks were using wrong API (similaritySearchWithScore vs search)
+- Following TDD principle: tests should reflect reality
+- Production code already integrated and working in app
+**Alternatives considered**:
+- Change production code to match test expectations (wrong approach)
+- Create adapter layer (unnecessary complexity)
+**Trade-offs**: Had to carefully analyze actual vs expected API
+**Result**: All 23 storage tests now passing without touching production code
+
+### Decision: Document actual VectorStore interface in tests
+**Rationale**:
+- Future developers need to understand correct API
+- Prevents similar mock mismatches
+- Self-documenting tests
+**Alternatives considered**:
+- Separate interface documentation file
+- JSDoc comments only
+**Trade-offs**: Test file slightly longer but more maintainable
+**Result**: Clear documentation comment block in test file
+
 ## 2025-09-20 - Documentation Overhaul
 
 ### Decision: Complete rewrite of README.md based on actual implementation

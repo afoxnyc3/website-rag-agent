@@ -1,5 +1,34 @@
 # Change Log
 
+## 2025-09-20 - Critical Test Failures Fixed
+
+### Storage Strategy Test Fixes
+- **Fixed test mocks**: Changed to match actual VectorStore interface
+  - `similaritySearchWithScore()` → `search()`
+  - `getDocuments()` → `getAllDocuments()`
+  - Document structure: `pageContent` → `content`
+- **Updated return types**: Mocks now return proper SearchResult objects
+- **Fixed delete test**: Now expects workaround behavior (get all, clear, re-add)
+- **Result**: All 23 storage strategy tests now passing ✅
+
+### Key Insight
+- Production code was correct all along
+- Tests were using wrong API (possibly LangChain's interface)
+- Fixed tests to match reality, not the other way around
+
+## 2025-09-20 - Agent Instructions Restructuring
+
+### agents.md Transformation
+- **Restructured as primary behavioral contract** (135 lines)
+- Added MANDATORY PRE-FLIGHT CHECKLIST at top
+- Moved all workflow rules from CLAUDE.md
+- Made scratchpad planning unavoidable
+
+### CLAUDE.md Streamlining
+- **Reduced to technical reference only** (313 lines)
+- Removed workflow documentation
+- Added cross-references to agents.md
+
 ## 2025-09-20 - Documentation Overhaul
 
 ### README.md Complete Rewrite
