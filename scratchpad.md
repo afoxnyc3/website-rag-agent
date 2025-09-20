@@ -1,5 +1,66 @@
 # Scratchpad - Planning & Notes
 
+## 2025-09-19 - Agent Instructions Restructuring Plan
+
+### Problem Identified
+- I completely failed to use scratchpad.md during BaseAgent implementation
+- CLAUDE.md is 320 lines (too long, important instructions get buried)
+- agents.md is only 33 lines (underutilized)
+- Massive overlap and confusion between the two files
+
+### Proposed Restructuring
+
+#### agents.md (Primary - 80 lines)
+**Purpose**: Behavioral contract and workflow enforcement
+```
+1. MANDATORY WORKFLOW (Never Skip)
+   - Planning (scratchpad.md) - ALWAYS FIRST
+   - Implementation (with TDD)
+   - Documentation (all logs)
+
+2. PRE-FLIGHT CHECKLIST
+   □ Read last scratchpad entry
+   □ Check todo.md for context
+   □ Review recent change-log
+   □ ASK: "Have I planned this in scratchpad?"
+   If any unchecked → STOP
+
+3. Planning Templates
+4. Quality Gates
+5. Common Mistakes to Avoid
+```
+
+#### CLAUDE.md (Reference - 170 lines)
+**Purpose**: Technical reference guide
+```
+1. Project Overview
+2. Technical Architecture
+3. Development Commands
+4. Code Standards
+5. API Reference
+6. Testing Strategy
+```
+
+### Key Changes Needed
+1. Move ALL workflow rules from CLAUDE.md to agents.md
+2. Add MANDATORY FIRST ACTION section at top of agents.md
+3. Include scratchpad template with example entry
+4. Add enforcement checkpoints throughout
+5. Make agents.md the "what to do RIGHT NOW" guide
+6. Make CLAUDE.md the "how things work" reference
+
+### Why This Matters
+- Makes scratchpad usage unavoidable (it's in primary file)
+- Reduces cognitive load (smaller, focused documents)
+- Clear hierarchy (behavior first, reference second)
+- Better compliance (checkpoints in right place)
+- Students can follow workflow clearly
+
+### Implementation Impact
+This restructuring ensures critical workflows (like scratchpad planning) are never missed because they'll be in the primary behavioral contract that's read first, not buried in a 320-line reference document.
+
+---
+
 ## 2025-09-18 - Bug Fix: VectorStore Integration Issue
 
 ### Problem Discovered
@@ -74,9 +135,9 @@
 
 ### RAG Architecture Design
 ```
-User Query � Embedding Generation � Vector Search �
-Context Retrieval � Augmented Prompt � GPT-5 �
-Confidence Scoring � Response with Sources
+User Query → Embedding Generation → Vector Search →
+Context Retrieval → Augmented Prompt → GPT-5 →
+Confidence Scoring → Response with Sources
 ```
 
 ### Implementation Approach
@@ -91,7 +152,7 @@ Confidence Scoring � Response with Sources
    - Cosine similarity for search
 
 3. **RAG Service** (`lib/rag.ts`)
-   - Orchestrate embedding � search � generate
+   - Orchestrate embedding → search → generate
    - Calculate confidence scores
    - Format responses with sources
 

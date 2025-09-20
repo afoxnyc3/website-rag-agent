@@ -1,400 +1,278 @@
 # AI RAG Agent
 
-An intelligent knowledge assistant that automatically ingests website content and provides instant, contextual answers to user questions with confidence scoring and source attribution.
+An intelligent knowledge assistant powered by BaseAgent orchestration that automatically ingests website content and provides instant, contextual answers with confidence scoring and source attribution.
 
-## 🏗️ How It Works
+## 🚀 Features
 
-This RAG (Retrieval-Augmented Generation) application ingests website content and provides intelligent, context-aware answers with confidence scoring.
+### Core Capabilities
+- **🤖 BaseAgent Orchestration**: Sophisticated agent layer that coordinates tools and RAG pipeline
+- **🌐 Smart Web Ingestion**: Dual-mode scraping (static HTML & JavaScript-rendered content)
+- **🔍 Intelligent Crawling**: Multi-page crawling with depth control and robots.txt compliance
+- **💡 Confidence Scoring**: Every response includes a confidence score (0.0-1.0)
+- **📚 Source Attribution**: Expandable source citations with direct links
+- **🗄️ Dual Storage Modes**: In-memory for development, PostgreSQL + pgvector for production
+- **⚡ Real-time Progress**: Live updates during scraping and crawling operations
+- **🎛️ Knowledge Management**: Interactive UI for viewing and managing knowledge base
 
-### Core Workflow
+### Technical Highlights
+- Tool-based plugin architecture for extensibility
+- Storage strategy pattern for environment-based switching
+- Semantic chunking with overlap for context preservation
+- 5-minute URL caching to prevent redundant scraping
+- Automatic fallback from fast fetch to Playwright for JavaScript sites
+
+## 🏗️ Architecture Overview
 
 ```mermaid
-graph LR
-    A[User Input] --> B{Action Type}
-    B -->|Add Website| C[Scrape/Crawl]
-    B -->|Ask Question| D[RAG Query]
-    C --> E[Generate Embeddings]
-    E --> F[Store in Vector DB]
-    D --> G[Search Knowledge Base]
-    G --> H[Generate Response]
-    H --> I[Return with Confidence Score]
+graph TB
+    A[User Query] --> B[BaseAgent]
+    B --> C{Intent Recognition}
+    C -->|URL Detected| D[Tool Selection]
+    C -->|Question| E[RAG Pipeline]
+    D --> F[ScrapeTool/CrawlTool]
+    F --> G[Content Processing]
+    G --> H[Embedding Generation]
+    H --> I[Vector Storage]
+    E --> J[Knowledge Search]
+    J --> K[Context Augmentation]
+    K --> L[GPT-4 Generation]
+    L --> M[Response with Confidence]
 ```
 
-### 1️⃣ Adding Content to Knowledge Base
+### Component Overview
 
-When you add a website URL, the system:
-
-1. **Determines Strategy** - Single page → ScrapeTool, Multiple pages → CrawlTool
-2. **Fetches Content** - Tries fast fetch first, falls back to Playwright for JavaScript sites
-3. **Processes Content** - Cleans HTML, extracts text, chunks if >3000 characters
-4. **Generates Embeddings** - Creates 1536-dimensional vectors using OpenAI
-5. **Stores Vectors** - Saves in VectorStore with metadata for retrieval
-
-### 2️⃣ Answering Questions (RAG Process)
-
-When you ask a question, the system:
-
-1. **Embeds Query** - Converts your question to a vector
-2. **Searches Knowledge** - Finds similar content using cosine similarity
-3. **Calculates Confidence** - Scores relevance (0.0 to 1.0)
-4. **Decides Mode**:
-   - Confidence ≥ 0.5 → RAG mode (uses knowledge base)
-   - Confidence < 0.5 → Direct mode (GPT-5 only)
-5. **Generates Answer** - Augments prompt with context and calls GPT-5
-6. **Returns Response** - Includes answer, confidence score, and sources
-
-### 🔧 Technical Architecture
-
-```
-┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│   Frontend UI   │────▶│   API Routes     │────▶│   Tool Layer    │
-│  (React/Next)   │     │  /api/chat       │     │  ScrapeTool     │
-│                 │     │  /api/scrape     │     │  CrawlTool      │
-└─────────────────┘     │  /api/crawl      │     └─────────────────┘
-                        └──────────────────┘              │
-                                 │                        ▼
-                                 ▼                ┌─────────────────┐
-                        ┌──────────────────┐     │   Web Content   │
-                        │   RAG Service    │────▶│  Fetch/Browser  │
-                        │  - Embeddings    │     └─────────────────┘
-                        │  - Vector Search │
-                        │  - GPT-5 Chat    │
-                        └──────────────────┘
-```
-
-### 🎯 Key Features in Action
-
-- **Smart Scraping**: Automatically switches between fetch (fast) and Playwright (JavaScript)
-- **Respectful Crawling**: Honors robots.txt, implements rate limiting
-- **Intelligent Chunking**: Splits large documents for optimal embedding
-- **Confidence Scoring**: Shows how certain the AI is about its answer
-- **Source Attribution**: Links every answer back to its source material
-- **5-Minute Cache**: Avoids redundant scraping of same content
-
-### 📊 Example Flow
-
-**Adding a website:**
-```
-1. User enters: https://docs.example.com
-2. System crawls 10 pages (respecting robots.txt)
-3. Extracts ~50KB of documentation content
-4. Chunks into 17 documents
-5. Generates embeddings for each chunk
-6. Stores in knowledge base
-✅ "Successfully added 17 documents"
-```
-
-**Asking a question:**
-```
-1. User asks: "How do I configure authentication?"
-2. System embeds query → [0.23, -0.45, 0.78, ...]
-3. Searches knowledge base → finds 3 relevant chunks
-4. Best match confidence: 0.82 (high relevance!)
-5. Augments GPT-5 prompt with context
-6. Returns detailed answer with:
-   - Step-by-step configuration guide
-   - Confidence score: 82%
-   - Sources: [docs-auth-1, docs-auth-2]
-   - Mode: RAG (using knowledge base)
-```
+- **BaseAgent**: Orchestrates the entire pipeline, managing tool execution and RAG operations
+- **Tool Registry**: Plugin system for ScrapeTool, CrawlTool, and future tools
+- **Storage Strategy**: Abstraction layer supporting both in-memory and persistent storage
+- **RAG Service**: Handles embeddings, vector search, and response generation
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
 - **Node.js** 18.17 or later
-- **pnpm** 8.0 or later (install with `npm install -g pnpm`)
+- **pnpm** 8.0 or later
 - **OpenAI API Key** with GPT-4 access
 
-### Installation
+### Quick Start
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/yourusername/website-rag-agent.git
-   cd website-rag-agent
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   pnpm install
-   ```
-
-3. **Set up environment variables:**
-   ```bash
-   cp .env.example .env.local
-   # Edit .env.local and add your OpenAI API key
-   ```
-
-   Required environment variables:
-   ```env
-   OPENAI_API_KEY=sk-...your-key-here
-   ```
-
-   Optional for production (Vercel Postgres):
-   ```env
-   POSTGRES_URL=your-vercel-postgres-url
-   USE_PERSISTENT_STORAGE=true
-   ```
-
-4. **Start the development server:**
-   ```bash
-   pnpm dev
-   ```
-
-5. **Open your browser:**
-   Navigate to [http://localhost:3000](http://localhost:3000)
-
-### First-Time Setup
-
-When you first run the app:
-
-1. **The knowledge base starts empty** - You'll see "0 documents" in the UI
-2. **Add your first website:**
-   - Enter a URL in the input field (e.g., `https://docs.example.com`)
-   - Choose "Scrape single page" or "Crawl multiple pages"
-   - Click the arrow button to ingest content
-3. **Ask questions:**
-   - Type your question in the chat input
-   - The system will search the knowledge base and respond with confidence scores
-   - Click "View sources" to see where the information came from
-
-### Testing the Application
-
-**Run automated tests:**
+1. **Clone and install:**
 ```bash
-pnpm test
+git clone https://github.com/yourusername/website-rag-agent.git
+cd website-rag-agent
+pnpm install
 ```
 
-**Test the UI manually:**
+2. **Configure environment:**
 ```bash
-# In one terminal, start the dev server
+cp .env.example .env.local
+# Add your OpenAI API key to .env.local
+```
+
+3. **Start development server:**
+```bash
 pnpm dev
-
-# In another terminal, run the Playwright test
-node test-ui-sources.mjs
 ```
 
-**Test RAG functionality:**
-```bash
-# Start the server first
-pnpm dev
+4. **Open browser:**
+Navigate to [http://localhost:3000](http://localhost:3000)
 
-# Run the RAG test
-node test-rag.mjs
+### First Steps
+
+1. The knowledge base starts with 7 pre-loaded documentation chunks
+2. Add a website by entering a URL and clicking the arrow button
+3. Choose between single page scraping or multi-page crawling
+4. Ask questions about the ingested content
+5. View confidence scores and expandable source citations
+
+## 💻 Usage Examples
+
+### Adding Content to Knowledge Base
+
+**Single Page:**
+```
+URL: https://docs.example.com/getting-started
+Mode: Scrape single page
+→ Fetches page, chunks content, generates embeddings
 ```
 
-### Production Deployment
-
-#### Vercel Deployment (Recommended)
-
-1. **Push to GitHub:**
-   ```bash
-   git push origin main
-   ```
-
-2. **Import to Vercel:**
-   - Go to [vercel.com](https://vercel.com)
-   - Import your GitHub repository
-   - Set environment variables in Vercel dashboard
-
-3. **Configure Postgres (Optional but Recommended for Production):**
-   - Go to your Vercel project dashboard
-   - Navigate to the "Storage" tab
-   - Click "Create Database" → Select "Postgres"
-   - Choose your database region (closest to your users)
-   - Click "Create & Continue"
-
-   **Important**: The database will automatically:
-   - Set up connection strings in your environment
-   - Enable pgvector extension (for vector similarity search)
-   - Configure connection pooling
-
-   **After setup, the app will automatically:**
-   - Detect the `POSTGRES_URL` environment variable
-   - Create necessary tables on first run:
-     - `documents` table for content storage
-     - `embeddings` table for vector data
-     - `versions` table for document history
-   - Switch from in-memory to persistent storage
-
-   **No manual SQL setup required!** The app handles all database initialization.
-
-#### Manual Deployment
-
-1. **Build for production:**
-   ```bash
-   pnpm build
-   ```
-
-2. **Start production server:**
-   ```bash
-   pnpm start
-   ```
-
-   The app will run on port 3000 by default.
-
-### Troubleshooting
-
-**Build errors with JSX:**
-- Run `pnpm build` to check for parsing errors
-- Ensure no IIFEs in JSX expressions
-- Check for proper parentheses matching
-
-**RAG not finding documents:**
-- Check confidence threshold (currently 0.3)
-- Verify documents are indexed (check Knowledge Base viewer)
-- Ensure embeddings are generating (check console logs)
-
-**Port 3000 already in use:**
-```bash
-PORT=3001 pnpm dev
+**Multi-page Site:**
+```
+URL: https://docs.example.com
+Mode: Crawl (depth: 2, max: 20 pages)
+→ Discovers pages, respects robots.txt, processes batch
 ```
 
-**Knowledge Base shows "Unknown Source":**
-- Re-scrape the URL to update metadata
-- Clear knowledge base and re-add content
+### Asking Questions
 
-**Playwright installation for scraping:**
-```bash
-pnpm exec playwright install chromium
 ```
-
-## 📋 Project Documentation
-
-This project maintains comprehensive documentation for development workflow:
-
-| File | Purpose |
-|------|---------|
-| `CLAUDE.md` | AI agent instructions and project guidelines |
-| `prd.md` | Product requirements and phased development plan |
-| `technical-spec.md` | Technical architecture and specifications |
-| `quality-standards.md` | Code quality and testing requirements |
-| `agents.md` | AI agent configuration and behavior |
-
-## 🔄 Development Workflow
-
-### Required Documentation Updates
-
-Every development session MUST maintain these files:
-
-1. **`scratchpad.md`** - Planning notes and design decisions
-2. **`todo.md`** - Task tracking with status markers
-3. **`decision-log.md`** - Technical choices and rationale
-4. **`change-log.md`** - File modifications and refactoring
-
-### Workflow Process
-
-```mermaid
-graph LR
-    A[Plan in scratchpad.md] --> B[Add tasks to todo.md]
-    B --> C[Implement with TDD]
-    C --> D[Update decision-log.md]
-    D --> E[Record in change-log.md]
-    E --> F[Mark todo complete]
+Query: "How do I configure authentication?"
+→ Embeds query
+→ Searches knowledge base
+→ Returns answer with:
+  - Confidence: 0.82
+  - Sources: [docs-auth-1, docs-auth-2]
+  - Mode: RAG (using knowledge base)
 ```
-
-## 🏗️ Development Phases
-
-### Completed ✅
-- **MVP**: Basic Text-Only RAG with confidence scoring
-- **Phase 0**: Tool Chest Foundation - Base Tool architecture
-- **Phase 0.5**: Tool Migration - Converted scrapers/crawlers to Tools
-- **Phase 1**: Web Scraping - Playwright integration
-- **Phase 2**: Web Crawling - Custom CrawlTool with depth control & robots.txt
-- **Phase 3**: Persistent Storage - Vercel Postgres with pgvector
-
-### Current Features
-- ✅ Chat interface with GPT-4/GPT-5
-- ✅ Dual storage system (memory/persistent)
-- ✅ Vercel Postgres with pgvector for production
-- ✅ Web scraping (ScrapeTool with fetch/Playwright strategies)
-- ✅ Web crawling (CrawlTool with depth control)
-- ✅ RAG system with confidence scoring
-- ✅ Expandable sources display with attribution
-- ✅ Knowledge Base viewer with search and management
-- ✅ Real-time progress tracking for scraping/crawling
-- ✅ Smart URL detection for optimal strategy selection
-- ✅ Semantic chunking with overlap for context preservation
-- ✅ Tool-based architecture for extensibility
-- ✅ Document versioning and history
-- ✅ Environment-based storage switching
-- ✅ 5-minute caching to prevent redundant scraping
-
-### Storage Configuration
-
-#### Development (Default)
-- **Type**: In-memory Map-based vector store
-- **Benefits**: Zero configuration, instant startup, fast operations
-- **Limitations**: Data lost on server restart, single instance only
-- **Use Case**: Local development, testing, demos
-
-#### Production (Vercel Postgres)
-- **Type**: PostgreSQL with pgvector extension
-- **Benefits**:
-  - Persistent storage across deployments
-  - Scalable to millions of documents
-  - Concurrent user support
-  - Document versioning and history
-  - Full-text search capabilities
-- **Automatic Features**:
-  - Connection pooling for performance
-  - SSL encryption for security
-  - Automated backups (Vercel Pro/Enterprise)
-- **Switching**:
-  - Automatic when `POSTGRES_URL` is detected
-  - Or set `USE_PERSISTENT_STORAGE=true` explicitly
-
-### Upcoming Phases
-- **Phase 4**: Advanced RAG Features
-- **Phase 5**: Multi-modal Support
-- **Phase 6**: Performance Optimization
-
-## 🎯 Success Metrics
-
-- **Accuracy**: >95% correct responses (confidence ≥ 0.9)
-- **Performance**: <200ms average response time
-- **Coverage**: 100% test coverage required
-- **Quality**: Max 15 lines per function, 100 lines per file
 
 ## 🛠️ Tech Stack
 
 - **Framework**: Next.js 15 with Turbopack
 - **Language**: TypeScript (strict mode)
-- **AI**: Vercel AI SDK 5 + OpenAI GPT-4/5
+- **AI**: Vercel AI SDK 5 + OpenAI GPT-4
 - **Embeddings**: OpenAI text-embedding-3-small (1536 dimensions)
-- **UI**: shadcn/ui + AI Elements + Lucide icons
-- **Styling**: Tailwind CSS v4
-- **Testing**: Vitest (TDD approach) - 60 tests passing
-- **Web Scraping**: Playwright (JavaScript sites) + fetch API (static sites)
-- **Vector Storage**: In-memory Map (dev) / Vercel Postgres with pgvector (prod)
-- **Architecture**: Tool-based with validation, retry logic, and caching
-- **Package Manager**: pnpm (exclusively)
+- **UI**: shadcn/ui components + Tailwind CSS v4
+- **Web Scraping**: Playwright + native fetch API
+- **Storage**:
+  - Development: In-memory Map-based store
+  - Production: Vercel Postgres with pgvector
+- **Testing**: Vitest with comprehensive test suite
 
-## 📝 Development Commands
+## 📦 API Endpoints
+
+### POST `/api/chat`
+Main chat endpoint using BaseAgent orchestration.
+
+**Request:**
+```json
+{
+  "message": "Your question or URL here"
+}
+```
+
+**Response:**
+```json
+{
+  "response": "The answer to your question...",
+  "confidence": 0.85,
+  "sources": ["source-1", "source-2"],
+  "mode": "agent"
+}
+```
+
+### GET `/api/knowledge`
+Retrieve knowledge base contents or search.
+
+**Query Parameters:**
+- `q` (optional): Search query
+
+**Response:**
+```json
+{
+  "sources": [...],
+  "totalDocuments": 42
+}
+```
+
+### DELETE `/api/knowledge`
+Clear the knowledge base.
+
+**Request:**
+```json
+{
+  "clearAll": true
+}
+```
+
+## 🚢 Deployment
+
+### Vercel Deployment (Recommended)
+
+1. **Push to GitHub:**
+```bash
+git push origin main
+```
+
+2. **Import to Vercel:**
+- Go to [vercel.com](https://vercel.com)
+- Import your repository
+- Add environment variables:
+  - `OPENAI_API_KEY`: Your OpenAI API key
+
+3. **Optional: Enable Persistent Storage**
+- In Vercel dashboard → Storage → Create Database → Postgres
+- Database URL will be automatically configured
+- Tables are created on first run
+
+### Environment Variables
+
+```env
+# Required
+OPENAI_API_KEY=sk-...your-key-here
+
+# Optional (auto-configured by Vercel)
+POSTGRES_URL=your-postgres-url
+USE_PERSISTENT_STORAGE=true
+```
+
+## ⚠️ Known Issues & Limitations
+
+- **Test Suite**: Some storage strategy tests are failing and need fixes
+- **Document Deletion**: Individual document deletion not supported (use Clear All)
+- **URL Caching**: 5-minute cache may cause stale content issues
+- **Token Limits**: Large documents are chunked at 3000 characters
+- **Confidence Threshold**: Set to 0.3 (relatively low for better recall)
+
+## 📋 Development Commands
 
 ```bash
 pnpm dev        # Start development server
 pnpm build      # Build for production
 pnpm start      # Start production server
 pnpm test       # Run test suite
-pnpm lint       # Check code quality
-pnpm format     # Format code
+pnpm lint       # Lint code (not configured)
+pnpm format     # Format code (not configured)
 ```
 
-## 🔒 Quality Standards
+## 🧪 Testing
 
-- **Functions**: Max 15 lines
-- **Files**: Max 100 lines
-- **Testing**: TDD with 100% coverage
+The project includes comprehensive tests for:
+- BaseAgent orchestration (31 tests)
+- Tool execution (ScrapeTool, CrawlTool)
+- Storage strategies
+- Vector operations
+- Semantic chunking
+
+Run tests with:
+```bash
+pnpm test
+```
+
+## 📐 Code Standards
+
+- **Functions**: Maximum 15 lines
+- **Files**: Maximum 100 lines
 - **TypeScript**: Strict mode enabled
-- **Commits**: Conventional format (`feat:`, `fix:`, etc.)
+- **Architecture**: Tool-based plugin system
+- **Testing**: TDD approach
 
-## 🌐 Resources
+## 🔄 Development Workflow
 
-- [Vercel AI SDK RAG Example](https://github.com/vercel-labs/ai-sdk-preview-rag)
-- [Playwright Docs](https://playwright.dev/docs/scraping)
-- [Vercel Postgres + pgvector](https://vercel.com/docs/storage/vercel-postgres)
+The project maintains detailed documentation:
+- `CLAUDE.md`: AI assistant instructions
+- `todo.md`: Task tracking
+- `decision-log.md`: Technical decisions
+- `change-log.md`: Implementation history
+- `scratchpad.md`: Planning notes
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Follow TDD approach
+4. Ensure tests pass
+5. Submit pull request
+
+## 📚 Documentation
+
+- [API Documentation](./API.md) - Detailed endpoint specifications
+- [Architecture Guide](./ARCHITECTURE.md) - Technical design details
+- [Deployment Plan](./deployment-plan.md) - Production setup guide
 
 ## 📄 License
 
 MIT
+
+---
+
+Built with Next.js, TypeScript, and the power of RAG technology.

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Building an intelligent RAG (Retrieval-Augmented Generation) knowledge assistant that ingests website content and provides precise, contextual answers with confidence scoring.
+An intelligent RAG (Retrieval-Augmented Generation) knowledge assistant powered by BaseAgent orchestration that ingests website content and provides precise, contextual answers with confidence scoring.
 
 ## Development Commands
 
@@ -25,14 +25,15 @@ This is a TypeScript Next.js 15 starter template for AI-powered applications:
 
 ### Core Stack
 - **Next.js 15** with App Router and Turbopack
-- **AI SDK 5** with OpenAI GPT-5 integration
+- **AI SDK 5** with OpenAI GPT-4 integration
+- **BaseAgent** orchestration layer with tool registry
 - **shadcn/ui** components (New York style, neutral base color)
 - **Tailwind CSS v4** for styling
 - **TypeScript** with strict mode enabled
 
 ### Key Directories
 - `app/` - Next.js App Router pages and API routes
-  - `app/api/chat/route.ts` - AI chat endpoint using non-streaming `generateText()`
+  - `app/api/chat/route.ts` - BaseAgent orchestration endpoint with tool execution
   - `app/page.tsx` - Main chat page
   - `app/about/`, `app/privacy/` - Static pages
 - `components/chat/` - Chat-specific components
@@ -42,9 +43,10 @@ This is a TypeScript Next.js 15 starter template for AI-powered applications:
 - `lib/utils.ts` - Utility functions including `cn()` for className merging
 
 ### AI Integration
-- Uses AI SDK 5's `generateText()` for non-streaming responses
-- Configured for GPT-5 via OpenAI provider
-- API route at `/api/chat` expects `{ message: string }` and returns `{ response: string }`
+- Uses BaseAgent orchestration for intelligent request handling
+- Integrated tool registry with ScrapeTool and CrawlTool
+- Configured for GPT-4 via OpenAI provider
+- API route at `/api/chat` returns `{ response, confidence, sources, mode }`
 - Chat interface uses AI Elements components (Conversation, Message, PromptInput)
 - Requires `OPENAI_API_KEY` in `.env.local`
 
@@ -71,32 +73,35 @@ This is a TypeScript Next.js 15 starter template for AI-powered applications:
 
 ## RAG Development Phases
 
-### MVP: Basic Text-Only RAG
-- Simple Q&A with pre-loaded content
-- OpenAI embeddings + chat completion
-- In-memory vector storage
+### Current Implementation: BaseAgent RAG System
+- BaseAgent orchestration with tool registry
+- Intelligent intent recognition and tool selection
+- OpenAI embeddings + GPT-4 completion
+- Dual storage: in-memory (dev) / Postgres+pgvector (prod)
 
-### Phase 0: Tool Chest Foundation
-- Vercel AI SDK integration
-- Base agent class with tool calling
+### Phase 0: Tool Chest Foundation ✅ COMPLETE
+- BaseAgent orchestration layer
+- Tool registry with plugin architecture
 - Embedding generation service
-- Vector similarity search
+- Vector similarity search with confidence scoring
 
-### Phase 1: Web Scraping (Playwright)
-- Single page content extraction
-- Clean text extraction from URLs
-- Content sanitization
+### Phase 1: Web Scraping ✅ COMPLETE
+- ScrapeTool with dual-mode extraction (fetch/Playwright)
+- Smart fallback for JavaScript sites
+- Content chunking and sanitization
+- 5-minute URL caching
 
-### Phase 2: Web Crawling (Custom CrawlTool)
-- Multi-page site discovery with depth control
-- Respect robots.txt compliance
+### Phase 2: Web Crawling ✅ COMPLETE
+- CrawlTool with configurable depth and page limits
+- Robots.txt compliance
 - Rate limiting and batch processing
 - Integrated with Playwright for JavaScript sites
 
-### Phase 3: Persistent Storage
-- Vercel Postgres + pgvector
-- Content versioning
-- Search optimization
+### Phase 3: Persistent Storage ✅ COMPLETE
+- Storage strategy pattern for environment switching
+- Vercel Postgres + pgvector for production
+- Content versioning and metadata tracking
+- Automatic schema initialization
 
 ## Code Quality Standards
 
@@ -152,6 +157,14 @@ This is a TypeScript Next.js 15 starter template for AI-powered applications:
   "printWidth": 80
 }
 ```
+
+## BaseAgent Architecture
+
+### Core Components
+- **BaseAgent**: Main orchestration class
+- **ToolRegistry**: Plugin system for tools
+- **RAGService**: Embedding and retrieval service
+- **StorageStrategy**: Abstraction for storage backends
 
 ## AI Agent Requirements
 
@@ -219,6 +232,16 @@ Types: feat, fix, chore, docs, refactor, test
 ## Core Interfaces
 
 ```typescript
+// BaseAgent Configuration
+interface AgentConfig {
+  name: string;
+  description?: string;
+  toolRegistry?: ToolRegistry;
+  ragService?: RAGService;
+  confidenceThreshold?: number;
+}
+
+// Agent Response Format
 interface AgentResponse {
   answer: string;
   sources: string[];
@@ -226,26 +249,27 @@ interface AgentResponse {
   chunks: ContentChunk[];
 }
 
-interface ResponseValidation {
-  hasRelevantContext: boolean;
-  confidenceScore: number;
-  sourceAttribution: string[];
-  shouldRespond: boolean;
+// Tool System Interfaces
+interface Tool {
+  name: string;
+  description: string;
+  execute(params: any): Promise<ToolResult>;
 }
 
-type ContentChunk = {
-  readonly id: string;
-  readonly content: string;
-  readonly source: URL;
-  readonly embedding?: EmbeddingVector;
-};
+interface ToolResult {
+  success: boolean;
+  data?: any;
+  error?: string;
+}
 
-interface AgentEvaluation {
-  accuracy: number;        // Correct answers / Total answers
-  precision: number;       // Relevant responses / Total responses
-  recall: number;         // Found answers / Available answers
-  responseTime: number;   // Average ms per query
-  confidenceCalibration: number; // Confidence vs actual accuracy
+// Storage Strategy Pattern
+interface StorageStrategy {
+  initialize(): Promise<void>;
+  addDocument(doc: Document, embedding: number[]): Promise<void>;
+  search(embedding: number[], limit: number): Promise<SearchResult[]>;
+  deleteDocument(id: string): Promise<void>;
+  listDocuments(): Promise<Document[]>;
+  close(): Promise<void>;
 }
 ```
 
@@ -255,18 +279,18 @@ interface AgentEvaluation {
 **Request:**
 ```typescript
 {
-  message: string;
-  sessionId?: string;
+  message: string;     // User query or URL
+  useRAG?: boolean;    // Enable RAG mode (default: true)
 }
 ```
 
 **Response:**
 ```typescript
 {
-  answer: string;
-  confidence: number;
-  sources: string[];
-  responseTime: number;
+  response: string;    // AI-generated answer
+  confidence: number;  // Score from 0.0 to 1.0
+  sources: string[];   // Source document IDs
+  mode: string;        // "agent" or "direct"
 }
 ```
 

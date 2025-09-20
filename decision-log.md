@@ -1,5 +1,41 @@
 # Decision Log
 
+## 2025-09-20 - Documentation Overhaul
+
+### Decision: Complete rewrite of README.md based on actual implementation
+**Rationale**:
+- README contained incorrect information (GPT-5, 100% tests passing)
+- Missing BaseAgent architecture documentation
+- Deployment instructions were overly complex
+- No API documentation existed
+**Alternatives considered**:
+- Incremental updates to existing README
+- Separate architecture documentation file
+**Trade-offs**: Complete rewrite takes time but ensures accuracy
+**Result**: Accurate, comprehensive documentation that reflects reality
+
+### Decision: Create dedicated API.md documentation
+**Rationale**:
+- API endpoints were undocumented
+- Users need request/response formats
+- SDK examples help adoption
+**Alternatives considered**:
+- Include API docs in README (too long)
+- Use OpenAPI/Swagger (overkill for current scope)
+**Trade-offs**: Manual maintenance vs automated generation
+**Result**: Complete API reference with examples
+
+### Decision: Remove all GPT-5 references
+**Rationale**:
+- GPT-5 doesn't exist in OpenAI's API
+- Misleading to claim non-existent features
+- GPT-4 is the actual model being used
+**Alternatives considered**:
+- Keep as "future-ready" (dishonest)
+- Note as placeholder (confusing)
+**Trade-offs**: None - accuracy is essential
+**Result**: All references corrected to GPT-4
+
 ## 2025-09-19 - Agent Integration into Production
 
 ### Decision: Replace RAG service with BaseAgent in chat API

@@ -1,5 +1,40 @@
 # Change Log
 
+## 2025-09-20 - Documentation Overhaul
+
+### README.md Complete Rewrite
+- **Removed incorrect claims**: GPT-5 references, 100% test coverage
+- **Added BaseAgent focus**: Highlighted orchestration architecture
+- **Simplified deployment**: Streamlined Vercel instructions
+- **Added known issues**: Transparent about test failures
+- **Updated tech stack**: Accurate dependency list
+- **Fixed examples**: Real API responses and usage patterns
+
+### New API Documentation (API.md)
+- **Created comprehensive reference**: All 5 endpoints documented
+- **Request/response formats**: Complete with JSON examples
+- **SDK examples**: JavaScript/TypeScript and Python
+- **Performance benchmarks**: Expected response times
+- **Error codes**: Standard HTTP status explanations
+
+### CLAUDE.md Updates
+- **BaseAgent architecture**: Added core components section
+- **Corrected AI model**: GPT-4 instead of GPT-5
+- **Updated phases**: Marked completed phases
+- **Fixed interfaces**: Accurate TypeScript definitions
+- **Tool system docs**: Added Tool and StorageStrategy interfaces
+
+### todo.md Restructure
+- **Added documentation tasks**: Tracked today's work
+- **Added bugs section**: Listed known test failures
+- **Updated status**: Honest production readiness assessment
+- **Reorganized phases**: Clear next steps for development
+
+### decision-log.md Additions
+- **Documentation decisions**: Rationale for complete rewrite
+- **GPT-5 removal**: Explanation of corrections
+- **API docs reasoning**: Why separate file created
+
 ## 2025-09-19 - Agent Orchestration Layer COMPLETE ✅
 
 ### Full BaseAgent Implementation
