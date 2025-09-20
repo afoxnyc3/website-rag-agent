@@ -27,16 +27,37 @@ describe('Storage Strategy Pattern', () => {
     delete process.env.USE_PERSISTENT_STORAGE;
   });
 
+  /*
+   * ACTUAL VectorStore Interface Documentation:
+   * - search(embedding: number[], topK: number, threshold: number): Promise<SearchResult[]>
+   * - getAllDocuments(): Document[]
+   * - addDocument(doc: Document): void
+   * - addDocuments(docs: Document[]): void
+   * - clear(): void
+   *
+   * Document Interface:
+   * - id: string
+   * - content: string (NOT pageContent!)
+   * - embedding?: number[]
+   * - metadata?: Record<string, any>
+   *
+   * SearchResult Interface:
+   * - document: Document
+   * - similarity: number
+   * - confidence: number
+   */
+
   describe('MemoryStorage', () => {
     let storage: MemoryStorage;
     let mockVectorStoreInstance: any;
 
     beforeEach(() => {
       mockVectorStoreInstance = {
+        addDocument: vi.fn(),
         addDocuments: vi.fn(),
-        similaritySearchWithScore: vi.fn().mockResolvedValue([]),
-        delete: vi.fn(),
-        getDocuments: vi.fn().mockReturnValue([]),
+        search: vi.fn().mockResolvedValue([]),
+        getAllDocuments: vi.fn().mockReturnValue([]),
+        clear: vi.fn(),
       };
       vi.mocked(VectorStore).mockImplementation(() => mockVectorStoreInstance);
       storage = new MemoryStorage();
@@ -56,8 +77,9 @@ describe('Storage Strategy Pattern', () => {
 
       expect(mockVectorStoreInstance.addDocuments).toHaveBeenCalledWith([
         expect.objectContaining({
-          pageContent: 'Test content',
-          metadata: expect.objectContaining({ id: 'test-1', url: 'test.com' }),
+          id: 'test-1',
+          content: 'Test content',
+          metadata: { url: 'test.com' },
           embedding,
         }),
       ]);
@@ -66,41 +88,60 @@ describe('Storage Strategy Pattern', () => {
     it('should search for similar documents', async () => {
       await storage.initialize();
       const embedding = [0.1, 0.2, 0.3];
-      mockVectorStoreInstance.similaritySearchWithScore.mockResolvedValue([
-        [{ pageContent: 'Test', metadata: { id: 'test-1' } }, 0.9],
+      mockVectorStoreInstance.search.mockResolvedValue([
+        {
+          document: { id: 'test-1', content: 'Test', metadata: { url: 'test.com' } },
+          similarity: 0.9,
+          confidence: 0.9,
+        },
       ]);
 
       const results = await storage.search(embedding, 5);
 
-      expect(mockVectorStoreInstance.similaritySearchWithScore).toHaveBeenCalledWith(embedding, 5);
+      expect(mockVectorStoreInstance.search).toHaveBeenCalledWith(embedding, 5, 0.0);
       expect(results).toHaveLength(1);
       expect(results[0]).toEqual({
         id: 'test-1',
         content: 'Test',
-        metadata: { id: 'test-1' },
+        metadata: { url: 'test.com' },
         similarity: 0.9,
       });
     });
 
     it('should delete a document', async () => {
       await storage.initialize();
+      mockVectorStoreInstance.getAllDocuments.mockReturnValue([
+        { id: 'test-1', content: 'Test 1' },
+        { id: 'test-2', content: 'Test 2' },
+      ]);
+
       await storage.deleteDocument('test-1');
-      expect(mockVectorStoreInstance.delete).toHaveBeenCalledWith({ ids: ['test-1'] });
+
+      // Should get all docs, clear, and re-add except deleted one
+      expect(mockVectorStoreInstance.getAllDocuments).toHaveBeenCalled();
+      expect(mockVectorStoreInstance.clear).toHaveBeenCalled();
+      expect(mockVectorStoreInstance.addDocument).toHaveBeenCalledWith(
+        { id: 'test-2', content: 'Test 2' }
+      );
+      expect(mockVectorStoreInstance.addDocument).not.toHaveBeenCalledWith(
+        expect.objectContaining({ id: 'test-1' })
+      );
     });
 
     it('should list all documents', async () => {
       await storage.initialize();
-      mockVectorStoreInstance.getDocuments.mockReturnValue([
-        { pageContent: 'Test', metadata: { id: 'test-1' } },
+      mockVectorStoreInstance.getAllDocuments.mockReturnValue([
+        { id: 'test-1', content: 'Test', metadata: { url: 'test.com' } },
       ]);
 
       const docs = await storage.listDocuments();
 
+      expect(mockVectorStoreInstance.getAllDocuments).toHaveBeenCalled();
       expect(docs).toHaveLength(1);
       expect(docs[0]).toEqual({
         id: 'test-1',
         content: 'Test',
-        metadata: { id: 'test-1' },
+        metadata: { url: 'test.com' },
       });
     });
 

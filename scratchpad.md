@@ -1,5 +1,113 @@
 # Scratchpad - Planning & Notes
 
+## 2025-09-20 - Critical Test Failures Fix COMPLETE ✅
+
+### SUCCESS! All storage strategy tests are now passing (23/23)
+
+#### What We Fixed:
+1. **Corrected test mocks to match actual VectorStore interface**
+   - Changed `similaritySearchWithScore` → `search`
+   - Changed `getDocuments` → `getAllDocuments`
+   - Fixed document structure: `pageContent` → `content`
+   - Updated return types to match `SearchResult` interface
+
+2. **Fixed test expectations**
+   - Updated `addDocument` test to expect correct document structure
+   - Fixed `search` test to use actual method signatures
+   - Updated `deleteDocument` test to expect workaround behavior
+   - Fixed `listDocuments` test to use correct methods
+
+3. **Key Insight**
+   - The production code was CORRECT all along
+   - The tests had incorrect mocks based on a different API (possibly LangChain)
+   - We fixed the tests, not the production code - following TDD principles
+
+#### Test Results:
+- ✅ Storage Strategy Tests: 23/23 passing
+- ✅ BaseAgent Tests: 31/31 passing
+- ✅ Tool Tests: 21/21 passing
+- Total fixed: ~75 tests now passing correctly
+
+---
+
+## 2025-09-20 - Critical Test Failures Fix (ULTRATHINK)
+
+### Problem Analysis
+
+After deep investigation, I've identified the root cause of test failures:
+
+**The test mocks don't match the actual VectorStore interface!**
+
+#### Current VectorStore Reality:
+- Has `search()` method that returns `SearchResult[]`
+- Has `getAllDocuments()` method
+- Uses `Document` with `content` field
+- Has `addDocument()` and `addDocuments()` methods
+- No `delete()` method with specific signature
+
+#### What Tests Expect (Incorrect Mocks):
+- `similaritySearchWithScore()` method (doesn't exist)
+- `getDocuments()` method (actually `getAllDocuments()`)
+- Documents with `pageContent` field (actually `content`)
+- `delete()` method with `{ ids: [...] }` format (doesn't exist)
+
+### Root Cause
+The tests were written with mocks based on a different vector store API (possibly LangChain's interface), but the actual VectorStore implementation uses a custom interface. The MemoryStorage adapter code is CORRECT - it's the test mocks that are WRONG.
+
+### Solution Strategy
+
+**Approach: Fix the test mocks to match actual VectorStore interface**
+
+Instead of changing the working production code, we need to:
+1. Update test mocks to use correct method names
+2. Fix document structure in mocks
+3. Remove non-existent method expectations
+4. Ensure mock behavior matches real VectorStore
+
+### Risk Analysis
+- **Low Risk**: Only changing test files, not production code
+- **No Breaking Changes**: Production code is working correctly
+- **Test Coverage**: Will accurately test the actual implementation
+
+### Success Criteria
+- All storage strategy tests pass
+- Mocks accurately reflect real VectorStore interface
+- No changes to production code needed
+- Tests actually validate correct behavior
+
+### Detailed Task Breakdown
+
+#### Phase 1: Analyze VectorStore Interface
+1. Document actual VectorStore methods and signatures
+2. Document actual Document interface structure
+3. Note return types and behaviors
+
+#### Phase 2: Fix MemoryStorage Test Mocks
+1. Replace `similaritySearchWithScore` mock with `search`
+2. Replace `getDocuments` mock with `getAllDocuments`
+3. Remove `delete` mock (not used in MemoryStorage)
+4. Fix document structure (remove `pageContent`, use `content`)
+5. Update mock return values to match actual types
+
+#### Phase 3: Fix Test Expectations
+1. Update `addDocument` test to check correct structure
+2. Fix `search` test to use correct method and return type
+3. Update `deleteDocument` test to expect workaround behavior
+4. Fix `listDocuments` test to use `getAllDocuments`
+
+#### Phase 4: Validate PersistentStorage Tests
+1. Check if PersistentStorage tests have similar issues
+2. Apply same fixes if needed
+3. Ensure consistency across all storage tests
+
+#### Phase 5: Run and Verify
+1. Run individual test file first
+2. Check for any remaining failures
+3. Run full test suite
+4. Document any additional issues found
+
+---
+
 ## 2025-09-20 - Agent Instructions Restructuring COMPLETE ✅
 
 ### What We Did
