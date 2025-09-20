@@ -1,5 +1,15 @@
 # Scratchpad - Planning & Notes
 
+## 2025-09-20 - Slash Command Ideas Documented
+
+### Created slash-ideas.md
+- Documented /dev-workflow command for complete development workflow
+- Based on agents.md behavioral contract
+- Includes both full and short versions
+- Added additional command ideas for common tasks
+
+---
+
 ## 2025-09-20 - Critical Test Failures Fix COMPLETE ✅
 
 ### SUCCESS! All storage strategy tests are now passing (23/23)

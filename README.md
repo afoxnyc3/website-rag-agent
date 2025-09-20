@@ -257,6 +257,7 @@ The project maintains detailed documentation:
 - `decision-log.md`: Technical decisions
 - `change-log.md`: Implementation history
 - `scratchpad.md`: Planning notes (MUST use before coding)
+- `slash-ideas.md`: Automation command templates for Claude Code
 
 ## 🤝 Contributing
 

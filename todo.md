@@ -36,6 +36,11 @@
 
 ## 📅 Recent Accomplishments (2025-09-20)
 
+### Slash Command Ideas Documented ✅
+- [x] Created slash-ideas.md with workflow automation commands
+- [x] Documented /dev-workflow for complete development cycle
+- [x] Added additional command ideas for common tasks
+
 ### Critical Test Failures Fixed ✅
 - [x] Identified root cause: test mocks didn't match actual VectorStore API
 - [x] Fixed all storage strategy test mocks (23 tests now passing)
