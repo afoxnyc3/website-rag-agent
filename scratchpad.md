@@ -1,5 +1,37 @@
 # Scratchpad - Planning & Notes
 
+## 2025-09-20 - Agent Instructions Restructuring COMPLETE ✅
+
+### What We Did
+Successfully restructured the agent instruction files as planned:
+
+#### agents.md (Now 135 lines - Primary Behavioral Contract)
+- ✅ Added MANDATORY PRE-FLIGHT CHECKLIST at the top
+- ✅ Moved all workflow rules from CLAUDE.md
+- ✅ Added planning template with clear structure
+- ✅ Created "Common Mistakes to Avoid" section
+- ✅ Included tool usage guide
+- ✅ Fixed GPT-5 reference → GPT-4
+- ✅ Added development checklist
+
+#### CLAUDE.md (Now 313 lines - Technical Reference)
+- ✅ Removed workflow documentation rules
+- ✅ Removed development checklist (moved to agents.md)
+- ✅ Added clear header pointing to agents.md FIRST
+- ✅ Kept all technical specifications
+- ✅ Added cross-references to other docs
+
+### Results
+- **Before**: CLAUDE.md was 344 lines with buried workflow instructions
+- **After**: Clear separation - agents.md for behavior, CLAUDE.md for technical reference
+- **Impact**: Workflow instructions are now impossible to miss
+- **Validation**: All content preserved, no information lost
+
+### Key Achievement
+The restructuring ensures that planning in scratchpad.md is now unavoidable - it's the first item in the mandatory pre-flight checklist in the primary behavioral contract (agents.md).
+
+---
+
 ## 2025-09-19 - Agent Instructions Restructuring Plan
 
 ### Problem Identified

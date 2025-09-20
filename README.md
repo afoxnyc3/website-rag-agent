@@ -249,11 +249,12 @@ pnpm test
 ## 🔄 Development Workflow
 
 The project maintains detailed documentation:
-- `CLAUDE.md`: AI assistant instructions
+- `agents.md`: Primary behavioral contract and workflow guide
+- `CLAUDE.md`: Technical reference and architecture details
 - `todo.md`: Task tracking
 - `decision-log.md`: Technical decisions
 - `change-log.md`: Implementation history
-- `scratchpad.md`: Planning notes
+- `scratchpad.md`: Planning notes (MUST use before coding)
 
 ## 🤝 Contributing
 

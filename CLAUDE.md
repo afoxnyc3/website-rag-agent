@@ -1,6 +1,8 @@
-# CLAUDE.md
+# CLAUDE.md - Technical Reference
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+**For workflow and behavioral guidance, see [agents.md](./agents.md) FIRST**
+
+This file provides technical reference for the project architecture and implementation details.
 
 ## Project Overview
 
@@ -187,34 +189,6 @@ This is a TypeScript Next.js 15 starter template for AI-powered applications:
 - Total response: <200ms average
 - Support 100+ concurrent users
 
-## Workflow Documentation Rules
-
-**CRITICAL**: Every development session MUST maintain these documentation files:
-
-### 1. `scratchpad.md` - Planning & Notes
-- Document ALL planning before implementation
-- Capture design decisions and considerations
-- Record research findings and API explorations
-- Update throughout the session
-
-### 2. `todo.md` - Task Tracking
-- Break down all features into specific tasks
-- Mark tasks as: [ ] pending, [x] completed, [~] in-progress
-- Update status in real-time
-- Include phase and priority labels
-
-### 3. `decision-log.md` - Technical Decisions
-- Record every technical choice with rationale
-- Include alternatives considered
-- Document trade-offs
-- Date each entry
-
-### 4. `change-log.md` - Implementation History
-- Log every file modification
-- Include before/after for significant changes
-- Record refactoring decisions
-- Note breaking changes
-
 ## Git Workflow
 
 ### Branch Naming
@@ -314,28 +288,23 @@ The project uses a pnpm workspace with specific built dependencies:
 - `@tailwindcss/oxide`
 - `sharp`
 
-## Key Resources
+## Related Documentation
+
+- **Workflow Guide**: [agents.md](./agents.md) - START HERE
+- **API Reference**: [API.md](./API.md)
+- **Project Overview**: [README.md](./README.md)
+
+## External Resources
 - [Vercel AI SDK RAG Example](https://github.com/vercel-labs/ai-sdk-preview-rag)
 - [Playwright Docs](https://playwright.dev/docs/scraping)
 - [Vercel Postgres + pgvector](https://vercel.com/docs/storage/vercel-postgres)
 
-## Development Checklist
+## Development Standards
 
-Before starting any task:
-1. ✅ Update `scratchpad.md` with plan
-2. ✅ Add tasks to `todo.md`
-3. ✅ Check `quality-standards.md` for guidelines
-
-During development:
-1. ✅ Update `decision-log.md` for choices
-2. ✅ Mark `todo.md` items in-progress
-3. ✅ Follow TDD - write tests first
-
-After implementation:
-1. ✅ Update `change-log.md` with modifications
-2. ✅ Mark `todo.md` items complete
-3. ✅ Run lint and format checks
-4. ✅ Verify confidence scoring works
+- Follow TDD approach with comprehensive tests
+- Maintain code quality standards (see below)
+- Verify all features work before marking complete
+- Run tests with `pnpm test`
 
 ## Monitoring & Evaluation
 - Log all queries, responses, and confidence scores
