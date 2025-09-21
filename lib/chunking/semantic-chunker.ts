@@ -126,7 +126,39 @@ export class SemanticChunker {
   }
 
   private chunkSemantic(text: string, config: Required<ChunkOptions>): Chunk[] {
-    // For simple repeating text without semantic boundaries
+    // Split by paragraph boundaries first
+    const paragraphs = text.split(/\n\n+/).map(p => p.trim()).filter(p => p);
+
+    // If we have clear paragraphs and they're small enough, return them as chunks
+    if (paragraphs.length > 1 && paragraphs.every(p => p.length <= config.maxSize)) {
+      const chunks: Chunk[] = [];
+      let currentOffset = 0;
+
+      for (const para of paragraphs) {
+        // Find the actual position of this paragraph in the original text
+        const paraIndex = text.indexOf(para, currentOffset);
+
+        chunks.push(this.createChunk(
+          para,
+          chunks.length,
+          paraIndex,
+          paraIndex + para.length,
+          'semantic',
+          false
+        ));
+
+        currentOffset = paraIndex + para.length;
+      }
+
+      // Update totalChunks
+      chunks.forEach(chunk => {
+        chunk.totalChunks = chunks.length;
+      });
+
+      return chunks;
+    }
+
+    // For other cases, use boundary-based chunking
     const boundaries = this.findSemanticBoundaries(text);
 
     // If no semantic boundaries found or text is just repeating characters
@@ -164,8 +196,8 @@ export class SemanticChunker {
 
         // Handle overlap
         if (config.overlap > 0) {
-          previousChunkEnd = currentChunk.slice(-Math.min(config.overlap, currentChunk.length)).trim();
-          currentChunk = previousChunkEnd + segment;
+          previousChunkEnd = trimmedChunk.slice(-Math.min(config.overlap, trimmedChunk.length));
+          currentChunk = previousChunkEnd + ' ' + segment;
           currentStartOffset = lastIndex - previousChunkEnd.length;
         } else {
           currentChunk = segment;
@@ -378,7 +410,7 @@ export class SemanticChunker {
     const paragraphRegex = /\n\n+/g;
     let match;
     while ((match = paragraphRegex.exec(text)) !== null) {
-      boundaries.push({ index: match.index + match[0].length, type: 'paragraph' });
+      boundaries.push({ index: match.index, type: 'paragraph' });
     }
 
     // Find sentence boundaries

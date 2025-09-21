@@ -1,5 +1,87 @@
 # Scratchpad - Planning & Notes
 
+## 2025-09-20 - SemanticChunker Test Failures Analysis & Fix Plan
+
+### Problem Analysis
+
+**4 Test Failures Identified:**
+
+1. **Multiple newlines as paragraph boundaries** (line 77-90)
+   - Test expects 3 chunks for `'Para 1\n\n\nPara 2\n\nPara 3'`
+   - Getting only 2 chunks
+   - Root cause: The regex `\n\n+` treats `\n\n\n` as one boundary instead of recognizing triple newlines as stronger separation
+
+2. **Overlap functionality** (line 157-172)
+   - Test expects overlap between chunks: `chunks[1].content.startsWith(chunks[0].content.slice(-10))`
+   - Getting false (no overlap)
+   - Root cause: Overlap logic in `chunkSemantic()` not properly preserving end of previous chunk
+
+3. **Position offset tracking** (line 203-211)
+   - Test expects chunk[0].endOffset to be 12 for "First chunk."
+   - Getting 13
+   - Root cause: Off-by-one error in offset calculation, likely including space after period
+
+4. **Unicode character length** (line 264-272)
+   - Test expects chunks to be ≤20 chars for `'Hello 世界! 🌍 Special chars: @#$%^&*()'`
+   - Getting 27 chars
+   - Root cause: Unicode characters counted incorrectly - emojis/Chinese chars take multiple bytes
+
+### Solution Strategy
+
+#### Fix 1: Multiple Newlines (HIGH PRIORITY)
+- Modify `findSemanticBoundaries()` to split on each `\n\n` occurrence
+- Treat triple+ newlines as multiple boundaries
+- Update paragraph regex from `/\n\n+/g` to handle each double newline separately
+
+#### Fix 2: Overlap Implementation (MEDIUM PRIORITY)
+- In `chunkSemantic()`, fix the overlap logic at lines 166-169
+- Ensure `previousChunkEnd` is properly added to next chunk start
+- Fix the calculation of `currentStartOffset` when overlap is applied
+
+#### Fix 3: Offset Tracking (MEDIUM PRIORITY)
+- Review offset calculations in `chunkSemantic()` lines 158-160
+- Fix off-by-one error: `endOffset` should be exclusive (not include the character at that position)
+- Ensure trimming doesn't affect offset calculations
+
+#### Fix 4: Unicode Handling (LOW PRIORITY)
+- Use `Array.from(text)` or `[...text]` to handle Unicode properly
+- Count grapheme clusters instead of UTF-16 code units
+- May need to adjust how `slice()` operations work with Unicode
+
+### Implementation Plan
+
+1. **Setup & Verification**
+   - Create isolated test file to reproduce each failure
+   - Verify current behavior matches test output
+
+2. **Fix Multiple Newlines**
+   - Modify paragraph boundary detection
+   - Split text on each `\n\n` individually
+   - Test with various newline combinations
+
+3. **Fix Overlap Logic**
+   - Debug current overlap behavior with console logs
+   - Fix previousChunkEnd preservation
+   - Ensure overlap text appears at start of next chunk
+
+4. **Fix Offset Calculation**
+   - Track exact character positions through chunking
+   - Account for trimming operations
+   - Ensure endOffset = startOffset + content.length (untrimmed)
+
+5. **Fix Unicode Length**
+   - Implement proper Unicode string length calculation
+   - Use grapheme cluster counting
+   - Test with various Unicode characters
+
+### Success Criteria
+- All 4 failing tests pass
+- No regression in other tests (20 tests should remain passing)
+- Code remains clean and maintainable
+- Performance not significantly impacted
+
+---
+
 ## 2025-09-20 - Context-Priming Slash Command `/prime` Created
 
 ### What We Built
