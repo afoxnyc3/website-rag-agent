@@ -142,7 +142,7 @@ class RAGvsDirectAnalyzer {
 
 ---
 
-## 2025-09-21 - Source Attribution Enhancement 🚀 IN PROGRESS
+## 2025-09-21 - Source Attribution Enhancement ✅ COMPLETED
 
 ### 🔬 ULTRATHINK: Source Attribution Fix
 
@@ -160,14 +160,15 @@ Currently, when users see source citations in responses, they only see base URLs
 
 **Key Finding**: The backend is NOT the problem. Full URLs are being preserved through the entire data pipeline.
 
-#### Root Cause FOUND! 🎯
+#### Solution Implemented ✅
 
-The issue is in the **UI Layer**, specifically in `/components/ai-elements/inline-citation.tsx`:
+**PR #12 Merged**: Fixed UI to show clean hostnames while preserving full URLs:
 
-- Line 53: `InlineCitationCardTrigger` displays `sources[0]` directly
-- This shows the full URL in the badge (e.g., "https://docs.example.com/api/auth")
-- Should instead show a cleaner display like domain name or page title
-- The actual URL should be preserved but shown in hover/expanded view
+- Modified `InlineCitationCardTrigger` to extract and display hostname
+- Full URLs still preserved in data for verification
+- Cleaner UI with "example.com" instead of full paths in badges
+
+**PR #13 Created**: Fixed flaky CrawlTool test that was timing out
 
 #### Solution Architecture
 
@@ -336,24 +337,113 @@ confidence = (
 
 ---
 
-## Next Focus Areas (from roadmap.md)
+## 2025-09-21 - RAG vs Direct Comparison Analysis 🚀 STARTING
 
-### 1. Enhance Confidence Scoring (HIGH PRIORITY)
+### 🔬 ULTRATHINK: Performance Comparison Framework
 
-- Implement multi-factor calculation
-- Add visual indicators in UI
-- Create calibration tests
+#### Problem Statement
 
-### 2. Documentation Cleanup (MEDIUM PRIORITY)
+Need comprehensive comparison between RAG-based and Direct approaches to guide users on optimal method selection. Currently have three modes but no quantitative analysis of trade-offs.
 
-- Resolve discrepancies between claude.md and agents.md
-- Standardize output format documentation
+#### Objectives
 
-### 3. Implement Evals Framework (MEDIUM PRIORITY)
+1. **Benchmark Performance**: Response times, accuracy, token usage
+2. **Create Decision Matrix**: Clear guidelines for approach selection
+3. **Document Trade-offs**: Cost vs quality vs speed analysis
+4. **Build Evaluation Framework**: Automated testing pipeline
+5. **Provide Recommendations**: Map use cases to optimal approach
 
-- Design evaluation pipeline
-- Create initial test dataset
-- Implement basic metrics
+#### Architecture Design
+
+##### 1. Evaluation Dataset
+
+```typescript
+interface EvalQuery {
+  id: string;
+  query: string;
+  category: 'factual' | 'reasoning' | 'creative' | 'retrieval';
+  expectedMode: 'rag' | 'direct' | 'agent';
+  groundTruth?: string;
+  acceptableAnswers?: string[];
+}
+```
+
+##### 2. Metrics Collection
+
+```typescript
+interface PerformanceMetrics {
+  mode: string;
+  responseTime: number;
+  tokensUsed: number;
+  estimatedCost: number;
+  confidence: number;
+  accuracy?: number;
+  relevance?: number;
+}
+```
+
+##### 3. Comparison Framework
+
+```typescript
+class RAGvsDirectAnalyzer {
+  async runComparison(query: EvalQuery): Promise<ComparisonResult>;
+  async runBenchmark(dataset: EvalQuery[]): Promise<BenchmarkReport>;
+  async generateDecisionMatrix(): Promise<DecisionMatrix>;
+}
+```
+
+#### Implementation Strategy (TDD)
+
+##### Phase 1: Evaluation Infrastructure
+
+- Build EvalDataset class with test queries
+- Create MetricsCollector for performance tracking
+- Implement ResultAnalyzer for statistical analysis
+
+##### Phase 2: Test Scenarios
+
+- **Factual**: "What is the capital of France?"
+- **Retrieval**: "What did the documentation say about X?"
+- **Reasoning**: "Why would someone choose Y over Z?"
+- **Creative**: "Generate a story about..."
+
+##### Phase 3: Comparison Logic
+
+- Execute same query in both modes
+- Collect comprehensive metrics
+- Statistical analysis of results
+- Generate comparison reports
+
+##### Phase 4: Decision Matrix
+
+- Query complexity scoring
+- Knowledge base relevance detection
+- Cost-benefit analysis
+- Mode recommendation engine
+
+##### Phase 5: Visualization & Reports
+
+- Performance charts
+- Cost analysis graphs
+- Decision flow diagrams
+- Markdown report generation
+
+#### Success Metrics
+
+1. **Response Time**: RAG < 500ms, Direct < 200ms average
+2. **Accuracy**: Document which mode performs better per category
+3. **Cost Efficiency**: Token usage comparison with $ estimates
+4. **Decision Clarity**: 90% of queries have clear mode recommendation
+5. **Documentation**: Complete analysis report with visualizations
+
+#### Test-First Development Plan
+
+1. Write tests for EvalDataset class
+2. Write tests for MetricsCollector
+3. Write tests for comparison logic
+4. Write tests for decision matrix generation
+5. Write tests for report generation
+6. Implement each component to pass tests
 
 ---
 
