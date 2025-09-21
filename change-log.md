@@ -1,5 +1,28 @@
 # Change Log
 
+## 2025-09-21 - BaseAgent Roadmap Documentation Added
+
+### Comprehensive Development Roadmap
+
+- **Created roadmap.md**: Detailed roadmap with priorities, effort estimates, and success criteria
+- **Organized by priority**: High Priority fixes, Documentation, Quality & Safety, GitHub Workflow
+- **Added to todo.md**: New roadmap section linking high-priority items
+- **Updated scratchpad.md**: ULTRATHINK analysis of priorities and implementation strategy
+- **Created slash commands**: `/roadmap-review` and `/roadmap-task` for roadmap management
+- **Updated README**: Added Development Roadmap section highlighting top priorities
+
+### Key Priorities Identified
+
+1. **Critical Bugs**: Source attribution and web crawling depth issues
+2. **Quality Improvements**: Confidence scoring and RAG vs Direct analysis
+3. **Long-term Health**: Evals framework, guardrails, and documentation
+
+### Implementation Plan
+
+- Week 1: Critical fixes (source attribution, crawling depth, confidence)
+- Week 2: Analysis and documentation
+- Week 3: Quality and safety measures
+
 ## 2025-09-20 - Code Quality Tooling Added
 
 ### Professional Development Standards

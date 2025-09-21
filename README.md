@@ -248,6 +248,23 @@ USE_PERSISTENT_STORAGE=true
 - **SemanticChunker Tests**: 20/24 passing (4 non-critical failures)
 - **Total**: 97 tests passing
 
+## 🗺️ Development Roadmap
+
+### Top Priority Items
+
+1. **Fix Source Attribution** 🐛 - Sources should link to actual pages, not home pages
+2. **Fix Web Crawling Depth** 🐛 - Crawler limited to 2-3 pages despite higher settings
+3. **Enhance Confidence Scoring** 📊 - Improve calculation and add explanations
+
+### Coming Soon
+
+- **RAG vs Direct Analysis** - Performance comparison and recommendations
+- **Evals Framework** - Automated quality testing pipeline
+- **Guardrails** - Content filtering and safety checks
+- **Documentation Improvements** - Streamlined and consistent docs
+
+See [roadmap.md](./roadmap.md) for the complete development roadmap with detailed specifications.
+
 ## ⚠️ Known Issues & Limitations
 
 - **Document Deletion**: Individual document deletion not supported (use Clear All)
@@ -255,6 +272,8 @@ USE_PERSISTENT_STORAGE=true
 - **Token Limits**: Large documents are chunked at 3000 characters
 - **Confidence Threshold**: Set to 0.3 (relatively low for better recall)
 - **ESLint Warnings**: ~115 warnings (mostly `any` types) but non-blocking
+- **Web Crawling**: Currently limited to 2-3 pages (fix in roadmap)
+- **Source Links**: Show base URL instead of specific pages (fix in roadmap)
 
 ## 📋 Development Commands
 

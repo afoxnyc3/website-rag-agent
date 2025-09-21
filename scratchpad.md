@@ -1,5 +1,101 @@
 # Scratchpad - Planning & Notes
 
+## 2025-09-21 - BaseAgent Roadmap Planning
+
+### ULTRATHINK Analysis
+
+**Goal:** Integrate comprehensive roadmap for BaseAgent development with clear priorities and implementation paths.
+
+**Priority Analysis:**
+
+1. **CRITICAL - User Experience Blockers**
+   - Source Attribution Bug: Users can't verify information sources
+   - Web Crawling Depth: Limited to 2-3 pages severely limits knowledge ingestion
+   - These directly impact core functionality
+
+2. **HIGH VALUE - Quality Improvements**
+   - Confidence Scoring: Better transparency builds user trust
+   - RAG vs Direct Analysis: Optimizes performance and costs
+
+3. **FOUNDATION - Long-term Health**
+   - Evals Framework: Prevents regression, ensures quality
+   - Guardrails: Safety for production deployment
+   - Documentation: Reduces onboarding friction
+
+### Risk Assessment
+
+**High Risk Items:**
+
+- Web Crawling Fix: Could break existing crawl functionality
+- Mitigation: Comprehensive testing, feature flag for rollback
+
+**Medium Risk Items:**
+
+- Confidence Scoring Changes: May affect existing thresholds
+- Mitigation: A/B testing, gradual rollout
+
+**Low Risk Items:**
+
+- Documentation updates: No production impact
+- GitHub automation: Development workflow only
+
+### Implementation Strategy
+
+#### Week 1: Critical Fixes
+
+1. **Source Attribution (Day 1)**
+   - Update ScrapeTool/CrawlTool to preserve full URLs
+   - Modify document metadata structure
+   - Test with various websites
+
+2. **Web Crawling Depth (Days 2-3)**
+   - Debug queue management in CrawlTool
+   - Add extensive logging
+   - Test with sites of varying complexity
+
+3. **Confidence Scoring (Day 4)**
+   - Implement multi-factor calculation
+   - Add visual indicators in UI
+   - Create calibration tests
+
+#### Week 2: Analysis & Documentation
+
+4. **RAG vs Direct Analysis (Days 5-7)**
+   - Create evaluation dataset
+   - Run benchmarks
+   - Document findings and recommendations
+
+5. **Documentation Cleanup (Day 8)**
+   - Audit all docs for conflicts
+   - Create clear hierarchy
+   - Add navigation index
+
+#### Week 3: Quality & Safety
+
+6. **Basic Guardrails (Days 9-11)**
+   - Implement input validation
+   - Add rate limiting
+   - Create content filters
+
+7. **Evals Framework Start (Days 12-14)**
+   - Design evaluation pipeline
+   - Create initial test dataset
+   - Implement basic metrics
+
+### Success Metrics
+
+- Fix both critical bugs (source & crawling)
+- Improve confidence scoring accuracy by 20%
+- Complete RAG vs Direct analysis with clear recommendations
+- Zero documentation conflicts
+- Basic guardrails preventing common attacks
+
+### Next Immediate Action
+
+Start with source attribution fix as it's high impact and low risk. The fix is well-understood and can be completed quickly.
+
+---
+
 ## 2025-09-20 - Code Quality Tooling (30-Minute Polish)
 
 ### ULTRATHINK Analysis
@@ -98,6 +194,7 @@ Since this is tooling configuration, our "tests" are:
 ### Implementation Complete ✅
 
 Successfully added code quality tooling:
+
 - ESLint configured with TypeScript rules
 - Prettier configured for consistent formatting
 - Husky pre-commit hooks with lint-staged

@@ -225,6 +225,32 @@
 - [ ] Implement request timeout handling
 - [ ] Add rate limiting per IP
 
+## 🚀 Roadmap Items (Next Development Cycle)
+
+### Critical Fixes (HIGH PRIORITY - Week 1)
+
+- [ ] **Fix Source Attribution** - Links should point to actual pages, not home pages
+- [ ] **Fix Web Crawling Depth** - Crawler stops after 2-3 pages despite higher settings
+- [ ] **Enhance Confidence Scoring** - Improve calculation and add explanations
+
+### Analysis & Documentation (MEDIUM PRIORITY - Week 2)
+
+- [ ] **RAG vs Direct Analysis** - Complete performance comparison
+- [ ] **Documentation Cleanup** - Resolve claude.md/agents.md discrepancies
+- [ ] **Create Doc Slash Command** - Auto-update docs from code
+
+### Quality & Safety (MEDIUM PRIORITY - Week 3)
+
+- [ ] **Implement Evals Framework** - Automated quality testing
+- [ ] **Add Guardrails** - Content filtering and safety checks
+
+### GitHub Workflow (LOW PRIORITY)
+
+- [ ] **Repository Organization** - GitHub Projects and Issues
+- [ ] **Code Review Automation** - Claude app for PRs
+
+**Full roadmap**: See [roadmap.md](./roadmap.md) for detailed specifications
+
 ## 🚀 Next Development Phases
 
 ### Phase 4: Testing & Quality ✅ MOSTLY COMPLETE

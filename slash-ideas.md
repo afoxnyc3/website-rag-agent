@@ -161,9 +161,58 @@ Review and update project documentation:
 
 ---
 
+## /roadmap-review - Review and Prioritize Roadmap Items
+
+### Purpose
+
+Reviews the current roadmap, assesses progress, and helps prioritize next actions based on impact and effort.
+
+### Command Prompt
+
+```
+Review roadmap and prioritize next actions:
+1. Read roadmap.md for all planned items
+2. Check todo.md for items in progress
+3. Assess each item by:
+   - User impact (critical/high/medium/low)
+   - Implementation effort (hours/days/weeks)
+   - Risk level (breaking changes, dependencies)
+4. Recommend top 3 items to tackle next
+5. Create implementation plan for #1 priority
+Output: Priority matrix and actionable next steps
+```
+
+---
+
+## /roadmap-task - Convert Roadmap Item to Tasks
+
+### Purpose
+
+Takes a roadmap item and breaks it down into granular, actionable tasks with clear success criteria.
+
+### Command Prompt
+
+```
+Convert roadmap item to actionable tasks:
+1. Identify the roadmap item: [ITEM_NAME]
+2. Break down into subtasks (max 4 hours each)
+3. Add tasks to todo.md with:
+   - Clear descriptions
+   - Success criteria
+   - Dependencies
+   - Estimated time
+4. Create implementation plan in scratchpad.md
+5. Identify risks and mitigation strategies
+Item: [USER_INPUT]
+```
+
+---
+
 ## Future Command Ideas
 
 - **/refactor** - Safely refactor code with test coverage
 - **/add-feature** - Add new feature following full workflow
 - **/optimize** - Performance optimization workflow
 - **/security-review** - Security audit and fixes
+- **/evals-run** - Run evaluation framework on agent responses
+- **/benchmark** - Compare RAG vs Direct performance
