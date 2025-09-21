@@ -1,5 +1,39 @@
 # Change Log
 
+## 2025-09-21 - Playwright Browser Auto-Installation Fix
+
+### Critical Onboarding Issue Resolved
+
+#### Problem
+
+- New users experienced crashes when trying to scrape websites
+- Error: `Executable doesn't exist at /path/to/node_modules/playwright/.local-browsers/chromium-xxx/chrome-linux/chrome`
+- Playwright npm package was installed but browser binaries were missing
+- Users had to manually run `npx playwright install` which wasn't documented
+
+#### Solution
+
+- Added `postinstall` script to package.json: `"postinstall": "npx playwright install"`
+- Updated README.md to clarify browsers are automatically installed
+- Added note in Quick Start section about automatic browser installation
+- Updated Tech Stack section to mention browsers are auto-installed
+- Created `docs/fix-instructions.md` documenting the issue and solution
+
+#### Impact
+
+- Eliminated onboarding crashes for new users
+- Zero manual steps required - just `pnpm install` and everything works
+- Improved developer experience with seamless setup
+- Standard practice aligned with other browser automation tools
+
+### Files Modified
+
+- `package.json`: Added postinstall script
+- `README.md`: Updated prerequisites and setup instructions
+- `docs/fix-instructions.md`: Created comprehensive documentation of the fix
+
+---
+
 ## 2025-09-21 - Source Attribution Fix & Tool Selection Bug Fix
 
 ### Major Bug Fixes

@@ -6,7 +6,7 @@
 
 **Issue**: New users experienced crashes when scraping due to missing Playwright browser binaries
 **Solution**: Added postinstall script and updated documentation
-**Status**: Ready for commit and PR
+**Status**: ✅ MERGED to main branch
 
 ### Changes Made
 

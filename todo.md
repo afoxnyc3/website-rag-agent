@@ -41,13 +41,21 @@
 
 ## 📅 Recent Accomplishments (2025-09-21)
 
+### Playwright Installation Fix ✅
+
+- [x] Added postinstall script to automatically install Playwright browsers
+- [x] Updated README.md prerequisites and setup instructions
+- [x] Created fix-instructions.md documenting the issue and solution
+- [x] Eliminated new user onboarding crashes from missing browser binaries
+- [x] Merged PR for automatic Playwright browser installation
+
 ### Source Attribution Fix ✅
 
 - [x] Fixed source URLs to display full paths instead of just hostnames
 - [x] Fixed InlineCitationCardTrigger component to show complete URLs
 - [x] Fixed BaseAgent selectTool() to return correct tool names
 - [x] Added 15 comprehensive URL preservation tests
-- [x] Created PR #8 for source attribution fix
+- [x] Created and merged PR #8 for source attribution fix
 
 ### RAG vs Direct Mode Analysis ✅
 

@@ -1,5 +1,32 @@
 # Decision Log
 
+## 2025-09-21 - Playwright Browser Auto-Installation
+
+### Decision: Add postinstall script for automatic Playwright browser installation
+
+**Problem**: New users experienced crashes when scraping websites because Playwright browser binaries weren't installed
+
+**Solution Chosen**:
+
+- Add `postinstall` script to package.json: `"postinstall": "npx playwright install"`
+- Update README.md to clarify browsers are auto-installed
+- Document the fix in docs/fix-instructions.md
+
+**Rationale**:
+
+- Eliminates confusing crashes for new users
+- Makes setup process smooth and reliable
+- Standard practice for browser automation tools
+- No manual steps required after `pnpm install`
+
+**Alternatives Considered**:
+
+1. Manual instruction in README - Rejected: Users often miss manual steps
+2. Separate setup script - Rejected: Adds complexity
+3. Check at runtime - Rejected: Too late, user already frustrated
+
+**Result**: Zero-friction onboarding with automatic browser installation
+
 ## 2025-09-21 - Mode Detection Implementation
 
 ### Decision: Track execution metrics to accurately determine response mode
