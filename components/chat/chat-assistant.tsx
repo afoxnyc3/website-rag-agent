@@ -50,7 +50,7 @@ type ChatMessage = {
   content: string;
   confidence?: number;
   sources?: string[];
-  mode?: 'rag' | 'direct';
+  mode?: 'rag' | 'direct' | 'agent';
 };
 
 export default function ChatAssistant() {
@@ -358,9 +358,20 @@ export default function ChatAssistant() {
                     {message.mode && (
                       <Badge
                         variant="outline"
-                        className="bg-blue-500/10 text-blue-700 border-blue-500/20 flex items-center gap-1"
+                        className={
+                          message.mode === 'agent'
+                            ? 'bg-purple-500/10 text-purple-700 border-purple-500/20 flex items-center gap-1'
+                            : message.mode === 'rag'
+                              ? 'bg-blue-500/10 text-blue-700 border-blue-500/20 flex items-center gap-1'
+                              : 'bg-green-500/10 text-green-700 border-green-500/20 flex items-center gap-1'
+                        }
                       >
-                        {message.mode === 'rag' ? (
+                        {message.mode === 'agent' ? (
+                          <>
+                            <Network className="w-3 h-3" />
+                            Agent Mode
+                          </>
+                        ) : message.mode === 'rag' ? (
                           <>
                             <Database className="w-3 h-3" />
                             RAG Mode

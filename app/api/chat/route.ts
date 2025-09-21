@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { BaseAgent } from '@/lib/agent/base-agent';
+import { BaseAgent, RAGResponseWithMetrics } from '@/lib/agent/base-agent';
 import { ToolRegistry } from '@/lib/tools/tool';
 import { ScrapeTool } from '@/lib/tools/scrape-tool';
 import { CrawlTool } from '@/lib/tools/crawl-tool';
@@ -140,12 +140,32 @@ export async function POST(request: NextRequest) {
     // Execute the agent's full orchestration pipeline
     const response = await agent.execute(message);
 
+    // Determine mode based on execution metrics
+    let mode = 'direct'; // Default to direct
+
+    if (response.metrics) {
+      if (response.metrics.toolsUsed) {
+        mode = 'agent'; // Agent orchestration with tools
+      } else if (response.metrics.ragUsed) {
+        mode = 'rag'; // RAG knowledge retrieval only
+      }
+      // If neither tools nor RAG were used, mode remains 'direct'
+    }
+
+    // Add debug logging in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Mode Detection] Metrics:', response.metrics);
+      console.log('[Mode Detection] Determined mode:', mode);
+    }
+
     // Return response in the expected format for the UI
     return NextResponse.json({
       response: response.answer,
       confidence: response.confidence,
       sources: response.sources,
-      mode: 'agent', // Changed from 'rag' to 'agent' to reflect new architecture
+      mode,
+      // Include metrics for analysis (optional, can be removed in production)
+      metrics: response.metrics,
     });
   } catch (error) {
     console.error('Agent API error:', error);

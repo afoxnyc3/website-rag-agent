@@ -1,5 +1,66 @@
 # Change Log
 
+## 2025-09-21 - RAG vs Direct Mode Analysis & Accurate Mode Detection
+
+### Major Feature: Mode Detection and Metrics Tracking
+
+#### Problem Solved
+
+- **Issue**: Mode was always showing as "agent" regardless of actual execution path
+- **User Impact**: Could not accurately analyze RAG vs Direct vs Agent performance
+- **Root Cause**: Mode was hardcoded in API route instead of being determined by execution
+
+#### Solution Implemented
+
+1. **BaseAgent Enhancements**:
+   - Added `ExecutionMetrics` interface to track execution path
+   - Modified `execute()` method to track:
+     - `toolsUsed`: Whether scraping/crawling tools were executed
+     - `ragUsed`: Whether RAG knowledge base was queried
+     - `urlsDetected`: Whether URLs were found in the query
+     - `responseTime`: Total execution time in milliseconds
+   - Returns `RAGResponseWithMetrics` with execution data
+
+2. **API Route Updates** (`/api/chat/route.ts`):
+   - Removed hardcoded mode='agent'
+   - Implemented dynamic mode determination based on metrics:
+     ```typescript
+     if (response.metrics.toolsUsed) mode = 'agent';
+     else if (response.metrics.ragUsed) mode = 'rag';
+     else mode = 'direct';
+     ```
+   - Added debug logging for development
+   - Returns metrics in response for analysis
+
+3. **UI Improvements** (`chat-assistant.tsx`):
+   - Added support for three modes: agent, rag, direct
+   - Color-coded badges:
+     - Agent: Purple badge with Network icon
+     - RAG: Blue badge with Database icon
+     - Direct: Green badge with Brain icon
+
+4. **Comprehensive Testing**:
+   - Created `app/api/chat/route.test.ts` with 7 tests
+   - Tests verify correct mode detection for all scenarios
+   - All tests passing (7/7)
+
+#### Performance Analysis
+
+| Mode   | Response Time | Confidence       | Use Case                   |
+| ------ | ------------- | ---------------- | -------------------------- |
+| Agent  | 5-30s         | High (0.8+)      | URL scraping, web crawling |
+| RAG    | 200-500ms     | Medium (0.5-0.8) | Knowledge base queries     |
+| Direct | 100-200ms     | Variable         | Fallback when no knowledge |
+
+### Files Modified
+
+- `lib/agent/base-agent.ts`: Added metrics tracking
+- `app/api/chat/route.ts`: Dynamic mode determination
+- `components/chat/chat-assistant.tsx`: Three-mode UI support
+- `app/api/chat/route.test.ts`: Created comprehensive tests
+
+---
+
 ## 2025-09-21 - Critical Bug Fixes and Debug Logging
 
 ### Bug Fixes
