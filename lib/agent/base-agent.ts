@@ -298,6 +298,8 @@ export class BaseAgent {
       return {
         answer: "I don't have access to a knowledge base",
         confidence: 0,
+        confidenceLevel: 'low' as any,
+        confidenceExplanation: 'No knowledge base available for retrieval.',
         sources: [],
         chunks: [],
       };

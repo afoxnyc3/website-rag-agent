@@ -1,5 +1,54 @@
 # Scratchpad - Planning & Notes
 
+## 2025-09-21 - Enhance Confidence Scoring 🚀 IN PROGRESS
+
+### Problem Analysis
+
+Current confidence scoring is too simplistic - only uses vector similarity. Users need:
+
+- Multi-factor confidence calculation
+- Clear visual indicators (green/yellow/red)
+- Explanations for confidence levels
+- Better handling of low-confidence responses
+
+### Solution Design
+
+#### Multi-Factor Confidence Formula
+
+```
+confidence = (
+  similarityScore * 0.4 +    // Vector similarity weight
+  sourceCountScore * 0.2 +    // Number of sources weight
+  recencyScore * 0.2 +        // How recent sources are
+  diversityScore * 0.2        // Source diversity weight
+)
+```
+
+#### Confidence Levels
+
+- **High** (0.7-1.0): ✅ Green - "I'm confident in this answer"
+- **Medium** (0.4-0.69): ⚠️ Yellow - "I found some relevant information"
+- **Low** (0.0-0.39): ❌ Red - "I don't have enough information"
+
+#### Implementation Plan (TDD)
+
+1. Create ConfidenceCalculator class with tests
+2. Implement multi-factor calculation
+3. Add confidence explanations
+4. Integrate with RAG service
+5. Update UI with visual indicators
+6. Add calibration tests
+
+### Test-First Development
+
+- Write comprehensive tests for each factor
+- Test edge cases (no sources, old sources, etc.)
+- Test threshold boundaries
+- Test explanation generation
+- Test UI component rendering
+
+---
+
 ## 2025-09-21 - Playwright Installation Fix ✅ COMPLETED
 
 ### Problem Solved

@@ -162,6 +162,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       response: response.answer,
       confidence: response.confidence,
+      confidenceLevel: response.confidenceLevel,
+      confidenceExplanation: response.confidenceExplanation,
       sources: response.sources,
       mode,
       // Include metrics for analysis (optional, can be removed in production)
