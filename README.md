@@ -73,6 +73,7 @@ graph TB
 - **Node.js** 18.17 or later
 - **pnpm** 8.0 or later
 - **OpenAI API Key** with GPT-4 access
+- **Playwright browsers** (automatically installed during setup)
 
 ### Quick Start
 
@@ -81,7 +82,7 @@ graph TB
 ```bash
 git clone https://github.com/yourusername/website-rag-agent.git
 cd website-rag-agent
-pnpm install
+pnpm install  # This will also install Playwright browsers automatically
 ```
 
 2. **Configure environment:**
@@ -147,7 +148,7 @@ Query: "How do I configure authentication?"
 - **AI**: Vercel AI SDK 5 + OpenAI GPT-4
 - **Embeddings**: OpenAI text-embedding-3-small (1536 dimensions)
 - **UI**: shadcn/ui components + Tailwind CSS v4
-- **Web Scraping**: Playwright + native fetch API
+- **Web Scraping**: Playwright + native fetch API (browsers auto-installed)
 - **Storage**:
   - Development: In-memory Map-based store
   - Production: Vercel Postgres with pgvector
