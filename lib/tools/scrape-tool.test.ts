@@ -1,29 +1,34 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ScrapeTool } from './scrape-tool';
 import { ToolResult } from './tool';
+import { FetchScraper } from '@/lib/scraper-fetch';
 
-// Mock the scrapers
+// Mock the scrapers to preserve URLs
 vi.mock('@/lib/scraper-playwright', () => ({
   PlaywrightScraper: vi.fn().mockImplementation(() => ({
     initialize: vi.fn(),
-    scrape: vi.fn().mockResolvedValue({
-      url: 'https://example.com',
-      title: 'Example Page',
-      content: 'This is example content from Playwright',
-      scrapedAt: new Date(),
-    }),
+    scrape: vi.fn().mockImplementation((url) =>
+      Promise.resolve({
+        url: url, // Preserve the actual URL passed in
+        title: 'Example Page',
+        content: 'This is example content from Playwright',
+        scrapedAt: new Date(),
+      })
+    ),
     close: vi.fn(),
   })),
 }));
 
 vi.mock('@/lib/scraper-fetch', () => ({
   FetchScraper: vi.fn().mockImplementation(() => ({
-    scrape: vi.fn().mockResolvedValue({
-      url: 'https://example.com',
-      title: 'Example Page',
-      content: 'This is example content from Fetch',
-      scrapedAt: new Date(),
-    }),
+    scrape: vi.fn().mockImplementation((url) =>
+      Promise.resolve({
+        url: url, // Preserve the actual URL passed in
+        title: 'Example Page',
+        content: 'This is example content from Fetch',
+        scrapedAt: new Date(),
+      })
+    ),
   })),
 }));
 
@@ -227,6 +232,99 @@ describe('ScrapeTool', () => {
       const formatted = tool.formatOutput(result);
       expect(formatted).toContain('Test Page');
       expect(formatted).toContain('Test content');
+    });
+  });
+
+  describe('URL Preservation Diagnostics', () => {
+    it('should preserve full URL with path and fragment', async () => {
+      const fullUrl = 'https://docs.example.com/api/authentication#oauth2';
+      const result = await tool.execute({ url: fullUrl, strategy: 'fetch' });
+
+      expect(result.success).toBe(true);
+      expect(result.data?.url).toBe(fullUrl);
+      expect(result.data?.url).toContain('/api/authentication');
+      expect(result.data?.url).toContain('#oauth2');
+    });
+
+    it('should preserve URL with query parameters', async () => {
+      const urlWithParams = 'https://example.com/search?q=baseagent&page=2';
+      const result = await tool.execute({ url: urlWithParams, strategy: 'fetch' });
+
+      expect(result.success).toBe(true);
+      expect(result.data?.url).toBe(urlWithParams);
+      expect(result.data?.url).toContain('?q=baseagent');
+      expect(result.data?.url).toContain('&page=2');
+    });
+
+    it('should preserve complex URLs with special characters', async () => {
+      const complexUrl = 'https://api.example.com/v2/data?filter[status]=active&sort=-created_at';
+      const result = await tool.execute({ url: complexUrl, strategy: 'fetch' });
+
+      expect(result.success).toBe(true);
+      expect(result.data?.url).toBe(complexUrl);
+      expect(result.data?.url).toContain('[status]=active');
+    });
+
+    it('should preserve URL in cache operations', async () => {
+      const fullUrl = 'https://example.com/docs/guide/installation';
+
+      // First request - should cache
+      const result1 = await tool.execute({ url: fullUrl, cache: true });
+      expect(result1.success).toBe(true);
+      expect(result1.data?.url).toBe(fullUrl);
+
+      // Second request - from cache
+      const result2 = await tool.execute({ url: fullUrl, cache: true });
+      expect(result2.success).toBe(true);
+      expect(result2.data?.url).toBe(fullUrl);
+      expect(result2.metadata?.fromCache).toBe(true);
+    });
+
+    it('should handle URL redirects properly', async () => {
+      const originalUrl = 'https://example.com/old-page';
+      const redirectedUrl = 'https://example.com/new-section/page?redirected=true';
+
+      // Mock specifically for redirect scenario
+      vi.mocked(FetchScraper).mockImplementationOnce(
+        () =>
+          ({
+            scrape: vi.fn().mockResolvedValueOnce({
+              url: redirectedUrl, // Scraper returns final URL after redirect
+              title: 'Redirected Page',
+              content: 'This page has been moved',
+              scrapedAt: new Date(),
+            }),
+          }) as any
+      );
+
+      const result = await tool.execute({ url: originalUrl, strategy: 'fetch' });
+
+      expect(result.success).toBe(true);
+      expect(result.data?.url).toBe(redirectedUrl);
+      expect(result.data?.url).toContain('/new-section/page');
+      expect(result.data?.url).toContain('?redirected=true');
+    });
+
+    it('should format output with full URL', async () => {
+      const fullUrl = 'https://example.com/documentation/advanced/features';
+
+      const mockResult: ToolResult = {
+        success: true,
+        data: {
+          url: fullUrl,
+          title: 'Advanced Features',
+          content: 'Documentation about advanced features',
+          scrapedAt: new Date(),
+        },
+        metadata: {
+          toolName: 'scrape',
+          strategy: 'fetch',
+        },
+      };
+
+      const formatted = tool.formatOutput(mockResult);
+      expect(formatted).toContain(`URL: ${fullUrl}`);
+      expect(formatted).toContain('Advanced Features');
     });
   });
 });

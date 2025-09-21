@@ -410,4 +410,255 @@ describe('CrawlTool', () => {
       expect(formatted).toContain('1.234s');
     });
   });
+
+  describe('URL Preservation Diagnostics', () => {
+    it('should preserve full URLs for each crawled page', async () => {
+      // Mock ScrapeTool to return different URLs with paths
+      const mockScrapeTool = vi.fn();
+      mockScrapeTool.mockImplementation(({ url }: { url: string }) => {
+        if (url === 'https://docs.example.com/guide/introduction') {
+          return Promise.resolve({
+            success: true,
+            data: {
+              url: 'https://docs.example.com/guide/introduction',
+              title: 'Introduction Guide',
+              content:
+                '<a href="/guide/getting-started">Getting Started</a><a href="/guide/advanced">Advanced</a>',
+            },
+          });
+        } else if (url === 'https://docs.example.com/guide/getting-started') {
+          return Promise.resolve({
+            success: true,
+            data: {
+              url: 'https://docs.example.com/guide/getting-started',
+              title: 'Getting Started',
+              content: '<a href="/guide/installation">Installation</a>',
+            },
+          });
+        }
+        return Promise.resolve({
+          success: true,
+          data: { url, title: 'Page', content: 'Content' },
+        });
+      });
+
+      tool['scrapeTool'].execute = mockScrapeTool;
+
+      const result = await tool.execute({
+        url: 'https://docs.example.com/guide/introduction',
+        maxDepth: 1,
+        maxPages: 10,
+      });
+
+      expect(result.success).toBe(true);
+      const pages = result.data?.pages || [];
+
+      // Check that each page has its full URL preserved
+      const page1 = pages.find((p: any) => p.title === 'Introduction Guide');
+      expect(page1?.url).toBe('https://docs.example.com/guide/introduction');
+      expect(page1?.url).toContain('/guide/introduction');
+
+      const page2 = pages.find((p: any) => p.title === 'Getting Started');
+      if (page2) {
+        expect(page2.url).toBe('https://docs.example.com/guide/getting-started');
+        expect(page2.url).toContain('/guide/getting-started');
+      }
+    });
+
+    it('should preserve URLs with query parameters during crawl', async () => {
+      const mockScrapeTool = vi.fn();
+      mockScrapeTool.mockImplementation(({ url }: { url: string }) => {
+        if (url === 'https://example.com/search?q=baseagent&page=1') {
+          return Promise.resolve({
+            success: true,
+            data: {
+              url: 'https://example.com/search?q=baseagent&page=1',
+              title: 'Search Results Page 1',
+              content: '<a href="/search?q=baseagent&page=2">Next Page</a>',
+            },
+          });
+        } else if (url === 'https://example.com/search?q=baseagent&page=2') {
+          return Promise.resolve({
+            success: true,
+            data: {
+              url: 'https://example.com/search?q=baseagent&page=2',
+              title: 'Search Results Page 2',
+              content: 'Results here',
+            },
+          });
+        }
+        return Promise.resolve({
+          success: true,
+          data: { url, title: 'Page', content: 'Content' },
+        });
+      });
+
+      tool['scrapeTool'].execute = mockScrapeTool;
+
+      const result = await tool.execute({
+        url: 'https://example.com/search?q=baseagent&page=1',
+        maxDepth: 1,
+      });
+
+      expect(result.success).toBe(true);
+      const pages = result.data?.pages || [];
+
+      const firstPage = pages.find((p: any) => p.title === 'Search Results Page 1');
+      expect(firstPage?.url).toBe('https://example.com/search?q=baseagent&page=1');
+      expect(firstPage?.url).toContain('?q=baseagent');
+      expect(firstPage?.url).toContain('&page=1');
+
+      const secondPage = pages.find((p: any) => p.title === 'Search Results Page 2');
+      if (secondPage) {
+        expect(secondPage.url).toBe('https://example.com/search?q=baseagent&page=2');
+        expect(secondPage.url).toContain('?q=baseagent');
+        expect(secondPage.url).toContain('&page=2');
+      }
+    });
+
+    it('should preserve URLs with fragments during crawl', async () => {
+      const mockScrapeTool = vi.fn();
+      mockScrapeTool.mockImplementation(({ url }: { url: string }) => {
+        return Promise.resolve({
+          success: true,
+          data: {
+            url: url, // Preserve whatever URL was passed
+            title: `Page for ${url}`,
+            content: '<a href="/docs#section2">Section 2</a>',
+          },
+        });
+      });
+
+      tool['scrapeTool'].execute = mockScrapeTool;
+
+      const result = await tool.execute({
+        url: 'https://example.com/docs#section1',
+        maxDepth: 1,
+      });
+
+      expect(result.success).toBe(true);
+      const pages = result.data?.pages || [];
+
+      const firstPage = pages[0];
+      expect(firstPage?.url).toBe('https://example.com/docs#section1');
+      expect(firstPage?.url).toContain('#section1');
+    });
+
+    it('should preserve different subdomain URLs', async () => {
+      const mockScrapeTool = vi.fn();
+      mockScrapeTool.mockImplementation(({ url }: { url: string }) => {
+        if (url === 'https://api.example.com/v2/endpoints') {
+          return Promise.resolve({
+            success: true,
+            data: {
+              url: 'https://api.example.com/v2/endpoints',
+              title: 'API Endpoints',
+              content: '<a href="/v2/users">Users API</a>',
+            },
+          });
+        } else if (url === 'https://api.example.com/v2/users') {
+          return Promise.resolve({
+            success: true,
+            data: {
+              url: 'https://api.example.com/v2/users',
+              title: 'Users API',
+              content: 'User endpoints documentation',
+            },
+          });
+        }
+        return Promise.resolve({
+          success: true,
+          data: { url, title: 'Page', content: 'Content' },
+        });
+      });
+
+      tool['scrapeTool'].execute = mockScrapeTool;
+
+      const result = await tool.execute({
+        url: 'https://api.example.com/v2/endpoints',
+        maxDepth: 1,
+      });
+
+      expect(result.success).toBe(true);
+      const pages = result.data?.pages || [];
+
+      const apiPage = pages.find((p: any) => p.title === 'API Endpoints');
+      expect(apiPage?.url).toBe('https://api.example.com/v2/endpoints');
+      expect(apiPage?.url).toContain('api.example.com');
+      expect(apiPage?.url).toContain('/v2/endpoints');
+
+      const usersPage = pages.find((p: any) => p.title === 'Users API');
+      if (usersPage) {
+        expect(usersPage.url).toBe('https://api.example.com/v2/users');
+        expect(usersPage.url).toContain('/v2/users');
+      }
+    });
+
+    it('should preserve full URLs in crawl result data structure', async () => {
+      const testUrl = 'https://docs.example.com/reference/api/authentication#oauth2';
+
+      const mockScrapeTool = vi.fn();
+      mockScrapeTool.mockImplementation(() => {
+        return Promise.resolve({
+          success: true,
+          data: {
+            url: testUrl,
+            title: 'OAuth2 Authentication',
+            content: 'OAuth2 authentication guide',
+          },
+        });
+      });
+
+      tool['scrapeTool'].execute = mockScrapeTool;
+
+      const result = await tool.execute({
+        url: testUrl,
+        maxDepth: 0,
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.data?.startUrl).toBe(testUrl);
+      expect(result.data?.pages[0]?.url).toBe(testUrl);
+      expect(result.data?.pages[0]?.url).toContain('/reference/api/authentication');
+      expect(result.data?.pages[0]?.url).toContain('#oauth2');
+    });
+
+    it('should preserve URLs when formatted for output', async () => {
+      const result = {
+        success: true,
+        data: {
+          startUrl: 'https://docs.example.com/guide/getting-started',
+          pagesVisited: 3,
+          pages: [
+            {
+              url: 'https://docs.example.com/guide/getting-started',
+              depth: 0,
+              links: [],
+            },
+            {
+              url: 'https://docs.example.com/guide/installation#requirements',
+              depth: 1,
+              links: [],
+            },
+            {
+              url: 'https://docs.example.com/guide/configuration?env=production',
+              depth: 1,
+              links: [],
+            },
+          ],
+          crawlTime: 1234,
+          errors: [],
+        },
+      };
+
+      const formatted = tool.formatOutput(result);
+
+      expect(formatted).toContain('https://docs.example.com/guide/getting-started');
+      expect(formatted).toContain('https://docs.example.com/guide/installation#requirements');
+      expect(formatted).toContain('https://docs.example.com/guide/configuration?env=production');
+      expect(formatted).toContain('/guide/getting-started');
+      expect(formatted).toContain('#requirements');
+      expect(formatted).toContain('?env=production');
+    });
+  });
 });
