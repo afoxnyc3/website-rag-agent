@@ -305,15 +305,27 @@ describe('CrawlTool', () => {
     });
 
     it('should handle scraping errors gracefully', async () => {
-      // Mock scraper to fail (test handled through the mock in the module mock)
-      // The ScrapeTool is mocked at the module level, so we'll test basic error recovery
-      const result = await tool.execute({
-        url: 'https://example.com',
+      // Mock scraper to fail with a network error
+      tool['scrapeTool'].execute = vi.fn().mockResolvedValue({
+        success: false,
+        error: 'Network timeout: Failed to load page',
+        metadata: {
+          toolName: 'scrape',
+        },
       });
 
-      // Since scraper is mocked to succeed, this test validates successful execution
+      const result = await tool.execute({
+        url: 'https://example.com',
+        maxDepth: 0, // Limit to single page for fast test
+        maxPages: 1,
+      });
+
+      // Crawl should complete successfully even with scraping error
       expect(result.success).toBe(true);
-      expect(result.data?.pagesVisited).toBeGreaterThan(0);
+      expect(result.data?.pagesVisited).toBe(0); // No pages successfully scraped
+      expect(result.data?.errors).toBeDefined();
+      expect(result.data?.errors).toHaveLength(1);
+      expect(result.data?.errors[0]).toContain('Network timeout');
     });
   });
 
