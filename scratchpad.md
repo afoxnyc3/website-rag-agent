@@ -128,7 +128,110 @@ class RAGvsDirectAnalyzer {
 
 ---
 
-## 2025-09-21 - RAG vs Direct Comparison Analysis 🚀 IN PROGRESS
+## 2025-09-21 - RAG vs Direct Comparison Analysis ✅ COMPLETED
+
+### Implementation Summary
+
+✅ Created comprehensive evaluation framework with 3 core components
+✅ EvalDataset class with 12 default test queries across 4 categories
+✅ MetricsCollector for performance tracking and statistical analysis
+✅ RAGvsDirectAnalyzer for orchestration and comparison
+✅ 47 tests written and passing (100% TDD coverage)
+✅ Decision matrix generation and markdown reporting
+✅ Successfully merged to main branch
+
+---
+
+## 2025-09-21 - Source Attribution Enhancement 🚀 IN PROGRESS
+
+### 🔬 ULTRATHINK: Source Attribution Fix
+
+#### Problem Analysis
+
+Currently, when users see source citations in responses, they only see base URLs (e.g., "docs.example.com") instead of the specific pages where content was found (e.g., "docs.example.com/api/authentication#oauth2"). This reduces trust and makes it difficult for users to verify information or explore related content.
+
+#### Root Cause Investigation
+
+1. **ScrapeTool Issue**: May be storing only the base URL in metadata instead of the full URL
+2. **CrawlTool Issue**: When crawling multiple pages, might not preserve individual page URLs
+3. **RAG Service**: May be losing URL information during document ingestion
+4. **UI Display**: InlineCitationCardTrigger was extracting hostname (fixed previously, but may have other issues)
+
+#### Solution Architecture
+
+##### 1. Metadata Structure Enhancement
+
+```typescript
+interface DocumentMetadata {
+  url: string; // Full URL with path and hash
+  baseUrl: string; // Domain for grouping
+  title: string; // Page title
+  excerpt: string; // Relevant text snippet
+  lastScraped: Date; // Freshness tracking
+  depth?: number; // For crawled pages
+}
+```
+
+##### 2. URL Preservation Pipeline
+
+- ScrapeTool: Ensure full URL is passed to metadata
+- CrawlTool: Preserve individual page URLs for each scraped page
+- RAGService: Maintain URL integrity during chunking
+- Storage: Verify both memory and persistent storage preserve URLs
+
+##### 3. Source Display Enhancement
+
+- Show full URL path in citations
+- Add page title alongside URL
+- Include relevant excerpt on hover
+- Display freshness indicator (how old the source is)
+
+#### Implementation Strategy (TDD)
+
+##### Phase 1: Diagnostic Tests
+
+- Write tests to verify current URL preservation at each stage
+- Test ScrapeTool metadata storage
+- Test CrawlTool page URL tracking
+- Test RAG service document metadata preservation
+- Test storage strategies URL handling
+
+##### Phase 2: Fix URL Preservation
+
+- Update ScrapeTool to always store full URL
+- Update CrawlTool to maintain page-level URLs
+- Ensure RAG service preserves metadata during chunking
+- Verify storage strategies maintain URL integrity
+
+##### Phase 3: Enhance Metadata
+
+- Add page title extraction to scraping tools
+- Implement excerpt extraction (relevant snippet)
+- Add timestamp tracking for freshness
+- Store crawl depth for context
+
+##### Phase 4: UI Improvements
+
+- Update source display component to show full paths
+- Add hover previews with excerpts
+- Implement freshness indicators
+- Add "View Source" links that open in new tabs
+
+#### Test Scenarios
+
+1. **Single Page Scrape**: Verify full URL is preserved
+2. **Multi-Page Crawl**: Each page should have its own URL
+3. **Chunked Documents**: All chunks should reference original URL
+4. **Search Results**: Retrieved documents should have complete URLs
+5. **UI Display**: Sources should show full paths and titles
+
+#### Success Metrics
+
+- 100% of sources display full URL paths
+- Page titles visible for all sources
+- Excerpt previews available on hover
+- Freshness indicators show age of sources
+- Users can click through to exact source pages
 
 ### Problem Analysis
 
