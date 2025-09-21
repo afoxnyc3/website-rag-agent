@@ -1,6 +1,20 @@
 import { Tool, ToolRegistry, ToolResult } from '../tools/tool';
 import { RAGService, RAGResponse } from '../rag';
 
+// Execution Metrics for tracking what was used
+export interface ExecutionMetrics {
+  toolsUsed: boolean;
+  ragUsed: boolean;
+  urlsDetected: boolean;
+  responseTime?: number;
+  tokensUsed?: number;
+}
+
+// Extended RAG Response with metrics
+export interface RAGResponseWithMetrics extends RAGResponse {
+  metrics?: ExecutionMetrics;
+}
+
 // Agent Configuration Interface
 export interface AgentConfig {
   name: string;
@@ -293,9 +307,23 @@ export class BaseAgent {
   }
 
   // Main orchestration method - brings everything together!
-  async execute(query: string): Promise<RAGResponse> {
+  async execute(query: string): Promise<RAGResponseWithMetrics> {
+    const startTime = Date.now();
+
+    // Initialize metrics tracking
+    const metrics: ExecutionMetrics = {
+      toolsUsed: false,
+      ragUsed: false,
+      urlsDetected: false,
+    };
+
     // Step 1: Parse intent
     const intent = this.parseIntent(query);
+
+    // Track if URLs were detected
+    if (intent.type === 'url' && intent.urls && intent.urls.length > 0) {
+      metrics.urlsDetected = true;
+    }
 
     // Step 2: Check if we need to fetch new data
     const shouldFetch = await this.shouldFetchNewData(intent);
@@ -311,6 +339,9 @@ export class BaseAgent {
         });
 
         if (toolResult.success) {
+          // Mark that tools were used
+          metrics.toolsUsed = true;
+
           // Step 5: Process the result
           const processed = await this.processToolResult(toolResult);
 
@@ -321,6 +352,21 @@ export class BaseAgent {
     }
 
     // Step 7: Search knowledge base for answer
-    return this.searchKnowledge(query);
+    const response = await this.searchKnowledge(query);
+
+    // Mark that RAG was used if we got actual results from the knowledge base
+    // RAG is considered "used" if it returned sources or had confidence > 0
+    if (this.ragService && (response.sources.length > 0 || response.confidence > 0)) {
+      metrics.ragUsed = true;
+    }
+
+    // Add response time
+    metrics.responseTime = Date.now() - startTime;
+
+    // Return response with metrics
+    return {
+      ...response,
+      metrics,
+    };
   }
 }
