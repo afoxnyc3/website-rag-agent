@@ -2,6 +2,7 @@ import { Tool, ToolResult, ToolSchema, ToolOptions } from './tool';
 import { PlaywrightScraper } from '@/lib/scraper-playwright';
 import { FetchScraper } from '@/lib/scraper-fetch';
 import { ScrapedContent } from '@/lib/scraper';
+import { validateURLBasic } from '@/lib/security/url-validator';
 
 interface ScrapeInput {
   url: string;
@@ -187,12 +188,8 @@ export class ScrapeTool extends Tool {
   }
 
   private isValidUrl(url: string): boolean {
-    try {
-      const parsed = new URL(url);
-      return parsed.protocol === 'http:' || parsed.protocol === 'https:';
-    } catch {
-      return false;
-    }
+    // Use secure URL validator to prevent SSRF attacks
+    return validateURLBasic(url);
   }
 
   private processContent(scraped: ScrapedContent, maxLength?: number): any {
