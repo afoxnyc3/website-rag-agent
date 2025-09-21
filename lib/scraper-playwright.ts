@@ -1,5 +1,6 @@
 import { chromium, Browser, Page } from 'playwright';
 import { ScrapedContent } from './scraper';
+import { validateURLBasic } from './security/url-validator';
 
 export class PlaywrightScraper {
   private browser: Browser | null = null;
@@ -46,13 +47,8 @@ export class PlaywrightScraper {
 
   isValidUrl(url: string): boolean {
     if (!url) return false;
-
-    try {
-      const parsed = new URL(url);
-      return parsed.protocol === 'http:' || parsed.protocol === 'https:';
-    } catch {
-      return false;
-    }
+    // Use secure URL validator to prevent SSRF attacks
+    return validateURLBasic(url);
   }
 
   getContentSelectors(): string[] {

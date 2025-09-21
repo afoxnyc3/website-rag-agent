@@ -1,7 +1,19 @@
 import { ScrapedContent } from './scraper';
+import { validateURLBasic } from './security/url-validator';
 
 export class FetchScraper {
   async scrape(url: string): Promise<ScrapedContent> {
+    // Validate URL to prevent SSRF attacks
+    if (!validateURLBasic(url)) {
+      return {
+        url,
+        title: '',
+        content: '',
+        scrapedAt: new Date(),
+        error: 'Invalid or blocked URL (security validation failed)',
+      };
+    }
+
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout

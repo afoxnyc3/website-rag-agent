@@ -23,6 +23,21 @@ An intelligent knowledge assistant powered by BaseAgent orchestration that autom
 - 5-minute URL caching to prevent redundant scraping
 - Automatic fallback from fast fetch to Playwright for JavaScript sites
 
+## 🔒 Security Features
+
+### SSRF (Server-Side Request Forgery) Protection
+
+The application includes comprehensive URL validation to prevent SSRF attacks:
+
+- **Private Network Blocking**: Blocks access to private IP ranges (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16)
+- **Localhost Protection**: Prevents access to localhost and loopback addresses (127.0.0.0/8, ::1)
+- **Cloud Metadata Protection**: Blocks access to cloud instance metadata endpoints (169.254.169.254)
+- **IPv6 Security**: Validates and blocks private IPv6 addresses (fe80::/10, fc00::/7, fd00::/8)
+- **Port Restrictions**: Blocks access to internal service ports (SSH, databases, etc.)
+- **DNS Rebinding Prevention**: Validates resolved IP addresses to prevent DNS-based attacks
+
+All URL inputs through the ScrapeTool, CrawlTool, and direct scraping endpoints are validated using the secure URL validator before any network requests are made.
+
 ## 🏗️ Architecture Overview
 
 ```mermaid

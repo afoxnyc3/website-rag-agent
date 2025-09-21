@@ -1,5 +1,6 @@
 import { Tool, ToolResult, ToolSchema, ToolRegistry } from './tool';
 import { ScrapeTool } from './scrape-tool';
+import { validateURLBasic } from '@/lib/security/url-validator';
 
 interface CrawlInput {
   url: string;
@@ -184,11 +185,12 @@ export class CrawlTool extends Tool {
           const content = scrapeResult.data.content || '';
           const links = this.extractLinks(content, currentUrl);
 
-          // Filter links by domain
+          // Filter links by domain and security validation
           const domain = new URL(url).hostname;
           const sameDomainLinks = links.filter((link) => {
             try {
-              return new URL(link).hostname === domain;
+              // Ensure link is same domain AND passes security validation
+              return new URL(link).hostname === domain && validateURLBasic(link);
             } catch {
               return false;
             }
@@ -234,12 +236,8 @@ export class CrawlTool extends Tool {
 
   // Helper methods
   private isValidUrl(url: string): boolean {
-    try {
-      const parsed = new URL(url);
-      return parsed.protocol === 'http:' || parsed.protocol === 'https:';
-    } catch {
-      return false;
-    }
+    // Use secure URL validator to prevent SSRF attacks
+    return validateURLBasic(url);
   }
 
   private addToQueue(url: string, depth: number): void {
