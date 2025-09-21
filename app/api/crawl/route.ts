@@ -8,18 +8,15 @@ export async function POST(request: NextRequest) {
     const { url, options = {} } = await request.json();
 
     if (!url) {
-      return NextResponse.json(
-        { error: 'URL is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'URL is required' }, { status: 400 });
     }
 
     // Use CrawlTool with improved default limits
     const crawlTool = new CrawlTool();
     const result = await crawlTool.execute({
       url,
-      maxDepth: options.maxDepth !== undefined ? options.maxDepth : 2,  // Increased from 1
-      maxPages: options.maxPages || 50,  // Increased from 10
+      maxDepth: options.maxDepth !== undefined ? options.maxDepth : 2, // Increased from 1
+      maxPages: options.maxPages || 50, // Increased from 10
       respectRobotsTxt: options.respectRobotsTxt !== false,
       crawlDelay: options.crawlDelay || 1000,
       followSitemap: options.followSitemap || false,
@@ -28,10 +25,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: result.error }, { status: 400 });
     }
 
     const crawlResult = result.data;
@@ -48,8 +42,8 @@ export async function POST(request: NextRequest) {
         maxSize: options.chunkSize || 3000,
         minSize: 500,
         overlap: 200,
-        strategy: isMarkdown ? 'markdown' as const : 'semantic' as const,
-        preserveCodeBlocks: true
+        strategy: isMarkdown ? ('markdown' as const) : ('semantic' as const),
+        preserveCodeBlocks: true,
       };
 
       const chunks = chunker.chunk(page.content, chunkOptions);
@@ -68,8 +62,8 @@ export async function POST(request: NextRequest) {
             chunkIndex: chunk.index,
             totalChunks: chunk.totalChunks,
             chunkStrategy: chunk.metadata?.strategy,
-            hasOverlap: chunk.metadata?.hasOverlap
-          }
+            hasOverlap: chunk.metadata?.hasOverlap,
+          },
         });
         documentsAdded++;
       }
@@ -99,7 +93,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         error: 'Failed to crawl website',
-        details: errorMessage
+        details: errorMessage,
       },
       { status: 500 }
     );

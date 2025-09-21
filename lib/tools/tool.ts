@@ -94,7 +94,7 @@ export abstract class Tool {
           };
         }
         // Wait before retry with exponential backoff
-        await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 100));
+        await new Promise((resolve) => setTimeout(resolve, Math.pow(2, attempt) * 100));
       }
     }
 
@@ -118,7 +118,7 @@ class ComposedTool extends Tool {
 
   constructor(private tools: Tool[]) {
     super();
-    this.name = tools.map(t => t.name).join('-');
+    this.name = tools.map((t) => t.name).join('-');
     // Use the first tool's input schema and last tool's output schema
     this.schema = {
       input: tools[0]?.schema.input || { type: 'object', properties: {} },
@@ -181,7 +181,7 @@ export class ToolRegistry {
 
   findByCapability(capability: string): Tool[] {
     return Array.from(this.tools.values()).filter(
-      tool => tool.capabilities?.includes(capability) || false
+      (tool) => tool.capabilities?.includes(capability) || false
     );
   }
 }
@@ -221,10 +221,14 @@ export class ToolExecutor {
     return Promise.race([
       tool.execute(input),
       new Promise<ToolResult>((resolve) =>
-        setTimeout(() => resolve({
-          success: false,
-          error: `Tool execution timeout after ${timeout}ms`,
-        }), timeout)
+        setTimeout(
+          () =>
+            resolve({
+              success: false,
+              error: `Tool execution timeout after ${timeout}ms`,
+            }),
+          timeout
+        )
       ),
     ]);
   }
@@ -251,9 +255,7 @@ export class ToolExecutor {
     tasks: Array<{ tool: string; input: any }>,
     options: ToolOptions = {}
   ): Promise<ToolResult[]> {
-    const promises = tasks.map(task =>
-      this.execute(task.tool, task.input, options)
-    );
+    const promises = tasks.map((task) => this.execute(task.tool, task.input, options));
 
     return Promise.all(promises);
   }

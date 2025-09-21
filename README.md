@@ -5,6 +5,7 @@ An intelligent knowledge assistant powered by BaseAgent orchestration that autom
 ## 🚀 Features
 
 ### Core Capabilities
+
 - **🤖 BaseAgent Orchestration**: Sophisticated agent layer that coordinates tools and RAG pipeline
 - **🌐 Smart Web Ingestion**: Dual-mode scraping (static HTML & JavaScript-rendered content)
 - **🔍 Intelligent Crawling**: Multi-page crawling with depth control and robots.txt compliance
@@ -15,6 +16,7 @@ An intelligent knowledge assistant powered by BaseAgent orchestration that autom
 - **🎛️ Knowledge Management**: Interactive UI for viewing and managing knowledge base
 
 ### Technical Highlights
+
 - Tool-based plugin architecture for extensibility
 - Storage strategy pattern for environment-based switching
 - Semantic chunking with overlap for context preservation
@@ -57,6 +59,7 @@ graph TB
 ### Quick Start
 
 1. **Clone and install:**
+
 ```bash
 git clone https://github.com/yourusername/website-rag-agent.git
 cd website-rag-agent
@@ -64,18 +67,20 @@ pnpm install
 ```
 
 2. **Configure environment:**
+
 ```bash
 cp .env.example .env.local
 # Add your OpenAI API key to .env.local
 ```
 
 3. **Start development server:**
+
 ```bash
 pnpm dev
 ```
 
 4. **Open browser:**
-Navigate to [http://localhost:3000](http://localhost:3000)
+   Navigate to [http://localhost:3000](http://localhost:3000)
 
 ### First Steps
 
@@ -90,6 +95,7 @@ Navigate to [http://localhost:3000](http://localhost:3000)
 ### Adding Content to Knowledge Base
 
 **Single Page:**
+
 ```
 URL: https://docs.example.com/getting-started
 Mode: Scrape single page
@@ -97,6 +103,7 @@ Mode: Scrape single page
 ```
 
 **Multi-page Site:**
+
 ```
 URL: https://docs.example.com
 Mode: Crawl (depth: 2, max: 20 pages)
@@ -131,9 +138,11 @@ Query: "How do I configure authentication?"
 ## 📦 API Endpoints
 
 ### POST `/api/chat`
+
 Main chat endpoint using BaseAgent orchestration.
 
 **Request:**
+
 ```json
 {
   "message": "Your question or URL here"
@@ -141,6 +150,7 @@ Main chat endpoint using BaseAgent orchestration.
 ```
 
 **Response:**
+
 ```json
 {
   "response": "The answer to your question...",
@@ -151,12 +161,15 @@ Main chat endpoint using BaseAgent orchestration.
 ```
 
 ### GET `/api/knowledge`
+
 Retrieve knowledge base contents or search.
 
 **Query Parameters:**
+
 - `q` (optional): Search query
 
 **Response:**
+
 ```json
 {
   "sources": [...],
@@ -165,9 +178,11 @@ Retrieve knowledge base contents or search.
 ```
 
 ### DELETE `/api/knowledge`
+
 Clear the knowledge base.
 
 **Request:**
+
 ```json
 {
   "clearAll": true
@@ -179,17 +194,20 @@ Clear the knowledge base.
 ### Vercel Deployment (Recommended)
 
 1. **Push to GitHub:**
+
 ```bash
 git push origin main
 ```
 
 2. **Import to Vercel:**
+
 - Go to [vercel.com](https://vercel.com)
 - Import your repository
 - Add environment variables:
   - `OPENAI_API_KEY`: Your OpenAI API key
 
 3. **Optional: Enable Persistent Storage**
+
 - In Vercel dashboard → Storage → Create Database → Postgres
 - Database URL will be automatically configured
 - Tables are created on first run
@@ -227,6 +245,7 @@ pnpm format     # Format code (not configured)
 ## 🧪 Testing
 
 The project includes comprehensive tests for:
+
 - BaseAgent orchestration (31 tests passing ✅)
 - Tool execution (21 tests passing ✅)
 - Storage strategies (23 tests passing ✅)
@@ -236,6 +255,7 @@ The project includes comprehensive tests for:
 **Test Status**: All critical tests passing! (Some non-critical SemanticChunker tests pending fixes)
 
 Run tests with:
+
 ```bash
 pnpm test
 ```
@@ -251,6 +271,7 @@ pnpm test
 ## 🔄 Development Workflow
 
 The project maintains detailed documentation:
+
 - `agents.md`: Primary behavioral contract and workflow guide
 - `CLAUDE.md`: Technical reference and architecture details
 - `todo.md`: Task tracking

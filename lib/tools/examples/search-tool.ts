@@ -27,7 +27,11 @@ export class SearchTool extends Tool {
     },
   };
 
-  async execute(input: { query: string; maxResults?: number; threshold?: number }): Promise<ToolResult> {
+  async execute(input: {
+    query: string;
+    maxResults?: number;
+    threshold?: number;
+  }): Promise<ToolResult> {
     try {
       const { query, maxResults = 3, threshold = 0.5 } = input;
 

@@ -1,16 +1,19 @@
 # Phase 6: Knowledge Operations - Learnings
 
 ## Overview
+
 Phase 6 completes the **RAG integration** - storing processed content in the knowledge base and querying it for answers.
 
 ## Workflow Evolution
 
 ### Previous Phases
+
 - Phase 1-3: Setup, understanding, decisions
 - Phase 4: Tool execution (get raw data)
 - Phase 5: Data processing (prepare for RAG)
 
 ### Phase 6 (Knowledge Operations) ✨ NEW
+
 - **Store content** in RAG service
 - **Generate embeddings** for semantic search
 - **Query knowledge** for answers
@@ -19,6 +22,7 @@ Phase 6 completes the **RAG integration** - storing processed content in the kno
 ## Code Structure
 
 ### New Methods:
+
 ```typescript
 // Store processed content in RAG
 async ingestToRAG(processed: ProcessedContent): Promise<void> {
@@ -51,6 +55,7 @@ async searchKnowledge(query: string): Promise<RAGResponse> {
 ## Implementation Details
 
 ### Chunk Handling
+
 ```typescript
 if (processed.chunks && processed.chunks.length > 0) {
   // Multiple chunks - add separately with chunk metadata
@@ -60,27 +65,30 @@ if (processed.chunks && processed.chunks.length > 0) {
       metadata: {
         ...processed.metadata,
         chunkIndex: i,
-        totalChunks: processed.chunks.length
-      }
+        totalChunks: processed.chunks.length,
+      },
     });
   }
 }
 ```
+
 - Each chunk gets indexed separately
 - Chunk metadata helps reassemble later
 - Better semantic matching on smaller units
 
 ### Graceful Fallback
+
 ```typescript
 if (!this.ragService) {
   return {
     answer: "I don't have access to a knowledge base",
     confidence: 0,
     sources: [],
-    chunks: []
+    chunks: [],
   };
 }
 ```
+
 - Never throws errors
 - Returns valid response structure
 - Zero confidence indicates no knowledge
@@ -88,13 +96,16 @@ if (!this.ragService) {
 ## Key Learnings
 
 ### 1. **Chunking Strategy Matters**
+
 Storing chunks separately enables:
+
 - Better semantic matching
 - More relevant context retrieval
 - Efficient embedding usage
 - Metadata preservation per chunk
 
 ### 2. **Metadata is Critical**
+
 ```javascript
 metadata: {
   url: 'https://source.com',
@@ -103,24 +114,29 @@ metadata: {
   title: 'Original Title'
 }
 ```
+
 Metadata enables:
+
 - Source attribution
 - Chunk reassembly
 - Quality filtering
 - Debug tracing
 
 ### 3. **Error Handling Pattern**
+
 ```javascript
 // Never throw, always return valid structure
 if (!ragService) {
   return defaultResponse;
 }
 ```
+
 - Predictable API contract
 - Graceful degradation
 - Easy error detection (check confidence)
 
 ### 4. **Separation of Concerns**
+
 - Agent doesn't know HOW RAG works
 - RAG doesn't know WHERE content came from
 - Clean interfaces between layers
@@ -128,6 +144,7 @@ if (!ragService) {
 ## Testing Strategy
 
 3 focused tests:
+
 ```javascript
 ✓ Calls addDocument on RAG service
 ✓ Handles chunks when ingesting
@@ -135,6 +152,7 @@ if (!ragService) {
 ```
 
 ### Mock Patterns
+
 ```javascript
 const mockRAGService = {
   addDocument: vi.fn(),
@@ -142,20 +160,22 @@ const mockRAGService = {
     answer: 'Test answer',
     confidence: 0.85,
     sources: ['source1'],
-    chunks: []
-  })
+    chunks: [],
+  }),
 };
 ```
 
 ## Real-World Impact
 
 ### Before Phase 6:
+
 ```
 Processed content: { content: "...", chunks: [...], metadata: {...} }
 Agent: "Now what? How do I store this?"
 ```
 
 ### After Phase 6:
+
 ```
 Processed content → ingestToRAG() → Knowledge stored!
 User question → searchKnowledge() → Confident answer with sources!
@@ -167,13 +187,14 @@ User question → searchKnowledge() → Confident answer with sources!
 // Complete flow through Phase 6
 const result = await executeTool('ScrapeTool', { url });
 const processed = await processToolResult(result);
-await ingestToRAG(processed);  // Phase 6: Store!
-const answer = await searchKnowledge(query);  // Phase 6: Retrieve!
+await ingestToRAG(processed); // Phase 6: Store!
+const answer = await searchKnowledge(query); // Phase 6: Retrieve!
 ```
 
 ## Architecture Insights
 
 ### Layer Separation
+
 ```
 User Query
     ↓
@@ -189,12 +210,14 @@ User Response
 ```
 
 ### Why This Works
+
 1. **Single Responsibility**: Each layer has one job
 2. **Testability**: Mock any layer independently
 3. **Flexibility**: Swap implementations easily
 4. **Scalability**: Add more tools/processors/stores
 
 ## Metrics
+
 - Tests written: 3
 - Tests passing: 28/28 (100%)
 - Lines of code: ~40
@@ -204,6 +227,7 @@ User Response
 ## Next Phase Preview
 
 Phase 7 (Orchestration) will:
+
 - Combine all phases into `execute()` method
 - Handle different query types
 - Implement caching logic

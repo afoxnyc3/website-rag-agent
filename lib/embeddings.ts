@@ -25,18 +25,16 @@ export async function generateEmbedding(text: string): Promise<EmbeddingResult> 
 
   return {
     embedding,
-    dimensions: embedding.length
+    dimensions: embedding.length,
   };
 }
 
-export async function generateEmbeddings(
-  texts: string[]
-): Promise<EmbeddingResult[]> {
+export async function generateEmbeddings(texts: string[]): Promise<EmbeddingResult[]> {
   if (!texts.length) {
     throw new Error('No texts provided');
   }
 
-  const validTexts = texts.filter(t => t?.trim());
+  const validTexts = texts.filter((t) => t?.trim());
   if (!validTexts.length) {
     throw new Error('All texts are empty');
   }
@@ -46,16 +44,13 @@ export async function generateEmbeddings(
     input: validTexts,
   });
 
-  return response.data.map(item => ({
+  return response.data.map((item) => ({
     embedding: item.embedding,
-    dimensions: item.embedding.length
+    dimensions: item.embedding.length,
   }));
 }
 
-export function cosineSimilarity(
-  vecA: EmbeddingVector,
-  vecB: EmbeddingVector
-): number {
+export function cosineSimilarity(vecA: EmbeddingVector, vecB: EmbeddingVector): number {
   if (vecA.length !== vecB.length) {
     throw new Error('Vectors must have same dimensions');
   }

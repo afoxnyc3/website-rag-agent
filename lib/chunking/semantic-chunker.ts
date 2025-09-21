@@ -1,9 +1,9 @@
 export interface ChunkOptions {
-  maxSize?: number;           // Maximum chunk size (default: 3000, max: 8000)
-  minSize?: number;           // Minimum chunk size (default: 500)
-  overlap?: number;           // Overlap between chunks (default: 200)
-  strategy?: 'semantic' | 'markdown' | 'fixed';  // Chunking strategy
-  preserveCodeBlocks?: boolean;  // Keep code blocks intact
+  maxSize?: number; // Maximum chunk size (default: 3000, max: 8000)
+  minSize?: number; // Minimum chunk size (default: 500)
+  overlap?: number; // Overlap between chunks (default: 200)
+  strategy?: 'semantic' | 'markdown' | 'fixed'; // Chunking strategy
+  preserveCodeBlocks?: boolean; // Keep code blocks intact
 }
 
 export interface Chunk {
@@ -48,27 +48,21 @@ export class SemanticChunker {
   }
 
   private normalizeOptions(options: ChunkOptions): Required<ChunkOptions> {
-    const maxSize = Math.min(
-      options.maxSize || this.DEFAULT_MAX_SIZE,
-      this.MAX_ALLOWED_SIZE
-    );
+    const maxSize = Math.min(options.maxSize || this.DEFAULT_MAX_SIZE, this.MAX_ALLOWED_SIZE);
 
     const minSize = Math.min(
       options.minSize || this.DEFAULT_MIN_SIZE,
       maxSize // minSize can't be larger than maxSize
     );
 
-    const overlap = Math.min(
-      options.overlap || 0,
-      Math.floor(maxSize * this.MAX_OVERLAP_RATIO)
-    );
+    const overlap = Math.min(options.overlap || 0, Math.floor(maxSize * this.MAX_OVERLAP_RATIO));
 
     return {
       maxSize,
       minSize,
       overlap,
       strategy: options.strategy || 'semantic',
-      preserveCodeBlocks: options.preserveCodeBlocks ?? true
+      preserveCodeBlocks: options.preserveCodeBlocks ?? true,
     };
   }
 
@@ -79,17 +73,19 @@ export class SemanticChunker {
     // Handle text that needs to be chunked
     if (text.length <= config.maxSize) {
       // Text fits in single chunk
-      return [{
-        content: text,
-        index: 0,
-        startOffset: 0,
-        endOffset: text.length,
-        totalChunks: 1,
-        metadata: {
-          strategy: 'fixed',
-          hasOverlap: false
-        }
-      }];
+      return [
+        {
+          content: text,
+          index: 0,
+          startOffset: 0,
+          endOffset: text.length,
+          totalChunks: 1,
+          metadata: {
+            strategy: 'fixed',
+            hasOverlap: false,
+          },
+        },
+      ];
     }
 
     // Text needs multiple chunks with overlap support
@@ -105,8 +101,8 @@ export class SemanticChunker {
         totalChunks: 0, // Will be updated
         metadata: {
           strategy: 'fixed',
-          hasOverlap: config.overlap > 0 && chunks.length > 0
-        }
+          hasOverlap: config.overlap > 0 && chunks.length > 0,
+        },
       });
 
       // Move position considering overlap
@@ -118,7 +114,7 @@ export class SemanticChunker {
     }
 
     // Update totalChunks
-    chunks.forEach(chunk => {
+    chunks.forEach((chunk) => {
       chunk.totalChunks = chunks.length;
     });
 
@@ -127,10 +123,13 @@ export class SemanticChunker {
 
   private chunkSemantic(text: string, config: Required<ChunkOptions>): Chunk[] {
     // Split by paragraph boundaries first
-    const paragraphs = text.split(/\n\n+/).map(p => p.trim()).filter(p => p);
+    const paragraphs = text
+      .split(/\n\n+/)
+      .map((p) => p.trim())
+      .filter((p) => p);
 
     // If we have clear paragraphs and they're small enough, return them as chunks
-    if (paragraphs.length > 1 && paragraphs.every(p => p.length <= config.maxSize)) {
+    if (paragraphs.length > 1 && paragraphs.every((p) => p.length <= config.maxSize)) {
       const chunks: Chunk[] = [];
       let currentOffset = 0;
 
@@ -138,20 +137,22 @@ export class SemanticChunker {
         // Find the actual position of this paragraph in the original text
         const paraIndex = text.indexOf(para, currentOffset);
 
-        chunks.push(this.createChunk(
-          para,
-          chunks.length,
-          paraIndex,
-          paraIndex + para.length,
-          'semantic',
-          false
-        ));
+        chunks.push(
+          this.createChunk(
+            para,
+            chunks.length,
+            paraIndex,
+            paraIndex + para.length,
+            'semantic',
+            false
+          )
+        );
 
         currentOffset = paraIndex + para.length;
       }
 
       // Update totalChunks
-      chunks.forEach(chunk => {
+      chunks.forEach((chunk) => {
         chunk.totalChunks = chunks.length;
       });
 
@@ -184,14 +185,16 @@ export class SemanticChunker {
         // Save current chunk
         const trimmedChunk = currentChunk.trim();
         if (trimmedChunk) {
-          chunks.push(this.createChunk(
-            trimmedChunk,
-            chunks.length,
-            currentStartOffset,
-            currentStartOffset + currentChunk.length,
-            'semantic',
-            config.overlap > 0 && previousChunkEnd.length > 0
-          ));
+          chunks.push(
+            this.createChunk(
+              trimmedChunk,
+              chunks.length,
+              currentStartOffset,
+              currentStartOffset + currentChunk.length,
+              'semantic',
+              config.overlap > 0 && previousChunkEnd.length > 0
+            )
+          );
         }
 
         // Handle overlap
@@ -215,14 +218,16 @@ export class SemanticChunker {
     // Add final chunk if there's content
     const finalTrimmed = currentChunk.trim();
     if (finalTrimmed) {
-      chunks.push(this.createChunk(
-        finalTrimmed,
-        chunks.length,
-        currentStartOffset,
-        currentStartOffset + currentChunk.length,
-        'semantic',
-        config.overlap > 0 && chunks.length > 0
-      ));
+      chunks.push(
+        this.createChunk(
+          finalTrimmed,
+          chunks.length,
+          currentStartOffset,
+          currentStartOffset + currentChunk.length,
+          'semantic',
+          config.overlap > 0 && chunks.length > 0
+        )
+      );
     }
 
     // Update totalChunks
@@ -244,7 +249,7 @@ export class SemanticChunker {
         codeBlocks.push({
           start: match.index,
           end: match.index + match[0].length,
-          content: match[0]
+          content: match[0],
         });
       }
 
@@ -259,28 +264,32 @@ export class SemanticChunker {
             const beforeText = text.slice(lastEnd, block.start).trim();
             if (beforeText) {
               const subChunks = this.chunkSemantic(beforeText, { ...config, strategy: 'semantic' });
-              subChunks.forEach(sc => {
-                chunks.push(this.createChunk(
-                  sc.content,
-                  chunks.length,
-                  lastEnd + sc.startOffset,
-                  lastEnd + sc.endOffset,
-                  'markdown',
-                  false
-                ));
+              subChunks.forEach((sc) => {
+                chunks.push(
+                  this.createChunk(
+                    sc.content,
+                    chunks.length,
+                    lastEnd + sc.startOffset,
+                    lastEnd + sc.endOffset,
+                    'markdown',
+                    false
+                  )
+                );
               });
             }
           }
 
           // Add code block as single chunk
-          chunks.push(this.createChunk(
-            block.content,
-            chunks.length,
-            block.start,
-            block.end,
-            'markdown',
-            false
-          ));
+          chunks.push(
+            this.createChunk(
+              block.content,
+              chunks.length,
+              block.start,
+              block.end,
+              'markdown',
+              false
+            )
+          );
 
           lastEnd = block.end;
         }
@@ -290,21 +299,23 @@ export class SemanticChunker {
           const afterText = text.slice(lastEnd).trim();
           if (afterText) {
             const subChunks = this.chunkSemantic(afterText, { ...config, strategy: 'semantic' });
-            subChunks.forEach(sc => {
-              chunks.push(this.createChunk(
-                sc.content,
-                chunks.length,
-                lastEnd + sc.startOffset,
-                lastEnd + sc.endOffset,
-                'markdown',
-                false
-              ));
+            subChunks.forEach((sc) => {
+              chunks.push(
+                this.createChunk(
+                  sc.content,
+                  chunks.length,
+                  lastEnd + sc.startOffset,
+                  lastEnd + sc.endOffset,
+                  'markdown',
+                  false
+                )
+              );
             });
           }
         }
 
         // Update totalChunks
-        chunks.forEach(chunk => {
+        chunks.forEach((chunk) => {
           chunk.totalChunks = chunks.length;
         });
 
@@ -318,32 +329,36 @@ export class SemanticChunker {
 
     sections.forEach((section) => {
       if (section.content.length <= config.maxSize) {
-        chunks.push(this.createChunk(
-          section.content,
-          chunks.length,
-          section.start,
-          section.end,
-          'markdown',
-          false
-        ));
+        chunks.push(
+          this.createChunk(
+            section.content,
+            chunks.length,
+            section.start,
+            section.end,
+            'markdown',
+            false
+          )
+        );
       } else {
         // Section too large, need to split it
         const subChunks = this.chunkSemantic(section.content, { ...config, strategy: 'semantic' });
         subChunks.forEach((subChunk) => {
-          chunks.push(this.createChunk(
-            subChunk.content,
-            chunks.length,
-            section.start + subChunk.startOffset,
-            section.start + subChunk.endOffset,
-            'markdown',
-            subChunk.metadata?.hasOverlap || false
-          ));
+          chunks.push(
+            this.createChunk(
+              subChunk.content,
+              chunks.length,
+              section.start + subChunk.startOffset,
+              section.start + subChunk.endOffset,
+              'markdown',
+              subChunk.metadata?.hasOverlap || false
+            )
+          );
         });
       }
     });
 
     // Update totalChunks
-    chunks.forEach(chunk => {
+    chunks.forEach((chunk) => {
       chunk.totalChunks = chunks.length;
     });
 
@@ -366,7 +381,7 @@ export class SemanticChunker {
       headers.push({
         index: match.index,
         level,
-        text: match[0]
+        text: match[0],
       });
     }
 
@@ -384,7 +399,7 @@ export class SemanticChunker {
       sections.push({
         content: text.slice(header.index, end).trim(),
         start: header.index,
-        end
+        end,
       });
     }
 
@@ -395,7 +410,7 @@ export class SemanticChunker {
         sections.unshift({
           content: preContent,
           start: 0,
-          end: headers[0].index
+          end: headers[0].index,
         });
       }
     }
@@ -447,8 +462,8 @@ export class SemanticChunker {
       totalChunks: 0, // Will be updated
       metadata: {
         strategy,
-        hasOverlap
-      }
+        hasOverlap,
+      },
     };
   }
 }

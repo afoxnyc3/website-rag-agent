@@ -120,9 +120,10 @@ describe('Storage Strategy Pattern', () => {
       // Should get all docs, clear, and re-add except deleted one
       expect(mockVectorStoreInstance.getAllDocuments).toHaveBeenCalled();
       expect(mockVectorStoreInstance.clear).toHaveBeenCalled();
-      expect(mockVectorStoreInstance.addDocument).toHaveBeenCalledWith(
-        { id: 'test-2', content: 'Test 2' }
-      );
+      expect(mockVectorStoreInstance.addDocument).toHaveBeenCalledWith({
+        id: 'test-2',
+        content: 'Test 2',
+      });
       expect(mockVectorStoreInstance.addDocument).not.toHaveBeenCalledWith(
         expect.objectContaining({ id: 'test-1' })
       );
@@ -229,9 +230,7 @@ describe('Storage Strategy Pattern', () => {
       await storage.initialize();
 
       // First call returns false (not connected), second returns true
-      mockPersistentStoreInstance.isConnected
-        .mockReturnValueOnce(false)
-        .mockReturnValueOnce(true);
+      mockPersistentStoreInstance.isConnected.mockReturnValueOnce(false).mockReturnValueOnce(true);
 
       await storage.addDocument({ id: 'test', content: 'test' }, [0.1]);
 

@@ -12,7 +12,9 @@ async function testSourcesDisplay() {
     await page.waitForLoadState('networkidle');
 
     console.log('2. Testing with a simple question about the RAG system...');
-    const chatInput = page.getByPlaceholder('Ask about our RAG system, embeddings, or architecture...');
+    const chatInput = page.getByPlaceholder(
+      'Ask about our RAG system, embeddings, or architecture...'
+    );
     await chatInput.fill('What embedding model does this system use?');
     await chatInput.press('Enter');
 
@@ -49,7 +51,7 @@ async function testSourcesDisplay() {
         const lastResponse = responseElements[responseElements.length - 1];
         const responseText = await lastResponse.textContent();
 
-        if (responseText.includes("text-embedding-3-small") || responseText.includes("1536")) {
+        if (responseText.includes('text-embedding-3-small') || responseText.includes('1536')) {
           console.log('   ✓ Response correctly identifies embedding model from knowledge base');
         }
       } else {
@@ -113,7 +115,6 @@ async function testSourcesDisplay() {
     console.log('  - Clicking expands to show source details');
     console.log('  - Internal docs show as "Project Documentation"');
     console.log('  - External URLs show as clickable links');
-
   } catch (error) {
     console.error('\n❌ Test failed:', error.message);
 

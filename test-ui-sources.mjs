@@ -18,7 +18,7 @@ async function testUISourcesDisplay() {
       'textarea',
       '[role="textbox"]',
       'textarea[placeholder*="RAG"]',
-      'div[contenteditable="true"]'
+      'div[contenteditable="true"]',
     ];
 
     let inputField = null;
@@ -107,7 +107,6 @@ async function testUISourcesDisplay() {
     console.log('  ✓ Sources button appears when sources exist');
     console.log('  ✓ Sources expand/collapse properly');
     console.log('  ✓ Internal docs show as "Project Documentation"');
-
   } catch (error) {
     console.error('\n❌ Test failed:', error.message);
     await page.screenshot({ path: 'ui-test-failure.png' });

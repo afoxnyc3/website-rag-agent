@@ -1,19 +1,23 @@
 # Phase 3: Decision Logic - Learnings
 
 ## Overview
+
 Phase 3 introduces **decision-making capabilities** - the agent can now decide when to fetch new data and which tools to use based on intent analysis.
 
 ## Workflow Evolution
 
 ### Phase 1 (Configuration)
+
 - Static data storage (name, description, thresholds)
 - Foundation setup
 
 ### Phase 2 (Intent Recognition)
+
 - Query understanding (URL, question, command)
 - Pattern matching for classification
 
 ### Phase 3 (Decision Logic) ✨ NEW
+
 - **Smart caching** - Avoid redundant fetches
 - **Tool selection** - Choose right tool for the job
 - **Autonomous decisions** - Agent thinks before acting
@@ -39,15 +43,18 @@ selectTool(intent: ParsedIntent): string | null
 ## Implementation Details
 
 ### Cache System
+
 ```typescript
 private urlCache: Map<string, number> = new Map();
 private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 ```
+
 - Simple in-memory cache with timestamps
 - Prevents hitting same URL repeatedly
 - 5-minute TTL matches scraper cache
 
 ### Tool Selection Logic
+
 ```
 Query Analysis:
 1. Has "crawl" keyword? → CrawlTool
@@ -59,13 +66,16 @@ Query Analysis:
 ## Key Learnings
 
 ### 1. **Caching is Critical**
+
 Without caching, the agent would:
+
 - Waste API calls
 - Slow down responses
 - Annoy websites with repeated requests
 - Cost more in resources
 
 ### 2. **URL Analysis Matters**
+
 ```javascript
 https://example.com → CrawlTool (entire site)
 https://example.com/docs → ScrapeTool (single page)
@@ -73,6 +83,7 @@ https://example.com/blog/post → ScrapeTool (specific content)
 ```
 
 ### 3. **Decision Flow**
+
 ```
 User Query
     ↓
@@ -86,6 +97,7 @@ Execute Tool [Phase 4]
 ```
 
 ### 4. **TDD Insights**
+
 - Cache testing revealed edge cases (expired entries)
 - URL parsing needed try-catch for malformed URLs
 - Tool selection needed keyword analysis for "crawl"
@@ -93,6 +105,7 @@ Execute Tool [Phase 4]
 ## Testing Strategy
 
 6 new tests covering:
+
 ```javascript
 ✓ shouldFetchNewData returns true for URLs
 ✓ shouldFetchNewData returns false for questions
@@ -105,12 +118,14 @@ Execute Tool [Phase 4]
 ## Real-World Impact
 
 ### Before Phase 3:
+
 ```
 User: "Check example.com/docs"
 Agent: 🤷 Don't know what to do
 ```
 
 ### After Phase 3:
+
 ```
 User: "Check example.com/docs"
 Agent:
@@ -123,12 +138,14 @@ Agent:
 ## Next Phase Preview
 
 Phase 4 (Tool Execution) will:
+
 - Actually call the selected tools
 - Handle success/failure cases
 - Add timeout protection
 - Process tool results
 
 ## Metrics
+
 - Tests written: 6
 - Tests passing: 18/18 (100%)
 - Lines of code: ~40

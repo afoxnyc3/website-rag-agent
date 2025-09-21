@@ -76,7 +76,7 @@ export class PlaywrightCrawler extends WebCrawler {
             const sitemapUrls = this.parseSitemap(sitemapXml);
 
             // Add sitemap URLs to queue with depth 1
-            sitemapUrls.forEach(url => {
+            sitemapUrls.forEach((url) => {
               this.addToQueue(url);
               this.depthMap.set(url, 1);
             });
@@ -151,7 +151,7 @@ export class PlaywrightCrawler extends WebCrawler {
 
           // Add discovered links to queue (if within depth limit)
           if (currentDepth < (options.maxDepth || 1)) {
-            sameDomainLinks.forEach(link => {
+            sameDomainLinks.forEach((link) => {
               if (!this.hasVisited(link) && !this.depthMap.has(link)) {
                 this.addToQueue(link);
                 this.depthMap.set(link, currentDepth + 1);
@@ -164,11 +164,15 @@ export class PlaywrightCrawler extends WebCrawler {
             break;
           }
         } catch (error) {
-          result.errors.push(`Error crawling ${currentUrl}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          result.errors.push(
+            `Error crawling ${currentUrl}: ${error instanceof Error ? error.message : 'Unknown error'}`
+          );
         }
       }
     } catch (error) {
-      result.errors.push(`Crawler initialization error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      result.errors.push(
+        `Crawler initialization error: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     } finally {
       await this.close();
       result.crawlTime = Date.now() - startTime;

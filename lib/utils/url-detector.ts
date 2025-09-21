@@ -12,24 +12,32 @@ export function analyzeUrl(url: string): UrlAnalysis {
     const host = parsed.hostname.toLowerCase();
 
     // Documentation sites - usually benefit from crawling
-    if (host.includes('docs.') || host.includes('documentation.') ||
-        path.includes('/docs/') || path.includes('/documentation/')) {
+    if (
+      host.includes('docs.') ||
+      host.includes('documentation.') ||
+      path.includes('/docs/') ||
+      path.includes('/documentation/')
+    ) {
       return {
         suggestedMode: 'crawl',
         confidence: 0.9,
         reason: 'Documentation site detected - multiple related pages likely available',
-        estimatedPages: 20
+        estimatedPages: 20,
       };
     }
 
     // Blog posts or articles - usually single page
-    if (path.includes('/blog/') || path.includes('/article/') ||
-        path.includes('/post/') || path.includes('/news/')) {
+    if (
+      path.includes('/blog/') ||
+      path.includes('/article/') ||
+      path.includes('/post/') ||
+      path.includes('/news/')
+    ) {
       return {
         suggestedMode: 'single',
         confidence: 0.8,
         reason: 'Blog/article page detected - single page content',
-        estimatedPages: 1
+        estimatedPages: 1,
       };
     }
 
@@ -39,7 +47,7 @@ export function analyzeUrl(url: string): UrlAnalysis {
         suggestedMode: 'crawl',
         confidence: 0.85,
         reason: 'API reference detected - multiple endpoints to document',
-        estimatedPages: 30
+        estimatedPages: 30,
       };
     }
 
@@ -49,18 +57,22 @@ export function analyzeUrl(url: string): UrlAnalysis {
         suggestedMode: 'crawl',
         confidence: 0.7,
         reason: 'GitHub repository - may contain multiple documentation files',
-        estimatedPages: 10
+        estimatedPages: 10,
       };
     }
 
     // Direct file links - always single
-    if (path.endsWith('.pdf') || path.endsWith('.md') ||
-        path.endsWith('.txt') || path.endsWith('.json')) {
+    if (
+      path.endsWith('.pdf') ||
+      path.endsWith('.md') ||
+      path.endsWith('.txt') ||
+      path.endsWith('.json')
+    ) {
       return {
         suggestedMode: 'single',
         confidence: 1.0,
         reason: 'Direct file link - single document',
-        estimatedPages: 1
+        estimatedPages: 1,
       };
     }
 
@@ -70,28 +82,31 @@ export function analyzeUrl(url: string): UrlAnalysis {
         suggestedMode: 'crawl',
         confidence: 0.6,
         reason: 'Homepage/landing page - may have multiple subpages',
-        estimatedPages: 15
+        estimatedPages: 15,
       };
     }
 
     // Tutorial or guide pages - often multi-page
-    if (path.includes('/tutorial') || path.includes('/guide') ||
-        path.includes('/getting-started')) {
+    if (
+      path.includes('/tutorial') ||
+      path.includes('/guide') ||
+      path.includes('/getting-started')
+    ) {
       return {
         suggestedMode: 'crawl',
         confidence: 0.8,
         reason: 'Tutorial/guide detected - likely multi-page content',
-        estimatedPages: 10
+        estimatedPages: 10,
       };
     }
 
     // Default - single page for specific paths, crawl for general
-    if (path.split('/').filter(p => p).length > 2) {
+    if (path.split('/').filter((p) => p).length > 2) {
       return {
         suggestedMode: 'single',
         confidence: 0.5,
         reason: 'Specific page path - treating as single page',
-        estimatedPages: 1
+        estimatedPages: 1,
       };
     }
 
@@ -99,15 +114,14 @@ export function analyzeUrl(url: string): UrlAnalysis {
       suggestedMode: 'single',
       confidence: 0.4,
       reason: 'Unable to determine page type - defaulting to single page',
-      estimatedPages: 1
+      estimatedPages: 1,
     };
-
   } catch (error) {
     return {
       suggestedMode: 'single',
       confidence: 0.1,
       reason: 'Invalid URL format',
-      estimatedPages: 1
+      estimatedPages: 1,
     };
   }
 }

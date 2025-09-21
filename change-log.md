@@ -3,12 +3,14 @@
 ## 2025-09-20 - SemanticChunker Partial Fix
 
 ### Test Analysis & Partial Resolution
+
 - **Analyzed 4 failing tests**: Multiple newlines, overlap, offset tracking, Unicode
 - **Fixed 1 test**: Multiple newlines paragraph boundary detection
 - **Side effect**: Broke paragraph boundaries test while fixing
 - **Result**: 20 of 24 tests passing (was 20 before, still 20 after)
 
 ### Key Decision
+
 - **Determined remaining failures are NOT critical**
 - App is fully operational for core RAG functionality
 - Remaining issues are quality/enhancement features:
@@ -18,6 +20,7 @@
   - Unicode/emoji edge cases
 
 ### Technical Changes
+
 - Modified `chunkSemantic()` to handle paragraph splitting more explicitly
 - Added early return for simple paragraph cases
 - Updated boundary detection logic
@@ -25,24 +28,28 @@
 ## 2025-09-20 - Test Suite Fixes (Branch: bugfix/test-failures)
 
 ### CrawlTool Test Fixes
+
 - **Added global fetch mock**: Prevents real HTTP requests to example.com
 - **Mocked robots.txt responses**: Returns valid robots.txt for compliance tests
 - **Mocked sitemap.xml responses**: Returns valid sitemap for parsing tests
 - **Result**: All 22 CrawlTool tests now passing ✅
 
 ### PersistentVectorStore Test Fixes
+
 - **Fixed retry test expectations**: Changed from 2 to 4 calls (initial + retries)
 - **Fixed transaction rollback test**: Proper SQL mock with dynamic query handling
 - **Updated SQL assertions**: Handle template literal format instead of strings
 - **Result**: All 24 PersistentVectorStore tests now passing ✅
 
 ### Remaining Issues
+
 - SemanticChunker: 4 tests failing (paragraph boundaries, overlap, offsets, unicode)
 - Overall test suite: ~114 tests passing, 4 failing
 
 ## 2025-09-20 - Critical Test Failures Fixed
 
 ### Storage Strategy Test Fixes
+
 - **Fixed test mocks**: Changed to match actual VectorStore interface
   - `similaritySearchWithScore()` → `search()`
   - `getDocuments()` → `getAllDocuments()`
@@ -52,6 +59,7 @@
 - **Result**: All 23 storage strategy tests now passing ✅
 
 ### Key Insight
+
 - Production code was correct all along
 - Tests were using wrong API (possibly LangChain's interface)
 - Fixed tests to match reality, not the other way around
@@ -59,12 +67,14 @@
 ## 2025-09-20 - Agent Instructions Restructuring
 
 ### agents.md Transformation
+
 - **Restructured as primary behavioral contract** (135 lines)
 - Added MANDATORY PRE-FLIGHT CHECKLIST at top
 - Moved all workflow rules from CLAUDE.md
 - Made scratchpad planning unavoidable
 
 ### CLAUDE.md Streamlining
+
 - **Reduced to technical reference only** (313 lines)
 - Removed workflow documentation
 - Added cross-references to agents.md
@@ -72,6 +82,7 @@
 ## 2025-09-20 - Documentation Overhaul
 
 ### README.md Complete Rewrite
+
 - **Removed incorrect claims**: GPT-5 references, 100% test coverage
 - **Added BaseAgent focus**: Highlighted orchestration architecture
 - **Simplified deployment**: Streamlined Vercel instructions
@@ -80,6 +91,7 @@
 - **Fixed examples**: Real API responses and usage patterns
 
 ### New API Documentation (API.md)
+
 - **Created comprehensive reference**: All 5 endpoints documented
 - **Request/response formats**: Complete with JSON examples
 - **SDK examples**: JavaScript/TypeScript and Python
@@ -87,6 +99,7 @@
 - **Error codes**: Standard HTTP status explanations
 
 ### CLAUDE.md Updates
+
 - **BaseAgent architecture**: Added core components section
 - **Corrected AI model**: GPT-4 instead of GPT-5
 - **Updated phases**: Marked completed phases
@@ -94,12 +107,14 @@
 - **Tool system docs**: Added Tool and StorageStrategy interfaces
 
 ### todo.md Restructure
+
 - **Added documentation tasks**: Tracked today's work
 - **Added bugs section**: Listed known test failures
 - **Updated status**: Honest production readiness assessment
 - **Reorganized phases**: Clear next steps for development
 
 ### decision-log.md Additions
+
 - **Documentation decisions**: Rationale for complete rewrite
 - **GPT-5 removal**: Explanation of corrections
 - **API docs reasoning**: Why separate file created
@@ -107,6 +122,7 @@
 ## 2025-09-19 - Agent Orchestration Layer COMPLETE ✅
 
 ### Full BaseAgent Implementation
+
 - Successfully implemented all 7 phases using strict TDD
 - 31 tests written and passing (100% coverage)
 - Integrated with existing chat UI
@@ -114,6 +130,7 @@
 - Complete orchestration pipeline working end-to-end
 
 ### Chat API Integration
+
 - **Updated /api/chat**: Now uses BaseAgent instead of direct RAG
 - **Agent initialization**: Creates singleton with ToolRegistry and RAGService
 - **Full pipeline**: Every chat message goes through 7-phase orchestration
@@ -123,6 +140,7 @@
 ## 2025-09-19 - Agent Orchestration Layer (TDD Implementation)
 
 ### Phase 1: Agent Configuration ✅
+
 - **BaseAgent Class**: Foundation for intelligent agent system
   - Created `AgentConfig` interface with name, description, toolRegistry, ragService, confidenceThreshold
   - Implemented `BaseAgent` constructor with proper initialization
@@ -131,6 +149,7 @@
   - Tests passing 100% for Phase 1: Agent Configuration
 
 ### Phase 2: Intent Recognition ✅
+
 - **parseIntent Method**: Query understanding and classification
   - Added `IntentType` enum: 'url' | 'question' | 'command' | 'unknown'
   - Created `ParsedIntent` interface with type, query, urls, keywords
@@ -141,6 +160,7 @@
   - 3 new tests, 12/12 total tests passing
 
 ### Phase 3: Decision Logic ✅
+
 - **shouldFetchNewData Method**: Smart caching and fetch decisions
   - Only fetches for URL intents, not questions/commands
   - Implements 5-minute cache TTL to prevent redundant fetches
@@ -154,6 +174,7 @@
 - **Testing**: 6 new tests, 18/18 total passing
 
 ### Phase 4: Tool Execution ✅
+
 - **executeTool Method**: Actual tool execution with error handling
   - Gets tool from registry and executes with input
   - Three-layer error handling (no registry, tool not found, execution error)
@@ -167,6 +188,7 @@
 - **Total Tests**: 22/22 passing (100% coverage)
 
 ### Phase 5: Data Processing ✅
+
 - **processToolResult Method**: Transform raw tool output for RAG
   - Extracts content from tool result data
   - Preserves all metadata fields (url, title, timestamps, etc.)
@@ -180,6 +202,7 @@
 - **Total Tests**: 25/25 passing (100% coverage)
 
 ### Phase 6: Knowledge Operations ✅
+
 - **ingestToRAG Method**: Store content in knowledge base
   - Adds documents to RAG service
   - Handles chunked content with chunk metadata
@@ -193,6 +216,7 @@
 - **Total Tests**: 28/28 passing (100% coverage)
 
 ### Phase 7: Orchestration ✅
+
 - **execute Method**: Complete agent orchestration pipeline
   - Combines all 6 previous phases in correct sequence
   - Three core flows: full pipeline, fetch-and-respond, query-only
@@ -210,6 +234,7 @@
 - **AGENT COMPLETE**: Fully functional intelligent agent! 🎉
 
 ### Technical Decisions
+
 - Using TDD approach with granular atomic tests for reliability
 - Mocking RAGService in tests to avoid OpenAI API dependency
 - BaseAgent designed as extensible foundation for RAGAgent specialization
@@ -218,6 +243,7 @@
 ## 2025-09-19 - Documentation Cleanup & Final Polish
 
 ### Documentation
+
 - **Removed Crawl4AI References**: Cleaned up outdated library references
   - Updated README.md, CLAUDE.md, prd.md, technical-spec.md
   - Documentation now accurately reflects custom CrawlTool implementation
@@ -226,6 +252,7 @@
 ## 2025-09-19 - Crawling Fix & Final Polish
 
 ### Fixed
+
 - **Crawling Depth Issue**: Fixed crawler only visiting single page
   - Changed default depth from 1 to 2 for multi-page crawling
   - Increased default max pages from 10 to 20
@@ -235,6 +262,7 @@
 ## 2025-09-19 - Major UI/UX Enhancements & Bug Fixes
 
 ### Fixed
+
 - **Critical RAG Retrieval Issue**: Fixed singleton pattern for RAGService
   - Changed from module-scoped to global singleton to persist across hot reloads
   - Lowered confidence threshold from 0.5 to 0.3 for better results
@@ -245,6 +273,7 @@
   - Cleaned up parentheses mismatches
 
 ### Added
+
 - **Expandable Sources Display**: Interactive source references in chat
   - Click to expand/collapse source details
   - Internal docs show as "Project Documentation" with FileText icon
@@ -270,6 +299,7 @@
   - Comprehensive test suite with 43 passing tests
 
 ### Updated
+
 - **UI Improvements**:
   - Changed title from "AI Chat Assistant" to "AI RAG Agent"
   - Added Simple/Advanced mode toggle for cleaner interface
@@ -282,6 +312,7 @@
   - Progress endpoint for crawling feedback
 
 ### Testing
+
 - Created comprehensive Playwright tests for RAG functionality
 - Added test files for sources display verification
 - All critical paths tested and passing
@@ -289,6 +320,7 @@
 ## 2025-09-18 - Bug Fix: VectorStore Document Format
 
 ### Fixed
+
 - **Critical Bug in MemoryStorage**: Resolved document format mismatch
   - Issue: MemoryStorage was passing `pageContent` field to VectorStore
   - VectorStore expected `content` field, causing "Document must have id and content" errors
@@ -302,6 +334,7 @@
   - Improved debugging visibility for production issues
 
 ### Impact
+
 - Web scraping and crawling now work correctly
 - Content properly added to knowledge base
 - RAG queries can access scraped content
@@ -309,6 +342,7 @@
 ## 2025-09-18 - Phase 3: Persistent Storage (feature/persistent-storage)
 
 ### Completed
+
 - **Set up Vercel Postgres**: Configured Neon database with Vercel integration
   - Enabled pgvector extension for vector similarity search
   - Created database schema with documents, embeddings, and versions tables
@@ -331,6 +365,7 @@
   - Graceful initialization and cleanup
 
 ### Configuration
+
 - **Environment Variables**:
   - `NODE_ENV`: Determines default storage (production → persistent)
   - `USE_PERSISTENT_STORAGE`: Override storage type (true/false)
@@ -341,6 +376,7 @@
   - SSL required for security
 
 ### Testing
+
 - **Unit Tests**: 47 tests for storage components
   - PersistentVectorStore: 24 tests ✓
   - Storage Strategy: 23 tests ✓
@@ -350,6 +386,7 @@
 ## 2025-09-18 - Phase 0.5: Tool Migration (feature/tool-migration) ✅ COMPLETED
 
 ### Completed
+
 - **Converted**: ScrapeTool from PlaywrightScraper and FetchScraper
   - Unified fetch and Playwright strategies
   - Added caching mechanism (5 min TTL)
@@ -373,6 +410,7 @@
   - All 60 tests passing ✓
 
 ### Architecture Benefits
+
 - Unified error handling across all tools
 - Standardized response formats
 - Better composability and reusability
@@ -380,6 +418,7 @@
 - Cleaner API endpoints
 
 ### Validation & Testing
+
 - **Unit Tests**: All 60 tests passing ✓
 - **Integration Tests**: All API endpoints tested successfully
   - `/api/scrape`: Working with ScrapeTool
@@ -392,11 +431,13 @@
 ## 2025-09-18 - Phase 0: Tool Chest Foundation (TDD)
 
 ### Course Correction
+
 - **Decision**: Return to Phase 0 after realizing we skipped foundation
 - **Rationale**: Building on weak foundation compounds technical debt
 - **Impact**: 3 days of potential refactoring avoided
 
 ### Implementation
+
 - **Created**: Tool base class with execute, validate, and format methods
 - **Created**: ToolExecutor for orchestrating tool execution
 - **Created**: ToolRegistry for managing available tools
@@ -415,6 +456,7 @@
 - **Result**: All 21 tests passing ✓
 
 ### Architecture Benefits
+
 - Unified interface for all operations
 - Consistent error handling
 - Standardized response formats
@@ -424,28 +466,33 @@
 ## 2024-01-17
 
 ### Session Start - Working Baseline Established
+
 - **Fixed**: Added @types/react-syntax-highlighter to resolve TypeScript errors
 - **Added**: Comprehensive todo.md with project roadmap
 - **Committed**: Working baseline to main branch
 - **Created**: Feature branch `feature/rag-mvp`
 
 ### Documentation Updates
+
 - **Created**: scratchpad.md with RAG implementation planning
 - **Created**: decision-log.md with technical decisions
 - **Created**: change-log.md for tracking modifications
 - **Updated**: todo.md with complete task breakdown
 
 ### Git Operations
+
 - **Commit**: "fix: add missing TypeScript types and update todo"
 - **Push**: Updates pushed to origin/main
 - **Branch**: Created and switched to feature/rag-mvp
 
 ### Development Environment
+
 - **Server**: Running on port 3003 (port 3000 was occupied)
 - **Build**: Successful production build with Turbopack
 - **Test**: Verified API endpoint working with curl tests
 
 ### RAG Implementation Started
+
 - **Created**: lib/embeddings.ts - OpenAI embedding generation service
   - generateEmbedding() for single text
   - generateEmbeddings() for batch processing
@@ -474,6 +521,7 @@
 ## 2024-01-17 - Phase 1: Web Scraping (TDD)
 
 ### Setup
+
 - **Merged**: RAG MVP PR to main branch
 - **Created**: feature/web-scraping branch
 - **Installed**: Vitest, @vitest/ui, happy-dom for testing
@@ -481,6 +529,7 @@
 - **Added**: Test scripts to package.json
 
 ### TDD Implementation
+
 - **Created**: scraper.test.ts with 14 test cases (TDD - Red phase)
 - **Implemented**: WebScraper class to pass all tests (TDD - Green phase)
   - URL validation (http/https only)
@@ -496,6 +545,7 @@
 - **Result**: All 14 tests passing ✓
 
 ### Integration with RAG System
+
 - **Created**: /api/scrape endpoint for web scraping
 - **Updated**: RAG service to accept documents with metadata
 - **Exported**: getRAGService() function for reuse
@@ -513,6 +563,7 @@
 ## 2025-09-18 - Phase 2: Web Crawling (TDD)
 
 ### Implementation
+
 - **Created**: crawler.test.ts with 17 comprehensive test cases
 - **Implemented**: WebCrawler class with full functionality:
   - URL discovery and link extraction
@@ -538,6 +589,7 @@
 - **Result**: All 17 tests passing ✓
 
 ## Phase 2 Complete: Web Crawling ✅
+
 - Successfully implemented multi-page crawling
 - TDD approach ensured quality (17/17 tests passing)
 - Respects robots.txt and implements rate limiting
@@ -545,6 +597,7 @@
 - Tested with example.com successfully
 
 ## Phase 1 Complete: Web Scraping ✅
+
 - Successfully integrated Playwright web scraping with RAG system
 - TDD approach ensured quality (14/14 tests passing)
 - UI allows users to add any website to knowledge base
@@ -554,6 +607,7 @@
 ## Previous Session
 
 ### Initial Setup (from git history)
+
 - **feat**: Configure RAG agent project with comprehensive documentation
 - **Added**: PRD, technical-spec, quality-standards documents
 - **Added**: agents.md configuration

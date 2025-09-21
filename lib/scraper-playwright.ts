@@ -12,21 +12,24 @@ export class PlaywrightScraper {
         args: [
           '--disable-dev-shm-usage',
           '--disable-blink-features=AutomationControlled',
-          '--disable-features=IsolateOrigins,site-per-process'
-        ]
+          '--disable-features=IsolateOrigins,site-per-process',
+        ],
       });
       this.page = await this.browser.newPage();
 
       // Set extra HTTP headers including user agent
       await this.page.setExtraHTTPHeaders({
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        'User-Agent':
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
       });
 
       // Set viewport
       await this.page.setViewportSize({ width: 1280, height: 720 });
 
       // Block heavy resources for faster loading (images, videos, etc)
-      await this.page.route('**/*.{png,jpg,jpeg,gif,svg,webp,mp4,avi,mov,wmv,flv,swf}', route => route.abort());
+      await this.page.route('**/*.{png,jpg,jpeg,gif,svg,webp,mp4,avi,mov,wmv,flv,swf}', (route) =>
+        route.abort()
+      );
     }
   }
 
@@ -89,7 +92,7 @@ export class PlaywrightScraper {
       try {
         await this.page.goto(url, {
           waitUntil: 'domcontentloaded', // Less strict than networkidle
-          timeout: 30000
+          timeout: 30000,
         });
 
         // Wait a bit for dynamic content to load
@@ -99,7 +102,7 @@ export class PlaywrightScraper {
         console.log(`First attempt timed out for ${url}, retrying with relaxed settings...`);
         await this.page.goto(url, {
           waitUntil: 'commit', // Just wait for navigation to start
-          timeout: 15000
+          timeout: 15000,
         });
       }
 

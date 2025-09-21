@@ -249,7 +249,7 @@ describe('ToolExecutor', () => {
     const results = await executor.executeParallel(tasks);
 
     expect(results).toHaveLength(3);
-    results.forEach(result => {
+    results.forEach((result) => {
       expect(result.success).toBe(true);
     });
   });
@@ -276,7 +276,7 @@ describe('ToolExecutor', () => {
     const slowTool = new TestTool();
     slowTool.name = 'slow-tool';
     slowTool.execute = async () => {
-      await new Promise(resolve => setTimeout(resolve, 5000));
+      await new Promise((resolve) => setTimeout(resolve, 5000));
       return { success: true, data: {} };
     };
 
@@ -328,7 +328,7 @@ describe('Tool Composition', () => {
     preprocessor.execute = async (input) => {
       return {
         success: true,
-        data: { message: input.message.toUpperCase(), stage: 'preprocessed' }
+        data: { message: input.message.toUpperCase(), stage: 'preprocessed' },
       };
     };
 
@@ -337,7 +337,7 @@ describe('Tool Composition', () => {
     processor.execute = async (input) => {
       return {
         success: true,
-        data: { result: `Processed: ${input.message}`, stage: input.stage }
+        data: { result: `Processed: ${input.message}`, stage: input.stage },
       };
     };
 

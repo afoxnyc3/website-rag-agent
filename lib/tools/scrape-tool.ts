@@ -146,10 +146,14 @@ export class ScrapeTool extends Tool {
     return Promise.race([
       this.execute(input),
       new Promise<ToolResult>((resolve) =>
-        setTimeout(() => resolve({
-          success: false,
-          error: `Scraping timeout after ${timeout}ms`,
-        }), timeout)
+        setTimeout(
+          () =>
+            resolve({
+              success: false,
+              error: `Scraping timeout after ${timeout}ms`,
+            }),
+          timeout
+        )
       ),
     ]);
   }
@@ -196,8 +200,8 @@ export class ScrapeTool extends Tool {
 
     // Clean and normalize content
     content = content
-      .replace(/\s+/g, ' ')  // Replace multiple spaces with single space
-      .replace(/\n{3,}/g, '\n\n')  // Replace multiple newlines with double newline
+      .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+      .replace(/\n{3,}/g, '\n\n') // Replace multiple newlines with double newline
       .trim();
 
     // Apply max length if specified

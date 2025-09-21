@@ -3,9 +3,11 @@
 ## /prime - Prime AI Context with Project Essentials
 
 ### Purpose
+
 Loads optimal project context at the start of each session, ensuring full awareness of project state, recent work, and next actions.
 
 ### Full Command Prompt
+
 ```
 Execute context-priming workflow to load project essentials:
 
@@ -37,11 +39,13 @@ This ensures you have full project awareness before starting work.
 ```
 
 ### Short Version
+
 ```
 /prime - Read agents.md, last scratchpad, todo.md, recent changes. Return status summary.
 ```
 
 ### Why This is Critical
+
 - **Prevents context loss** between sessions
 - **Ensures workflow compliance** by loading agents.md first
 - **Provides actionable next steps** from todo and scratchpad
@@ -53,9 +57,11 @@ This ensures you have full project awareness before starting work.
 ## /dev-workflow - Complete Development Workflow
 
 ### Purpose
+
 Executes the complete development workflow as documented in agents.md, ensuring consistent adherence to best practices.
 
 ### Full Command Prompt
+
 ```
 Execute the complete development workflow from agents.md:
 
@@ -98,11 +104,13 @@ Use ULTRATHINK for complex problems. Follow TDD strictly. Maintain all documenta
 ```
 
 ### Short Version
+
 ```
 Follow agents.md workflow: Plan in scratchpad → Update todo → TDD implementation → Update logs → Commit. Task: [USER_INPUT]
 ```
 
 ### Key Elements
+
 - **Explicit reference to agents.md** (the behavioral contract)
 - **Scratchpad planning requirement** (makes it unavoidable)
 - **TDD emphasis** (write tests first)
@@ -115,9 +123,11 @@ Follow agents.md workflow: Plan in scratchpad → Update todo → TDD implementa
 ## /fix-tests - Test Failure Analysis & Fix
 
 ### Purpose
+
 Analyzes failing tests, identifies root causes, and fixes them following TDD principles.
 
 ### Command Prompt
+
 ```
 Analyze and fix failing tests:
 1. Run test suite and identify failures
@@ -134,9 +144,11 @@ Task: [TEST_FILE or ALL]
 ## /doc-review - Documentation Consistency Check
 
 ### Purpose
+
 Reviews all documentation files for accuracy and consistency with current implementation.
 
 ### Command Prompt
+
 ```
 Review and update project documentation:
 1. Compare README.md against actual implementation

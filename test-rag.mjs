@@ -39,7 +39,10 @@ async function testRAG() {
     await page.getByRole('button', { name: /View KB/i }).click();
     await page.waitForTimeout(1000);
 
-    const kbContent = await page.locator('text=/Knowledge Base Manager/i').locator('..').textContent();
+    const kbContent = await page
+      .locator('text=/Knowledge Base Manager/i')
+      .locator('..')
+      .textContent();
     const docBadge = await page.locator('text=/documents/i').first().textContent();
     console.log('   KB shows:', docBadge);
 
@@ -48,7 +51,9 @@ async function testRAG() {
     await page.waitForTimeout(500);
 
     console.log('6. Asking about Playwright...');
-    const chatInput = page.getByPlaceholder('Ask about our RAG system, embeddings, or architecture...');
+    const chatInput = page.getByPlaceholder(
+      'Ask about our RAG system, embeddings, or architecture...'
+    );
     await chatInput.fill('What is Playwright?');
     await chatInput.press('Enter');
 
@@ -75,7 +80,6 @@ async function testRAG() {
       console.log('✅ SUCCESS: RAG is working correctly');
       console.log('   Response preview:', responseText.substring(0, 200));
     }
-
   } catch (error) {
     console.error('Test failed:', error);
   } finally {

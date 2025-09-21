@@ -57,7 +57,7 @@ export class MemoryStorage implements StorageStrategy {
 
     const results = await this.vectorStore.search(embedding, limit, 0.0);
 
-    return results.map(result => ({
+    return results.map((result) => ({
       id: result.document.id,
       content: result.document.content,
       metadata: result.document.metadata,
@@ -86,7 +86,7 @@ export class MemoryStorage implements StorageStrategy {
     }
 
     const docs = this.vectorStore.getAllDocuments();
-    return docs.map(doc => ({
+    return docs.map((doc) => ({
       id: doc.id,
       content: doc.content,
       metadata: doc.metadata,

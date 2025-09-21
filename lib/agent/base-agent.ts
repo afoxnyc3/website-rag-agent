@@ -74,9 +74,18 @@ export class BaseAgent {
     }
 
     // Check for commands
-    const commandKeywords = ['add', 'remove', 'delete', 'clear', 'show', 'list', 'create', 'update'];
+    const commandKeywords = [
+      'add',
+      'remove',
+      'delete',
+      'clear',
+      'show',
+      'list',
+      'create',
+      'update',
+    ];
     const lowerQuery = query.toLowerCase();
-    const foundKeywords = commandKeywords.filter(keyword => lowerQuery.includes(keyword));
+    const foundKeywords = commandKeywords.filter((keyword) => lowerQuery.includes(keyword));
 
     if (foundKeywords.length > 0) {
       result.type = 'command';
@@ -154,7 +163,7 @@ export class BaseAgent {
     if (!this.toolRegistry) {
       return {
         success: false,
-        error: 'No tool registry configured'
+        error: 'No tool registry configured',
       };
     }
 
@@ -163,7 +172,7 @@ export class BaseAgent {
     if (!tool) {
       return {
         success: false,
-        error: `Tool not found: ${toolName}`
+        error: `Tool not found: ${toolName}`,
       };
     }
 
@@ -185,24 +194,24 @@ export class BaseAgent {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Tool execution failed'
+        error: error instanceof Error ? error.message : 'Tool execution failed',
       };
     }
   }
 
-  private async executeWithTimeout(
-    tool: Tool,
-    input: any,
-    timeout: number
-  ): Promise<ToolResult> {
+  private async executeWithTimeout(tool: Tool, input: any, timeout: number): Promise<ToolResult> {
     return Promise.race([
       tool.execute(input),
       new Promise<ToolResult>((resolve) =>
-        setTimeout(() => resolve({
-          success: false,
-          error: `Tool execution timeout after ${timeout}ms`
-        }), timeout)
-      )
+        setTimeout(
+          () =>
+            resolve({
+              success: false,
+              error: `Tool execution timeout after ${timeout}ms`,
+            }),
+          timeout
+        )
+      ),
     ]);
   }
 
@@ -211,7 +220,7 @@ export class BaseAgent {
     if (!toolResult.success || !toolResult.data) {
       return {
         content: '',
-        metadata: { error: toolResult.error || 'No data returned' }
+        metadata: { error: toolResult.error || 'No data returned' },
       };
     }
 
@@ -240,7 +249,7 @@ export class BaseAgent {
     return {
       content,
       chunks,
-      metadata
+      metadata,
     };
   }
 
@@ -257,15 +266,15 @@ export class BaseAgent {
           metadata: {
             ...processed.metadata,
             chunkIndex: i,
-            totalChunks: processed.chunks.length
-          }
+            totalChunks: processed.chunks.length,
+          },
         });
       }
     } else {
       // Ingest as single document
       await this.ragService.addDocument({
         content: processed.content,
-        metadata: processed.metadata
+        metadata: processed.metadata,
       });
     }
   }
@@ -276,7 +285,7 @@ export class BaseAgent {
         answer: "I don't have access to a knowledge base",
         confidence: 0,
         sources: [],
-        chunks: []
+        chunks: [],
       };
     }
 
@@ -298,7 +307,7 @@ export class BaseAgent {
       if (toolName) {
         // Step 4: Execute tool to fetch content
         const toolResult = await this.executeTool(toolName, {
-          url: intent.urls[0]
+          url: intent.urls[0],
         });
 
         if (toolResult.success) {

@@ -1,4 +1,4 @@
-import ChatAssistant from "@/components/chat/chat-assistant";
+import ChatAssistant from '@/components/chat/chat-assistant';
 
 export default function Home() {
   return (

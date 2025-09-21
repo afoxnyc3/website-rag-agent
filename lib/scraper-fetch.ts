@@ -9,8 +9,8 @@ export class FetchScraper {
       const response = await fetch(url, {
         signal: controller.signal,
         headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; RAGBot/1.0; +https://example.com/bot)'
-        }
+          'User-Agent': 'Mozilla/5.0 (compatible; RAGBot/1.0; +https://example.com/bot)',
+        },
       });
 
       clearTimeout(timeoutId);
@@ -26,7 +26,7 @@ export class FetchScraper {
       const title = titleMatch ? titleMatch[1].trim() : 'Untitled';
 
       // Extract text content (basic HTML stripping)
-      let content = html
+      const content = html
         // Remove script and style elements
         .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
         .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')

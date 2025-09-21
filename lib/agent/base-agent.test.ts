@@ -8,14 +8,14 @@ vi.mock('../rag', () => ({
     addDocument: vi.fn(),
     query: vi.fn(),
     getDocumentCount: vi.fn(),
-  }))
+  })),
 }));
 
 // Phase 1: Agent Configuration Tests
 describe('AgentConfig', () => {
   it('should accept name property', () => {
     const config: AgentConfig = {
-      name: 'TestAgent'
+      name: 'TestAgent',
     };
     expect(config.name).toBe('TestAgent');
   });
@@ -23,7 +23,7 @@ describe('AgentConfig', () => {
   it('should accept description property', () => {
     const config: AgentConfig = {
       name: 'TestAgent',
-      description: 'A test agent for unit tests'
+      description: 'A test agent for unit tests',
     };
     expect(config.description).toBe('A test agent for unit tests');
   });
@@ -32,7 +32,7 @@ describe('AgentConfig', () => {
     const registry = new ToolRegistry();
     const config: AgentConfig = {
       name: 'TestAgent',
-      toolRegistry: registry
+      toolRegistry: registry,
     };
     expect(config.toolRegistry).toBe(registry);
   });
@@ -42,7 +42,7 @@ describe('AgentConfig', () => {
     const ragService = new RAGService();
     const config: AgentConfig = {
       name: 'TestAgent',
-      ragService: ragService
+      ragService: ragService,
     };
     expect(config.ragService).toBe(ragService);
   });
@@ -50,7 +50,7 @@ describe('AgentConfig', () => {
   it('should accept confidenceThreshold property', () => {
     const config: AgentConfig = {
       name: 'TestAgent',
-      confidenceThreshold: 0.7
+      confidenceThreshold: 0.7,
     };
     expect(config.confidenceThreshold).toBe(0.7);
   });
@@ -61,7 +61,7 @@ describe('BaseAgent', () => {
   it('should accept AgentConfig in constructor', async () => {
     const { BaseAgent } = await import('./base-agent');
     const config: AgentConfig = {
-      name: 'TestAgent'
+      name: 'TestAgent',
     };
     const agent = new BaseAgent(config);
     expect(agent).toBeDefined();
@@ -70,7 +70,7 @@ describe('BaseAgent', () => {
   it('should store name from config', async () => {
     const { BaseAgent } = await import('./base-agent');
     const config: AgentConfig = {
-      name: 'TestAgent'
+      name: 'TestAgent',
     };
     const agent = new BaseAgent(config);
     expect(agent.name).toBe('TestAgent');
@@ -80,7 +80,7 @@ describe('BaseAgent', () => {
     const { BaseAgent } = await import('./base-agent');
     const config: AgentConfig = {
       name: 'TestAgent',
-      description: 'A test agent'
+      description: 'A test agent',
     };
     const agent = new BaseAgent(config);
     expect(agent.description).toBe('A test agent');
@@ -89,7 +89,7 @@ describe('BaseAgent', () => {
   it('should default confidenceThreshold to 0.5', async () => {
     const { BaseAgent } = await import('./base-agent');
     const config: AgentConfig = {
-      name: 'TestAgent'
+      name: 'TestAgent',
     };
     const agent = new BaseAgent(config);
     expect(agent.confidenceThreshold).toBe(0.5);
@@ -140,7 +140,7 @@ describe('BaseAgent.shouldFetchNewData', () => {
     const intent = {
       type: 'url' as const,
       query: 'Check https://example.com',
-      urls: ['https://example.com']
+      urls: ['https://example.com'],
     };
 
     const result = await agent.shouldFetchNewData(intent);
@@ -153,7 +153,7 @@ describe('BaseAgent.shouldFetchNewData', () => {
 
     const intent = {
       type: 'question' as const,
-      query: 'What is the pricing?'
+      query: 'What is the pricing?',
     };
 
     const result = await agent.shouldFetchNewData(intent);
@@ -171,7 +171,7 @@ describe('BaseAgent.shouldFetchNewData', () => {
     const intent = {
       type: 'url' as const,
       query: 'Check https://cached.com',
-      urls: [expiredUrl]
+      urls: [expiredUrl],
     };
 
     const result = await agent.shouldFetchNewData(intent);
@@ -186,13 +186,13 @@ describe('BaseAgent.selectTool', () => {
     const registry = new ToolRegistry();
     const agent = new BaseAgent({
       name: 'TestAgent',
-      toolRegistry: registry
+      toolRegistry: registry,
     });
 
     const intent = {
       type: 'url' as const,
       query: 'Check https://example.com/page',
-      urls: ['https://example.com/page']
+      urls: ['https://example.com/page'],
     };
 
     const tool = agent.selectTool(intent);
@@ -204,13 +204,13 @@ describe('BaseAgent.selectTool', () => {
     const registry = new ToolRegistry();
     const agent = new BaseAgent({
       name: 'TestAgent',
-      toolRegistry: registry
+      toolRegistry: registry,
     });
 
     const intent = {
       type: 'url' as const,
       query: 'Crawl https://example.com',
-      urls: ['https://example.com']
+      urls: ['https://example.com'],
     };
 
     const tool = agent.selectTool(intent);
@@ -223,7 +223,7 @@ describe('BaseAgent.selectTool', () => {
 
     const intent = {
       type: 'question' as const,
-      query: 'What is the pricing?'
+      query: 'What is the pricing?',
     };
 
     const tool = agent.selectTool(intent);
@@ -240,8 +240,8 @@ describe('BaseAgent.executeTool', () => {
       description: 'Test tool',
       execute: vi.fn().mockResolvedValue({
         success: true,
-        data: { content: 'test content' }
-      })
+        data: { content: 'test content' },
+      }),
     };
 
     const registry = new ToolRegistry();
@@ -249,7 +249,7 @@ describe('BaseAgent.executeTool', () => {
 
     const agent = new BaseAgent({
       name: 'TestAgent',
-      toolRegistry: registry
+      toolRegistry: registry,
     });
 
     const result = await agent.executeTool('MockTool', { url: 'https://example.com' });
@@ -266,8 +266,8 @@ describe('BaseAgent.executeTool', () => {
       description: 'Test tool',
       execute: vi.fn().mockResolvedValue({
         success: true,
-        data: { content: 'success data' }
-      })
+        data: { content: 'success data' },
+      }),
     };
 
     const registry = new ToolRegistry();
@@ -275,7 +275,7 @@ describe('BaseAgent.executeTool', () => {
 
     const agent = new BaseAgent({
       name: 'TestAgent',
-      toolRegistry: registry
+      toolRegistry: registry,
     });
 
     const result = await agent.executeTool('MockTool', {});
@@ -291,8 +291,8 @@ describe('BaseAgent.executeTool', () => {
       description: 'Test tool',
       execute: vi.fn().mockResolvedValue({
         success: false,
-        error: 'Tool execution failed'
-      })
+        error: 'Tool execution failed',
+      }),
     };
 
     const registry = new ToolRegistry();
@@ -300,7 +300,7 @@ describe('BaseAgent.executeTool', () => {
 
     const agent = new BaseAgent({
       name: 'TestAgent',
-      toolRegistry: registry
+      toolRegistry: registry,
     });
 
     const result = await agent.executeTool('MockTool', {});
@@ -314,9 +314,11 @@ describe('BaseAgent.executeTool', () => {
     const mockTool = {
       name: 'MockTool',
       description: 'Test tool',
-      execute: vi.fn().mockImplementation(() =>
-        new Promise(resolve => setTimeout(() => resolve({ success: true }), 2000))
-      )
+      execute: vi
+        .fn()
+        .mockImplementation(
+          () => new Promise((resolve) => setTimeout(() => resolve({ success: true }), 2000))
+        ),
     };
 
     const registry = new ToolRegistry();
@@ -324,7 +326,7 @@ describe('BaseAgent.executeTool', () => {
 
     const agent = new BaseAgent({
       name: 'TestAgent',
-      toolRegistry: registry
+      toolRegistry: registry,
     });
 
     // Execute with 100ms timeout (should timeout)
@@ -346,8 +348,8 @@ describe('BaseAgent.processToolResult', () => {
       data: {
         content: 'This is the extracted content from the webpage',
         url: 'https://example.com',
-        title: 'Example Page'
-      }
+        title: 'Example Page',
+      },
     };
 
     const processed = await agent.processToolResult(toolResult);
@@ -366,8 +368,8 @@ describe('BaseAgent.processToolResult', () => {
       success: true,
       data: {
         content: largeContent,
-        url: 'https://example.com'
-      }
+        url: 'https://example.com',
+      },
     };
 
     const processed = await agent.processToolResult(toolResult);
@@ -388,8 +390,8 @@ describe('BaseAgent.processToolResult', () => {
         url: 'https://example.com',
         title: 'Test Page',
         scrapedAt: '2025-01-01',
-        customField: 'custom value'
-      }
+        customField: 'custom value',
+      },
     };
 
     const processed = await agent.processToolResult(toolResult);
@@ -411,24 +413,24 @@ describe('BaseAgent.ingestToRAG', () => {
     const mockRAGService = {
       addDocument: mockAddDocument,
       query: vi.fn(),
-      getDocumentCount: vi.fn()
+      getDocumentCount: vi.fn(),
     };
 
     const agent = new BaseAgent({
       name: 'TestAgent',
-      ragService: mockRAGService as any
+      ragService: mockRAGService as any,
     });
 
     const processed = {
       content: 'Test content',
-      metadata: { url: 'https://example.com' }
+      metadata: { url: 'https://example.com' },
     };
 
     await agent.ingestToRAG(processed);
 
     expect(mockAddDocument).toHaveBeenCalledWith({
       content: 'Test content',
-      metadata: { url: 'https://example.com' }
+      metadata: { url: 'https://example.com' },
     });
   });
 
@@ -439,18 +441,18 @@ describe('BaseAgent.ingestToRAG', () => {
     const mockRAGService = {
       addDocument: mockAddDocument,
       query: vi.fn(),
-      getDocumentCount: vi.fn()
+      getDocumentCount: vi.fn(),
     };
 
     const agent = new BaseAgent({
       name: 'TestAgent',
-      ragService: mockRAGService as any
+      ragService: mockRAGService as any,
     });
 
     const processed = {
       content: 'Full content',
       chunks: ['Chunk 1', 'Chunk 2', 'Chunk 3'],
-      metadata: { url: 'https://example.com' }
+      metadata: { url: 'https://example.com' },
     };
 
     await agent.ingestToRAG(processed);
@@ -458,7 +460,7 @@ describe('BaseAgent.ingestToRAG', () => {
     expect(mockAddDocument).toHaveBeenCalledTimes(3);
     expect(mockAddDocument).toHaveBeenCalledWith({
       content: 'Chunk 1',
-      metadata: { url: 'https://example.com', chunkIndex: 0, totalChunks: 3 }
+      metadata: { url: 'https://example.com', chunkIndex: 0, totalChunks: 3 },
     });
   });
 });
@@ -471,18 +473,18 @@ describe('BaseAgent.searchKnowledge', () => {
       answer: 'Test answer',
       confidence: 0.85,
       sources: ['source1'],
-      chunks: []
+      chunks: [],
     });
 
     const mockRAGService = {
       addDocument: vi.fn(),
       query: mockQuery,
-      getDocumentCount: vi.fn()
+      getDocumentCount: vi.fn(),
     };
 
     const agent = new BaseAgent({
       name: 'TestAgent',
-      ragService: mockRAGService as any
+      ragService: mockRAGService as any,
     });
 
     const result = await agent.searchKnowledge('Test question');
@@ -504,8 +506,8 @@ describe('BaseAgent.execute', () => {
       description: 'Scrape tool',
       execute: vi.fn().mockResolvedValue({
         success: true,
-        data: { content: 'Scraped content', url: 'https://example.com/page' }
-      })
+        data: { content: 'Scraped content', url: 'https://example.com/page' },
+      }),
     };
 
     const registry = new ToolRegistry();
@@ -517,19 +519,19 @@ describe('BaseAgent.execute', () => {
       answer: 'Based on the content...',
       confidence: 0.9,
       sources: ['https://example.com/page'],
-      chunks: []
+      chunks: [],
     });
 
     const mockRAGService = {
       addDocument: mockAddDocument,
       query: mockQuery,
-      getDocumentCount: vi.fn()
+      getDocumentCount: vi.fn(),
     };
 
     const agent = new BaseAgent({
       name: 'TestAgent',
       toolRegistry: registry,
-      ragService: mockRAGService as any
+      ragService: mockRAGService as any,
     });
 
     const result = await agent.execute('Check https://example.com/page and tell me about it');
@@ -553,9 +555,9 @@ describe('BaseAgent.execute', () => {
         data: {
           content: 'New article about AI trends in 2025',
           url: 'https://techblog.com/ai-trends',
-          title: 'AI Trends 2025'
-        }
-      })
+          title: 'AI Trends 2025',
+        },
+      }),
     };
 
     const registry = new ToolRegistry();
@@ -567,19 +569,19 @@ describe('BaseAgent.execute', () => {
       answer: 'According to the article, AI will focus on...',
       confidence: 0.95,
       sources: ['https://techblog.com/ai-trends'],
-      chunks: []
+      chunks: [],
     });
 
     const mockRAGService = {
       addDocument: mockAddDocument,
       query: mockQuery,
-      getDocumentCount: vi.fn()
+      getDocumentCount: vi.fn(),
     };
 
     const agent = new BaseAgent({
       name: 'TestAgent',
       toolRegistry: registry,
-      ragService: mockRAGService as any
+      ragService: mockRAGService as any,
     });
 
     // First time asking about this URL - should fetch
@@ -587,10 +589,14 @@ describe('BaseAgent.execute', () => {
 
     // Verify full flow executed
     expect(mockTool.execute).toHaveBeenCalledWith({ url: 'https://techblog.com/ai-trends' });
-    expect(mockAddDocument).toHaveBeenCalledWith(expect.objectContaining({
-      content: 'New article about AI trends in 2025'
-    }));
-    expect(mockQuery).toHaveBeenCalledWith('What does https://techblog.com/ai-trends say about AI?');
+    expect(mockAddDocument).toHaveBeenCalledWith(
+      expect.objectContaining({
+        content: 'New article about AI trends in 2025',
+      })
+    );
+    expect(mockQuery).toHaveBeenCalledWith(
+      'What does https://techblog.com/ai-trends say about AI?'
+    );
     expect(result.answer).toContain('According to the article');
     expect(result.confidence).toBe(0.95);
   });
@@ -606,19 +612,19 @@ describe('BaseAgent.execute', () => {
       answer: 'Based on my knowledge, the answer is...',
       confidence: 0.88,
       sources: ['internal://doc1', 'internal://doc2'],
-      chunks: []
+      chunks: [],
     });
 
     const mockRAGService = {
       addDocument: vi.fn(),
       query: mockQuery,
-      getDocumentCount: vi.fn()
+      getDocumentCount: vi.fn(),
     };
 
     const agent = new BaseAgent({
       name: 'TestAgent',
       toolRegistry: registry,
-      ragService: mockRAGService as any
+      ragService: mockRAGService as any,
     });
 
     // Ask a general question without URLs

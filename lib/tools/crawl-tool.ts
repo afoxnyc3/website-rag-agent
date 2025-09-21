@@ -88,7 +88,7 @@ export class CrawlTool extends Tool {
   ): Promise<ToolResult> {
     const {
       url,
-      maxDepth = 2,  // Increased default depth
+      maxDepth = 2, // Increased default depth
       maxPages = 50, // Increased default page limit
       includePatterns = [],
       excludePatterns = [],
@@ -135,7 +135,7 @@ export class CrawlTool extends Tool {
       // Check sitemap if enabled
       if (followSitemap) {
         const sitemapUrls = await this.fetchSitemap(url);
-        sitemapUrls.forEach(sitemapUrl => {
+        sitemapUrls.forEach((sitemapUrl) => {
           this.addToQueue(sitemapUrl, 1);
         });
       }
@@ -170,7 +170,7 @@ export class CrawlTool extends Tool {
             currentUrl,
             depth,
             pagesVisited: result.pagesVisited,
-            totalQueued: this.urlQueue.length
+            totalQueued: this.urlQueue.length,
           });
         }
 
@@ -186,7 +186,7 @@ export class CrawlTool extends Tool {
 
           // Filter links by domain
           const domain = new URL(url).hostname;
-          const sameDomainLinks = links.filter(link => {
+          const sameDomainLinks = links.filter((link) => {
             try {
               return new URL(link).hostname === domain;
             } catch {
@@ -204,7 +204,7 @@ export class CrawlTool extends Tool {
 
           // Add discovered links to queue
           if (depth < maxDepth) {
-            sameDomainLinks.forEach(link => {
+            sameDomainLinks.forEach((link) => {
               if (!this.visitedUrls.has(link)) {
                 this.addToQueue(link, depth + 1);
               }
@@ -243,7 +243,7 @@ export class CrawlTool extends Tool {
   }
 
   private addToQueue(url: string, depth: number): void {
-    if (!this.visitedUrls.has(url) && !this.urlQueue.some(item => item.url === url)) {
+    if (!this.visitedUrls.has(url) && !this.urlQueue.some((item) => item.url === url)) {
       this.urlQueue.push({ url, depth });
     }
   }
@@ -253,13 +253,17 @@ export class CrawlTool extends Tool {
     const timeSinceLastRequest = now - this.lastRequestTime;
 
     if (this.lastRequestTime > 0 && timeSinceLastRequest < delayMs) {
-      await new Promise(resolve => setTimeout(resolve, delayMs - timeSinceLastRequest));
+      await new Promise((resolve) => setTimeout(resolve, delayMs - timeSinceLastRequest));
     }
 
     this.lastRequestTime = Date.now();
   }
 
-  private matchesPatterns(url: string, includePatterns: string[], excludePatterns: string[]): boolean {
+  private matchesPatterns(
+    url: string,
+    includePatterns: string[],
+    excludePatterns: string[]
+  ): boolean {
     // Check exclude patterns first
     for (const pattern of excludePatterns) {
       if (url.includes(pattern)) return false;

@@ -169,7 +169,7 @@ export class PersistentVectorStore {
       } catch (error) {
         lastError = error;
         if (i < retries - 1) {
-          await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 100));
+          await new Promise((resolve) => setTimeout(resolve, Math.pow(2, i) * 100));
         }
       }
     }
@@ -314,7 +314,7 @@ export class PersistentVectorStore {
     limit: number = 10
   ): Promise<SearchResult[]> {
     const results = await this.search(embedding, limit);
-    return results.filter(r => r.similarity >= threshold);
+    return results.filter((r) => r.similarity >= threshold);
   }
 
   /**

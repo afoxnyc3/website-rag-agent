@@ -28,7 +28,7 @@ export class VectorStore {
   }
 
   addDocuments(docs: Document[]): void {
-    docs.forEach(doc => this.addDocument(doc));
+    docs.forEach((doc) => this.addDocument(doc));
   }
 
   getDocument(id: string): Document | undefined {
@@ -55,7 +55,7 @@ export class VectorStore {
         results.push({
           document: doc,
           similarity,
-          confidence: similarity
+          confidence: similarity,
         });
       }
     }

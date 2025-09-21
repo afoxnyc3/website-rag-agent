@@ -15,7 +15,7 @@ describe('SemanticChunker', () => {
 
       const chunks = chunker.chunk(text, options);
 
-      chunks.forEach(chunk => {
+      chunks.forEach((chunk) => {
         expect(chunk.content.length).toBeLessThanOrEqual(300);
       });
     });
@@ -27,7 +27,7 @@ describe('SemanticChunker', () => {
       const chunks = chunker.chunk(text, options);
 
       // All chunks except possibly the last should be >= minSize
-      chunks.slice(0, -1).forEach(chunk => {
+      chunks.slice(0, -1).forEach((chunk) => {
         expect(chunk.content.length).toBeGreaterThanOrEqual(100);
       });
     });
@@ -51,7 +51,7 @@ describe('SemanticChunker', () => {
       const text = 'First sentence. Second sentence. Third sentence. Fourth sentence.';
       const options: ChunkOptions = {
         maxSize: 35,
-        strategy: 'semantic'
+        strategy: 'semantic',
       };
 
       const chunks = chunker.chunk(text, options);
@@ -64,7 +64,7 @@ describe('SemanticChunker', () => {
       const text = 'First paragraph.\n\nSecond paragraph.\n\nThird paragraph.';
       const options: ChunkOptions = {
         maxSize: 40,
-        strategy: 'semantic'
+        strategy: 'semantic',
       };
 
       const chunks = chunker.chunk(text, options);
@@ -78,7 +78,7 @@ describe('SemanticChunker', () => {
       const text = 'Para 1\n\n\nPara 2\n\nPara 3';
       const options: ChunkOptions = {
         maxSize: 15,
-        strategy: 'semantic'
+        strategy: 'semantic',
       };
 
       const chunks = chunker.chunk(text, options);
@@ -95,7 +95,7 @@ describe('SemanticChunker', () => {
       const text = '# Header 1\nContent for header 1.\n\n# Header 2\nContent for header 2.';
       const options: ChunkOptions = {
         maxSize: 40,
-        strategy: 'markdown'
+        strategy: 'markdown',
       };
 
       const chunks = chunker.chunk(text, options);
@@ -111,13 +111,13 @@ describe('SemanticChunker', () => {
       const options: ChunkOptions = {
         maxSize: 30,
         strategy: 'markdown',
-        preserveCodeBlocks: true
+        preserveCodeBlocks: true,
       };
 
       const chunks = chunker.chunk(text, options);
 
       // Code block should be kept together
-      const codeChunk = chunks.find(c => c.content.includes('```javascript'));
+      const codeChunk = chunks.find((c) => c.content.includes('```javascript'));
       expect(codeChunk?.content).toContain('const x = 1');
       expect(codeChunk?.content).toContain('const y = 2');
     });
@@ -126,13 +126,13 @@ describe('SemanticChunker', () => {
       const text = 'Use `npm install` to install. Then run `npm start`.';
       const options: ChunkOptions = {
         maxSize: 30,
-        strategy: 'markdown'
+        strategy: 'markdown',
       };
 
       const chunks = chunker.chunk(text, options);
 
       // Inline code should not be split
-      chunks.forEach(chunk => {
+      chunks.forEach((chunk) => {
         const backticks = chunk.content.match(/`/g) || [];
         expect(backticks.length % 2).toBe(0); // Even number of backticks
       });
@@ -142,7 +142,7 @@ describe('SemanticChunker', () => {
       const text = '- Item 1\n- Item 2\n- Item 3\n\nNext paragraph';
       const options: ChunkOptions = {
         maxSize: 30,
-        strategy: 'markdown'
+        strategy: 'markdown',
       };
 
       const chunks = chunker.chunk(text, options);
@@ -159,7 +159,7 @@ describe('SemanticChunker', () => {
       const options: ChunkOptions = {
         maxSize: 30,
         overlap: 10,
-        strategy: 'semantic'
+        strategy: 'semantic',
       };
 
       const chunks = chunker.chunk(text, options);
@@ -176,7 +176,7 @@ describe('SemanticChunker', () => {
       const options: ChunkOptions = {
         maxSize: 10,
         overlap: 100, // Unreasonably large
-        strategy: 'semantic'
+        strategy: 'semantic',
       };
 
       const chunks = chunker.chunk(text, options);
@@ -224,7 +224,7 @@ describe('SemanticChunker', () => {
       const chunks = chunker.chunk(longWord, { maxSize: 100 });
 
       expect(chunks.length).toBeGreaterThan(1);
-      chunks.forEach(chunk => {
+      chunks.forEach((chunk) => {
         expect(chunk.content.length).toBeLessThanOrEqual(100);
       });
     });
@@ -249,14 +249,14 @@ Another paragraph.
       const chunks = chunker.chunk(text, {
         maxSize: 100,
         strategy: 'markdown',
-        preserveCodeBlocks: true
+        preserveCodeBlocks: true,
       });
 
       expect(chunks).toBeDefined();
       expect(chunks.length).toBeGreaterThan(0);
 
       // Verify code block is preserved
-      const codeChunk = chunks.find(c => c.content.includes('```python'));
+      const codeChunk = chunks.find((c) => c.content.includes('```python'));
       expect(codeChunk).toBeDefined();
       expect(codeChunk?.content).toContain('print("Hello")');
     });
@@ -266,7 +266,7 @@ Another paragraph.
       const chunks = chunker.chunk(text, { maxSize: 20 });
 
       expect(chunks).toBeDefined();
-      chunks.forEach(chunk => {
+      chunks.forEach((chunk) => {
         expect(chunk.content.length).toBeLessThanOrEqual(20);
       });
     });
@@ -279,7 +279,7 @@ Another paragraph.
 
       const chunks = chunker.chunk(largeText, {
         maxSize: 3000,
-        strategy: 'semantic'
+        strategy: 'semantic',
       });
 
       const duration = Date.now() - startTime;
@@ -334,8 +334,8 @@ describe('Chunk Type Interface', () => {
       totalChunks: 1,
       metadata: {
         strategy: 'semantic',
-        hasOverlap: false
-      }
+        hasOverlap: false,
+      },
     };
 
     expect(chunk.content).toBe('test');

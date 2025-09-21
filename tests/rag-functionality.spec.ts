@@ -28,7 +28,9 @@ test.describe('RAG Functionality', () => {
     await expect(page.getByText(/Successfully/i)).toBeVisible({ timeout: 30000 });
 
     // Ask a question about the scraped content
-    const chatInput = page.getByPlaceholder('Ask about our RAG system, embeddings, or architecture...');
+    const chatInput = page.getByPlaceholder(
+      'Ask about our RAG system, embeddings, or architecture...'
+    );
     await chatInput.fill('What is this page about?');
     await chatInput.press('Enter');
 
@@ -62,7 +64,10 @@ test.describe('RAG Functionality', () => {
     await expect(page.getByText(/documents/i)).toBeVisible();
 
     // Should show at least 1 document
-    const docCount = await page.locator('.badge').filter({ hasText: /documents/i }).textContent();
+    const docCount = await page
+      .locator('.badge')
+      .filter({ hasText: /documents/i })
+      .textContent();
     expect(docCount).not.toContain('0 documents');
   });
 
@@ -74,7 +79,10 @@ test.describe('RAG Functionality', () => {
     await page.getByRole('button', { name: /Clear All/i }).click();
 
     // Confirm in dialog
-    await page.getByRole('button', { name: /Clear All/i }).last().click();
+    await page
+      .getByRole('button', { name: /Clear All/i })
+      .last()
+      .click();
 
     // Check that knowledge base is empty
     await expect(page.getByText(/Knowledge base is empty/i)).toBeVisible({ timeout: 5000 });

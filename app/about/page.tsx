@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from 'next/link';
 
 export default function About() {
   return (
@@ -12,18 +12,17 @@ export default function About() {
 
       <main className="p-6 space-y-4">
         <p className="text-muted-foreground">
-          This starter showcases a minimal AI chat interface using the Next.js
-          App Router and a small set of reusable UI primitives.
+          This starter showcases a minimal AI chat interface using the Next.js App Router and a
+          small set of reusable UI primitives.
         </p>
         <p>
-          Explore the code in{" "}
-          <code className="px-1 py-0.5 bg-muted rounded">app/page.tsx</code> and
-          the UI building blocks under{" "}
+          Explore the code in <code className="px-1 py-0.5 bg-muted rounded">app/page.tsx</code> and
+          the UI building blocks under{' '}
           <code className="px-1 py-0.5 bg-muted rounded">components</code>.
         </p>
         <p>
-          Use this as a foundation for your own product, and customize the
-          layout, styles, and components to fit your needs.
+          Use this as a foundation for your own product, and customize the layout, styles, and
+          components to fit your needs.
         </p>
       </main>
     </div>

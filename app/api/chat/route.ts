@@ -31,7 +31,7 @@ export async function getAgent(): Promise<BaseAgent> {
       description: 'An intelligent agent that can fetch web content and answer questions',
       toolRegistry,
       ragService,
-      confidenceThreshold: 0.3
+      confidenceThreshold: 0.3,
     });
 
     globalForAgent.isInitialized = true;
@@ -45,61 +45,68 @@ async function initializeKnowledgeBase(service: RAGService) {
   // Sample knowledge base about the agent and system
   const sampleDocs = [
     {
-      content: "I am an intelligent BaseAgent that orchestrates web scraping, content processing, and knowledge retrieval using RAG (Retrieval-Augmented Generation).",
+      content:
+        'I am an intelligent BaseAgent that orchestrates web scraping, content processing, and knowledge retrieval using RAG (Retrieval-Augmented Generation).',
       metadata: {
-        url: "internal://agent-docs",
-        title: "Agent Overview",
-        source: "Agent Documentation"
-      }
+        url: 'internal://agent-docs',
+        title: 'Agent Overview',
+        source: 'Agent Documentation',
+      },
     },
     {
-      content: "I can recognize different types of queries: URLs (for fetching web content), questions (for knowledge retrieval), and commands (for actions). When you provide a URL, I'll fetch and analyze the content.",
+      content:
+        "I can recognize different types of queries: URLs (for fetching web content), questions (for knowledge retrieval), and commands (for actions). When you provide a URL, I'll fetch and analyze the content.",
       metadata: {
-        url: "internal://agent-docs",
-        title: "Intent Recognition",
-        source: "Agent Documentation"
-      }
+        url: 'internal://agent-docs',
+        title: 'Intent Recognition',
+        source: 'Agent Documentation',
+      },
     },
     {
-      content: "For single page URLs (with a path like /page), I use ScrapeTool. For domain-level URLs, I use CrawlTool to explore multiple pages.",
+      content:
+        'For single page URLs (with a path like /page), I use ScrapeTool. For domain-level URLs, I use CrawlTool to explore multiple pages.',
       metadata: {
-        url: "internal://agent-docs",
-        title: "Tool Selection",
-        source: "Agent Documentation"
-      }
+        url: 'internal://agent-docs',
+        title: 'Tool Selection',
+        source: 'Agent Documentation',
+      },
     },
     {
-      content: "I implement intelligent caching with a 5-minute TTL to avoid redundant fetches. Once I've fetched a URL, I can answer multiple questions about it without re-fetching.",
+      content:
+        "I implement intelligent caching with a 5-minute TTL to avoid redundant fetches. Once I've fetched a URL, I can answer multiple questions about it without re-fetching.",
       metadata: {
-        url: "internal://agent-docs",
-        title: "Caching Strategy",
-        source: "Agent Documentation"
-      }
+        url: 'internal://agent-docs',
+        title: 'Caching Strategy',
+        source: 'Agent Documentation',
+      },
     },
     {
-      content: "The system uses OpenAI's text-embedding-3-small model to convert text into 1536-dimensional vectors for semantic similarity search.",
+      content:
+        "The system uses OpenAI's text-embedding-3-small model to convert text into 1536-dimensional vectors for semantic similarity search.",
       metadata: {
-        url: "internal://project-docs",
-        title: "Embedding Model",
-        source: "Project Documentation"
-      }
+        url: 'internal://project-docs',
+        title: 'Embedding Model',
+        source: 'Project Documentation',
+      },
     },
     {
-      content: "This application is built with Next.js 15, TypeScript, and uses a custom BaseAgent architecture with Tool orchestration.",
+      content:
+        'This application is built with Next.js 15, TypeScript, and uses a custom BaseAgent architecture with Tool orchestration.',
       metadata: {
-        url: "internal://project-docs",
-        title: "Technology Stack",
-        source: "Project Documentation"
-      }
+        url: 'internal://project-docs',
+        title: 'Technology Stack',
+        source: 'Project Documentation',
+      },
     },
     {
-      content: "The BaseAgent was built using Test-Driven Development (TDD) with 31 tests covering all functionality at 100% coverage.",
+      content:
+        'The BaseAgent was built using Test-Driven Development (TDD) with 31 tests covering all functionality at 100% coverage.',
       metadata: {
-        url: "internal://project-docs",
-        title: "Development Process",
-        source: "Project Documentation"
-      }
-    }
+        url: 'internal://project-docs',
+        title: 'Development Process',
+        source: 'Project Documentation',
+      },
+    },
   ];
 
   try {
@@ -115,7 +122,7 @@ async function initializeKnowledgeBase(service: RAGService) {
 // Keep the old RAG service export for backward compatibility
 export async function getRAGService(): Promise<RAGService> {
   const agent = await getAgent();
-  // @ts-ignore - accessing private property for compatibility
+  // @ts-expect-error - accessing private property for compatibility
   return agent.ragService;
 }
 
@@ -138,7 +145,7 @@ export async function POST(request: NextRequest) {
       response: response.answer,
       confidence: response.confidence,
       sources: response.sources,
-      mode: 'agent' // Changed from 'rag' to 'agent' to reflect new architecture
+      mode: 'agent', // Changed from 'rag' to 'agent' to reflect new architecture
     });
   } catch (error) {
     console.error('Agent API error:', error);
@@ -149,7 +156,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         error: 'Failed to generate response',
-        details: errorMessage
+        details: errorMessage,
       },
       { status: 500 }
     );

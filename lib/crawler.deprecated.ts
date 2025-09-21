@@ -94,7 +94,7 @@ export class WebCrawler {
   }
 
   filterByDomain(urls: string[], domain: string): string[] {
-    return urls.filter(url => {
+    return urls.filter((url) => {
       try {
         const urlObj = new URL(url);
         return urlObj.hostname === domain || urlObj.hostname === `www.${domain}`;
@@ -187,7 +187,7 @@ export class WebCrawler {
     const timeSinceLastRequest = now - this.lastRequestTime;
 
     if (timeSinceLastRequest < delayMs) {
-      await new Promise(resolve => setTimeout(resolve, delayMs - timeSinceLastRequest));
+      await new Promise((resolve) => setTimeout(resolve, delayMs - timeSinceLastRequest));
     }
 
     this.lastRequestTime = Date.now();
@@ -221,7 +221,7 @@ export class WebCrawler {
       return true;
     }
 
-    return patterns.some(pattern => pattern.test(url));
+    return patterns.some((pattern) => pattern.test(url));
   }
 
   shouldExclude(url: string, patterns?: RegExp[]): boolean {
@@ -229,7 +229,7 @@ export class WebCrawler {
       return false;
     }
 
-    return patterns.some(pattern => pattern.test(url));
+    return patterns.some((pattern) => pattern.test(url));
   }
 
   // Queue Management
@@ -327,11 +327,13 @@ export class WebCrawler {
 
           // Add discovered links to queue (if within depth limit)
           if (currentDepth < (options.maxDepth || 0)) {
-            links.forEach(link => this.addToQueue(link));
+            links.forEach((link) => this.addToQueue(link));
           }
         }
       } catch (error) {
-        result.errors.push(`Error crawling ${currentUrl}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        result.errors.push(
+          `Error crawling ${currentUrl}: ${error instanceof Error ? error.message : 'Unknown error'}`
+        );
       }
     }
 

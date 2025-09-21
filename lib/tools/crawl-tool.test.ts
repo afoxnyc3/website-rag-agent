@@ -192,14 +192,17 @@ describe('CrawlTool', () => {
     });
 
     it('should normalize URLs correctly', () => {
-      expect(tool.normalizeUrl('page.html', 'https://example.com/dir/'))
-        .toBe('https://example.com/dir/page.html');
+      expect(tool.normalizeUrl('page.html', 'https://example.com/dir/')).toBe(
+        'https://example.com/dir/page.html'
+      );
 
-      expect(tool.normalizeUrl('/absolute/path', 'https://example.com/dir/'))
-        .toBe('https://example.com/absolute/path');
+      expect(tool.normalizeUrl('/absolute/path', 'https://example.com/dir/')).toBe(
+        'https://example.com/absolute/path'
+      );
 
-      expect(tool.normalizeUrl('https://other.com', 'https://example.com'))
-        .toBe('https://other.com');
+      expect(tool.normalizeUrl('https://other.com', 'https://example.com')).toBe(
+        'https://other.com'
+      );
     });
 
     it('should extract links from content', () => {

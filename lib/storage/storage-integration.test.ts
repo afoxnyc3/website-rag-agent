@@ -46,14 +46,14 @@ describe.skipIf(skipInCI)('Storage Integration Tests', () => {
           {
             id: `test-db-${Date.now()}`,
             content: 'Database test document',
-            metadata: { source: 'integration-test' }
+            metadata: { source: 'integration-test' },
           },
           embedding
         );
 
         // Search for it
         const searchResults = await storage.search(embedding, 5);
-        const found = searchResults.find(r => r.content === 'Database test document');
+        const found = searchResults.find((r) => r.content === 'Database test document');
         expect(found).toBeDefined();
         expect(found?.metadata?.source).toBe('integration-test');
 

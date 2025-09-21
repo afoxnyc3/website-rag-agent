@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,7 +15,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from '@/components/ui/alert-dialog';
 import {
   Database,
   Search,
@@ -24,8 +24,8 @@ import {
   Globe,
   Calendar,
   AlertCircle,
-  RefreshCw
-} from "lucide-react";
+  RefreshCw,
+} from 'lucide-react';
 
 interface KnowledgeSource {
   url: string;
@@ -49,7 +49,7 @@ interface KnowledgeBaseViewerProps {
 
 export function KnowledgeBaseViewer({ isOpen, onClose, onClear }: KnowledgeBaseViewerProps) {
   const [sources, setSources] = useState<KnowledgeSource[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<KnowledgeSearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
@@ -102,7 +102,7 @@ export function KnowledgeBaseViewer({ isOpen, onClose, onClear }: KnowledgeBaseV
       const response = await fetch('/api/knowledge', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ clearAll: true })
+        body: JSON.stringify({ clearAll: true }),
       });
 
       const data = await response.json();
@@ -144,21 +144,11 @@ export function KnowledgeBaseViewer({ isOpen, onClose, onClear }: KnowledgeBaseV
                 Knowledge Base Manager
               </CardTitle>
               <div className="flex items-center gap-2">
-                <Badge variant="secondary">
-                  {totalDocuments} documents
-                </Badge>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={loadKnowledgeBase}
-                >
+                <Badge variant="secondary">{totalDocuments} documents</Badge>
+                <Button variant="ghost" size="sm" onClick={loadKnowledgeBase}>
                   <RefreshCw className="w-4 h-4" />
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={onClose}
-                >
+                <Button variant="ghost" size="sm" onClick={onClose}>
                   ✕
                 </Button>
               </div>
@@ -177,10 +167,7 @@ export function KnowledgeBaseViewer({ isOpen, onClose, onClear }: KnowledgeBaseV
                 }}
                 className="flex-1"
               />
-              <Button
-                onClick={handleSearch}
-                disabled={isSearching || !searchQuery.trim()}
-              >
+              <Button onClick={handleSearch} disabled={isSearching || !searchQuery.trim()}>
                 <Search className="w-4 h-4 mr-2" />
                 Search
               </Button>
@@ -224,13 +211,9 @@ export function KnowledgeBaseViewer({ isOpen, onClose, onClear }: KnowledgeBaseV
                             </a>
                           )}
                         </div>
-                        <p className="text-sm line-clamp-3">
-                          {result.content}
-                        </p>
+                        <p className="text-sm line-clamp-3">{result.content}</p>
                         <div className="flex gap-2 text-xs text-muted-foreground">
-                          {result.metadata?.title && (
-                            <span>{result.metadata.title}</span>
-                          )}
+                          {result.metadata?.title && <span>{result.metadata.title}</span>}
                           {result.metadata?.chunkIndex !== undefined && (
                             <span>Chunk {result.metadata.chunkIndex + 1}</span>
                           )}

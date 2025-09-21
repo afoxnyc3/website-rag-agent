@@ -12,20 +12,28 @@ export async function POST(request: NextRequest) {
         const { url, options = {} } = await request.json();
 
         if (!url) {
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({
-            type: 'error',
-            message: 'URL is required'
-          })}\n\n`));
+          controller.enqueue(
+            encoder.encode(
+              `data: ${JSON.stringify({
+                type: 'error',
+                message: 'URL is required',
+              })}\n\n`
+            )
+          );
           controller.close();
           return;
         }
 
         // Send starting event
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify({
-          type: 'progress',
-          status: 'starting',
-          message: 'Initializing crawler...'
-        })}\n\n`));
+        controller.enqueue(
+          encoder.encode(
+            `data: ${JSON.stringify({
+              type: 'progress',
+              status: 'starting',
+              message: 'Initializing crawler...',
+            })}\n\n`
+          )
+        );
 
         const crawlTool = new CrawlTool();
         const startTime = Date.now();
@@ -44,24 +52,32 @@ export async function POST(request: NextRequest) {
           },
           (update: any) => {
             // Send progress update
-            controller.enqueue(encoder.encode(`data: ${JSON.stringify({
-              type: 'progress',
-              status: 'in-progress',
-              currentPage: update.currentUrl,
-              pagesProcessed: update.pagesVisited,
-              totalPages: options.maxPages || 50,
-              currentDepth: update.depth,
-              maxDepth: options.maxDepth || 2,
-              startTime
-            })}\n\n`));
+            controller.enqueue(
+              encoder.encode(
+                `data: ${JSON.stringify({
+                  type: 'progress',
+                  status: 'in-progress',
+                  currentPage: update.currentUrl,
+                  pagesProcessed: update.pagesVisited,
+                  totalPages: options.maxPages || 50,
+                  currentDepth: update.depth,
+                  maxDepth: options.maxDepth || 2,
+                  startTime,
+                })}\n\n`
+              )
+            );
           }
         );
 
         if (!result.success) {
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({
-            type: 'error',
-            message: result.error
-          })}\n\n`));
+          controller.enqueue(
+            encoder.encode(
+              `data: ${JSON.stringify({
+                type: 'error',
+                message: result.error,
+              })}\n\n`
+            )
+          );
           controller.close();
           return;
         }
@@ -69,11 +85,15 @@ export async function POST(request: NextRequest) {
         const crawlResult = result.data;
 
         // Process and add to knowledge base
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify({
-          type: 'progress',
-          status: 'in-progress',
-          message: 'Processing content and adding to knowledge base...'
-        })}\n\n`));
+        controller.enqueue(
+          encoder.encode(
+            `data: ${JSON.stringify({
+              type: 'progress',
+              status: 'in-progress',
+              message: 'Processing content and adding to knowledge base...',
+            })}\n\n`
+          )
+        );
 
         const chunker = new SemanticChunker();
         const ragService = await getRAGService();
@@ -85,8 +105,8 @@ export async function POST(request: NextRequest) {
             maxSize: options.chunkSize || 3000,
             minSize: 500,
             overlap: 200,
-            strategy: isMarkdown ? 'markdown' as const : 'semantic' as const,
-            preserveCodeBlocks: true
+            strategy: isMarkdown ? ('markdown' as const) : ('semantic' as const),
+            preserveCodeBlocks: true,
           };
 
           const chunks = chunker.chunk(page.content, chunkOptions);
@@ -104,40 +124,48 @@ export async function POST(request: NextRequest) {
                 chunkIndex: chunk.index,
                 totalChunks: chunk.totalChunks,
                 chunkStrategy: chunk.metadata?.strategy,
-                hasOverlap: chunk.metadata?.hasOverlap
-              }
+                hasOverlap: chunk.metadata?.hasOverlap,
+              },
             });
             documentsAdded++;
           }
         }
 
         // Send completion event
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify({
-          type: 'complete',
-          status: 'completed',
-          pagesVisited: crawlResult.pagesVisited,
-          documentsAdded,
-          crawlTime: crawlResult.crawlTime,
-          message: `Successfully crawled ${crawlResult.pagesVisited} pages and added ${documentsAdded} documents to knowledge base`
-        })}\n\n`));
+        controller.enqueue(
+          encoder.encode(
+            `data: ${JSON.stringify({
+              type: 'complete',
+              status: 'completed',
+              pagesVisited: crawlResult.pagesVisited,
+              documentsAdded,
+              crawlTime: crawlResult.crawlTime,
+              message: `Successfully crawled ${crawlResult.pagesVisited} pages and added ${documentsAdded} documents to knowledge base`,
+            })}\n\n`
+          )
+        );
 
         controller.close();
       } catch (error) {
         console.error('Crawling error:', error);
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify({
-          type: 'error',
-          message: error instanceof Error ? error.message : 'Unknown error'
-        })}\n\n`));
+        controller.enqueue(
+          encoder.encode(
+            `data: ${JSON.stringify({
+              type: 'error',
+              message: error instanceof Error ? error.message : 'Unknown error',
+            })}\n\n`
+          )
+        );
         controller.close();
       }
-    }
+    },
   });
 
   return new Response(stream, {
     headers: {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive',
+      Connection: 'keep-alive',
     },
   });
 }

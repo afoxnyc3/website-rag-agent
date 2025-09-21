@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
       const results = response.chunks.map((chunk: any) => ({
         content: chunk.content,
         score: chunk.similarity || 0,
-        metadata: chunk.metadata || {}
+        metadata: chunk.metadata || {},
       }));
 
       return NextResponse.json({
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
         query,
         results,
         count: results.length,
-        confidence: response.confidence
+        confidence: response.confidence,
       });
     } else {
       // Get all documents using the new getAllDocuments method
@@ -37,13 +37,12 @@ export async function GET(request: NextRequest) {
         if (!acc[url]) {
           acc[url] = {
             url,
-            title: isInternal
-              ? 'Project Documentation'
-              : (doc.metadata?.title || 'Untitled'),
+            title: isInternal ? 'Project Documentation' : doc.metadata?.title || 'Untitled',
             documentCount: 0,
             totalSize: 0,
-            lastUpdated: doc.metadata?.crawledAt || doc.metadata?.scrapedAt || doc.metadata?.timestamp,
-            source: doc.metadata?.source || (isInternal ? 'Internal' : 'External')
+            lastUpdated:
+              doc.metadata?.crawledAt || doc.metadata?.scrapedAt || doc.metadata?.timestamp,
+            source: doc.metadata?.source || (isInternal ? 'Internal' : 'External'),
           };
         }
         acc[url].documentCount++;
@@ -54,15 +53,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         success: true,
         sources: Object.values(groupedByUrl),
-        totalDocuments: documents.length
+        totalDocuments: documents.length,
       });
     }
   } catch (error) {
     console.error('Knowledge base error:', error);
-    return NextResponse.json(
-      { error: 'Failed to access knowledge base' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to access knowledge base' }, { status: 500 });
   }
 }
 
@@ -77,7 +73,7 @@ export async function DELETE(request: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        message: 'Knowledge base cleared successfully'
+        message: 'Knowledge base cleared successfully',
       });
     } else if (documentId) {
       // Delete specific document - not implemented since we don't have individual delete
@@ -87,16 +83,10 @@ export async function DELETE(request: NextRequest) {
         { status: 400 }
       );
     } else {
-      return NextResponse.json(
-        { error: 'Missing documentId or clearAll flag' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Missing documentId or clearAll flag' }, { status: 400 });
     }
   } catch (error) {
     console.error('Knowledge base deletion error:', error);
-    return NextResponse.json(
-      { error: 'Failed to delete from knowledge base' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to delete from knowledge base' }, { status: 500 });
   }
 }

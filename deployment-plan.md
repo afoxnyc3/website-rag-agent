@@ -3,18 +3,21 @@
 ## Recommended Architecture: 3-Tier Production Setup
 
 ### 1. **Frontend & API Layer** (Vercel)
+
 - Deploy Next.js app with automatic scaling
 - Edge functions for API routes
 - Global CDN distribution
 - Automatic SSL/TLS
 
 ### 2. **Vector Database** (Vercel Postgres + pgvector)
+
 - Persistent document storage
 - Vector similarity search
 - Connection pooling
 - Automatic backups
 
 ### 3. **Background Jobs & Scraping** (Serverless Functions)
+
 - Web scraping with Playwright
 - Long-running crawl jobs
 - Queue management for batch processing
@@ -22,6 +25,7 @@
 ## Deployment Configuration
 
 ### Environment Variables
+
 ```env
 # Production Essentials
 OPENAI_API_KEY=sk-...
@@ -72,16 +76,19 @@ QUEUE_URL=<for job processing>
 ## Scaling Strategy
 
 ### Phase 1: MVP (Current)
+
 - Single Vercel deployment
 - In-memory storage (dev) / Postgres (prod)
 - Direct API calls
 
 ### Phase 2: Growth
+
 - Add Redis caching
 - Implement job queue
 - Add CDN for static assets
 
 ### Phase 3: Enterprise
+
 - Multi-region deployment
 - Read replicas for database
 - Dedicated scraping infrastructure
@@ -128,6 +135,7 @@ QUEUE_URL=<for job processing>
 ## Monitoring Dashboard
 
 Track these key metrics:
+
 - API response times
 - OpenAI API usage and costs
 - Database query performance
@@ -155,24 +163,28 @@ Track these key metrics:
 ## Implementation Timeline
 
 ### Week 1: Basic Deployment
+
 - [ ] Set up Vercel project
 - [ ] Configure environment variables
 - [ ] Deploy main application
 - [ ] Verify basic functionality
 
 ### Week 2: Database & Storage
+
 - [ ] Enable Vercel Postgres
 - [ ] Migrate to persistent storage
 - [ ] Test vector search performance
 - [ ] Implement connection pooling
 
 ### Week 3: Performance & Monitoring
+
 - [ ] Add caching layer
 - [ ] Set up monitoring
 - [ ] Configure alerts
 - [ ] Performance testing
 
 ### Week 4: Production Hardening
+
 - [ ] Security audit
 - [ ] Rate limiting
 - [ ] Error tracking
@@ -181,21 +193,25 @@ Track these key metrics:
 ## Budget Estimation (Monthly)
 
 ### Vercel Free Tier
+
 - **Cost**: $0
 - **Includes**: 100GB bandwidth, 100GB-hours functions
 - **Good for**: MVP, small projects
 
 ### Vercel Pro
+
 - **Cost**: $20/month
 - **Includes**: 1TB bandwidth, 1000GB-hours functions
 - **Good for**: Growing applications
 
 ### Vercel Enterprise
+
 - **Cost**: Custom pricing
 - **Includes**: SLA, dedicated support, custom limits
 - **Good for**: High-traffic applications
 
 ### Additional Services
+
 - **Vercel Postgres**: $15/month (starter)
 - **Vercel KV**: $0.15/1M requests
 - **OpenAI API**: ~$0.002/1K tokens
@@ -212,6 +228,7 @@ Track these key metrics:
 - ✅ Security best practices
 
 This deployment setup provides:
+
 - **Reliability**: Auto-scaling, monitoring, backups
 - **Performance**: CDN, caching, optimized queries
 - **Security**: Encrypted connections, API key management

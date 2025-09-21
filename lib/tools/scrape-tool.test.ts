@@ -72,7 +72,7 @@ describe('ScrapeTool', () => {
     it('should try fetch strategy first by default', async () => {
       const result = await tool.execute({
         url: 'https://example.com',
-        strategy: 'auto'
+        strategy: 'auto',
       });
 
       expect(result.success).toBe(true);
@@ -83,7 +83,7 @@ describe('ScrapeTool', () => {
     it('should use playwright strategy when specified', async () => {
       const result = await tool.execute({
         url: 'https://example.com',
-        strategy: 'playwright'
+        strategy: 'playwright',
       });
 
       expect(result.success).toBe(true);
@@ -96,7 +96,7 @@ describe('ScrapeTool', () => {
       // we verify basic functionality instead
       const result = await tool.execute({
         url: 'https://example.com',
-        strategy: 'auto'
+        strategy: 'auto',
       });
 
       expect(result.success).toBe(true);
@@ -124,7 +124,7 @@ describe('ScrapeTool', () => {
     it('should respect maxLength option', async () => {
       const result = await tool.execute({
         url: 'https://example.com',
-        maxLength: 10
+        maxLength: 10,
       });
 
       expect(result.success).toBe(true);
@@ -157,13 +157,13 @@ describe('ScrapeTool', () => {
       // First scrape
       const result1 = await tool.execute({
         url: 'https://example.com',
-        cache: true
+        cache: true,
       });
 
       // Second scrape - should use cache
       const result2 = await tool.execute({
         url: 'https://example.com',
-        cache: true
+        cache: true,
       });
 
       expect(result1.success).toBe(true);
@@ -175,13 +175,13 @@ describe('ScrapeTool', () => {
       // First scrape with cache
       await tool.execute({
         url: 'https://example.com',
-        cache: true
+        cache: true,
       });
 
       // Second scrape without cache
       const result = await tool.execute({
         url: 'https://example.com',
-        cache: false
+        cache: false,
       });
 
       expect(result.success).toBe(true);

@@ -12,7 +12,7 @@ export interface RAGResponse {
 
 export class RAGService {
   private storage: StorageStrategy;
-  private readonly confidenceThreshold = 0.3;  // Lowered from 0.5 to 0.3
+  private readonly confidenceThreshold = 0.3; // Lowered from 0.5 to 0.3
   private initialized = false;
 
   constructor(options?: { forceMemory?: boolean; forcePersistent?: boolean }) {
@@ -41,8 +41,8 @@ export class RAGService {
         content: doc.content,
         metadata: {
           timestamp: new Date().toISOString(),
-          ...doc.metadata
-        }
+          ...doc.metadata,
+        },
       },
       embedding
     );
@@ -67,7 +67,9 @@ export class RAGService {
 
     console.log(`📚 Found ${searchResults.length} results`);
     searchResults.forEach((r, i) => {
-      console.log(`  ${i+1}. Score: ${r.similarity.toFixed(3)} - "${r.content.substring(0, 50)}..."`);
+      console.log(
+        `  ${i + 1}. Score: ${r.similarity.toFixed(3)} - "${r.content.substring(0, 50)}..."`
+      );
     });
 
     if (searchResults.length === 0) {
@@ -76,30 +78,28 @@ export class RAGService {
         answer: "I don't have enough information to answer accurately.",
         confidence: 0,
         sources: [],
-        chunks: []
+        chunks: [],
       };
     }
 
     // Filter by confidence threshold
-    const relevantResults = searchResults.filter(r => r.similarity >= this.confidenceThreshold);
+    const relevantResults = searchResults.filter((r) => r.similarity >= this.confidenceThreshold);
 
     if (relevantResults.length === 0) {
-      const maxConfidence = Math.max(...searchResults.map(r => r.similarity));
+      const maxConfidence = Math.max(...searchResults.map((r) => r.similarity));
       console.log(`⚠️ No results above confidence threshold (${this.confidenceThreshold})`);
       return {
         answer: "I don't have enough information to answer accurately.",
         confidence: maxConfidence,
         sources: [],
-        chunks: searchResults
+        chunks: searchResults,
       };
     }
 
-    const maxConfidence = Math.max(...relevantResults.map(r => r.similarity));
+    const maxConfidence = Math.max(...relevantResults.map((r) => r.similarity));
     console.log(`✨ Max confidence: ${maxConfidence.toFixed(3)}`);
 
-    const context = relevantResults
-      .map(r => r.content)
-      .join('\n\n');
+    const context = relevantResults.map((r) => r.content).join('\n\n');
 
     const prompt = `Based on the following context, answer the question.
 If the context doesn't contain enough information, say so.
@@ -113,14 +113,14 @@ Answer:`;
 
     const { text } = await generateText({
       model: openai('gpt-5'),
-      prompt
+      prompt,
     });
 
     return {
       answer: text,
       confidence: maxConfidence,
-      sources: relevantResults.map(r => r.metadata?.url || r.metadata?.source || r.id),
-      chunks: relevantResults
+      sources: relevantResults.map((r) => r.metadata?.url || r.metadata?.source || r.id),
+      chunks: relevantResults,
     };
   }
 

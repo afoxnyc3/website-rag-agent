@@ -66,9 +66,7 @@ export class WebScraper {
       }
 
       const mockContent = `This is sample content from ${url}`;
-      const content = options.maxLength
-        ? mockContent.slice(0, options.maxLength)
-        : mockContent;
+      const content = options.maxLength ? mockContent.slice(0, options.maxLength) : mockContent;
 
       return {
         url,

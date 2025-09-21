@@ -23,37 +23,41 @@ Main endpoint for interacting with the BaseAgent. Handles both URL ingestion and
 
 ```json
 {
-  "message": "string",  // Required: User query or URL
-  "useRAG": true       // Optional: Enable RAG mode (default: true)
+  "message": "string", // Required: User query or URL
+  "useRAG": true // Optional: Enable RAG mode (default: true)
 }
 ```
 
 #### Response
 
 **Success (200 OK)**
+
 ```json
 {
-  "response": "string",     // AI-generated response
-  "confidence": 0.85,       // Confidence score (0.0 to 1.0)
-  "sources": [              // Source document IDs
+  "response": "string", // AI-generated response
+  "confidence": 0.85, // Confidence score (0.0 to 1.0)
+  "sources": [
+    // Source document IDs
     "doc-id-1",
     "doc-id-2"
   ],
-  "mode": "agent"          // Response mode: "agent" or "direct"
+  "mode": "agent" // Response mode: "agent" or "direct"
 }
 ```
 
 **Error (400/500)**
+
 ```json
 {
-  "error": "string",       // Error message
-  "details": "string"      // Optional: Detailed error information
+  "error": "string", // Error message
+  "details": "string" // Optional: Detailed error information
 }
 ```
 
 #### Examples
 
 **URL Ingestion:**
+
 ```bash
 curl -X POST http://localhost:3000/api/chat \
   -H "Content-Type: application/json" \
@@ -63,6 +67,7 @@ curl -X POST http://localhost:3000/api/chat \
 ```
 
 **Question Answering:**
+
 ```bash
 curl -X POST http://localhost:3000/api/chat \
   -H "Content-Type: application/json" \
@@ -81,18 +86,19 @@ Scrapes a single web page and adds content to the knowledge base.
 
 ```json
 {
-  "url": "string"          // Required: URL to scrape
+  "url": "string" // Required: URL to scrape
 }
 ```
 
 #### Response
 
 **Success (200 OK)**
+
 ```json
 {
   "success": true,
-  "message": "string",     // Success message
-  "documentsAdded": 5,     // Number of chunks created
+  "message": "string", // Success message
+  "documentsAdded": 5, // Number of chunks created
   "metadata": {
     "url": "string",
     "title": "string",
@@ -103,10 +109,11 @@ Scrapes a single web page and adds content to the knowledge base.
 ```
 
 **Error (400/500)**
+
 ```json
 {
-  "error": "string",       // Error message
-  "details": "string"      // Optional: Error details
+  "error": "string", // Error message
+  "details": "string" // Optional: Error details
 }
 ```
 
@@ -120,15 +127,16 @@ Crawls multiple pages from a website and adds to knowledge base.
 
 ```json
 {
-  "url": "string",         // Required: Starting URL
-  "maxDepth": 2,           // Optional: Maximum crawl depth (default: 2)
-  "maxPages": 10           // Optional: Maximum pages to crawl (default: 10)
+  "url": "string", // Required: Starting URL
+  "maxDepth": 2, // Optional: Maximum crawl depth (default: 2)
+  "maxPages": 10 // Optional: Maximum pages to crawl (default: 10)
 }
 ```
 
 #### Response
 
 **Success (200 OK)**
+
 ```json
 {
   "success": true,
@@ -149,6 +157,7 @@ Crawls multiple pages from a website and adds to knowledge base.
 ```
 
 **Error (400/500)**
+
 ```json
 {
   "error": "string",
@@ -169,6 +178,7 @@ Retrieves knowledge base contents or searches for documents.
 #### Response
 
 **Without search query:**
+
 ```json
 {
   "success": true,
@@ -187,6 +197,7 @@ Retrieves knowledge base contents or searches for documents.
 ```
 
 **With search query:**
+
 ```json
 {
   "success": true,
@@ -227,14 +238,15 @@ Clears documents from the knowledge base.
 
 ```json
 {
-  "clearAll": true,        // Required for clearing all
-  "documentId": "string"   // Not currently supported
+  "clearAll": true, // Required for clearing all
+  "documentId": "string" // Not currently supported
 }
 ```
 
 #### Response
 
 **Success (200 OK)**
+
 ```json
 {
   "success": true,
@@ -243,6 +255,7 @@ Clears documents from the knowledge base.
 ```
 
 **Error (400)**
+
 ```json
 {
   "error": "Individual document deletion not supported. Use Clear All instead."
@@ -261,19 +274,20 @@ Future versions will support WebSocket connections for real-time updates:
 ## Rate Limiting
 
 Currently not implemented. Future versions will include:
+
 - 10 requests/minute for scraping endpoints
 - 100 requests/minute for chat endpoint
 - 1000 requests/minute for knowledge queries
 
 ## Error Codes
 
-| Code | Description |
-|------|-------------|
-| 400 | Bad Request - Invalid parameters |
-| 404 | Not Found - Endpoint doesn't exist |
-| 429 | Too Many Requests - Rate limit exceeded |
-| 500 | Internal Server Error - Server-side error |
-| 503 | Service Unavailable - API temporarily down |
+| Code | Description                                |
+| ---- | ------------------------------------------ |
+| 400  | Bad Request - Invalid parameters           |
+| 404  | Not Found - Endpoint doesn't exist         |
+| 429  | Too Many Requests - Rate limit exceeded    |
+| 500  | Internal Server Error - Server-side error  |
+| 503  | Service Unavailable - API temporarily down |
 
 ## Response Headers
 
@@ -288,19 +302,24 @@ X-Request-ID: <unique-id>
 ## Data Formats
 
 ### Document ID Format
+
 ```
 <source>-<hash>-<timestamp>
 Example: https://example.com-abc123-1234567890
 ```
 
 ### Timestamp Format
+
 All timestamps use ISO 8601 format:
+
 ```
 2024-01-20T15:30:45.123Z
 ```
 
 ### Confidence Score
+
 Floating point between 0.0 and 1.0:
+
 - 0.9+ : Very high confidence
 - 0.7-0.9: High confidence
 - 0.5-0.7: Medium confidence
@@ -319,7 +338,7 @@ class RAGClient {
     const response = await fetch(`${this.baseUrl}/api/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message })
+      body: JSON.stringify({ message }),
     });
     return response.json();
   }
@@ -328,15 +347,13 @@ class RAGClient {
     const response = await fetch(`${this.baseUrl}/api/scrape`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url })
+      body: JSON.stringify({ url }),
     });
     return response.json();
   }
 
   async searchKnowledge(query: string) {
-    const response = await fetch(
-      `${this.baseUrl}/api/knowledge?q=${encodeURIComponent(query)}`
-    );
+    const response = await fetch(`${this.baseUrl}/api/knowledge?q=${encodeURIComponent(query)}`);
     return response.json();
   }
 }
@@ -411,6 +428,7 @@ Expected response times under normal load:
 ## Changelog
 
 ### v1.0.0 (Current)
+
 - Initial API implementation
 - BaseAgent orchestration
 - ScrapeTool and CrawlTool integration
@@ -418,6 +436,7 @@ Expected response times under normal load:
 - Confidence scoring
 
 ### v1.1.0 (Planned)
+
 - API authentication
 - Rate limiting
 - WebSocket support

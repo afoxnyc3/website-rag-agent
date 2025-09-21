@@ -65,14 +65,20 @@ describe('PersistentVectorStore', () => {
 
       // Check that CREATE TABLE statements were executed (template literals)
       const calls = mockSql.mock.calls;
-      const sqlStatements = calls.map(call => {
+      const sqlStatements = calls.map((call) => {
         const arg = call[0];
         return Array.isArray(arg) ? arg.join('') : String(arg);
       });
 
-      expect(sqlStatements.some(s => s.includes('CREATE TABLE IF NOT EXISTS documents'))).toBe(true);
-      expect(sqlStatements.some(s => s.includes('CREATE TABLE IF NOT EXISTS embeddings'))).toBe(true);
-      expect(sqlStatements.some(s => s.includes('CREATE TABLE IF NOT EXISTS document_versions'))).toBe(true);
+      expect(sqlStatements.some((s) => s.includes('CREATE TABLE IF NOT EXISTS documents'))).toBe(
+        true
+      );
+      expect(sqlStatements.some((s) => s.includes('CREATE TABLE IF NOT EXISTS embeddings'))).toBe(
+        true
+      );
+      expect(
+        sqlStatements.some((s) => s.includes('CREATE TABLE IF NOT EXISTS document_versions'))
+      ).toBe(true);
     });
 
     it('should create pgvector extension', async () => {
@@ -82,12 +88,14 @@ describe('PersistentVectorStore', () => {
       await store.initializeSchema();
 
       const calls = mockSql.mock.calls;
-      const sqlStatements = calls.map(call => {
+      const sqlStatements = calls.map((call) => {
         const arg = call[0];
         return Array.isArray(arg) ? arg.join('') : String(arg);
       });
 
-      expect(sqlStatements.some(s => s.includes('CREATE EXTENSION IF NOT EXISTS vector'))).toBe(true);
+      expect(sqlStatements.some((s) => s.includes('CREATE EXTENSION IF NOT EXISTS vector'))).toBe(
+        true
+      );
     });
   });
 
@@ -105,7 +113,8 @@ describe('PersistentVectorStore', () => {
       };
       const embedding = new Array(1536).fill(0.1);
 
-      const mockSql = vi.fn()
+      const mockSql = vi
+        .fn()
         .mockResolvedValueOnce({ rows: [] }) // INSERT document
         .mockResolvedValueOnce({ rows: [] }); // INSERT embedding
       (sql as any).mockImplementation(mockSql);
@@ -114,12 +123,12 @@ describe('PersistentVectorStore', () => {
 
       // Check calls were made (template literal format)
       const calls = mockSql.mock.calls;
-      const hasDocumentInsert = calls.some(call => {
+      const hasDocumentInsert = calls.some((call) => {
         const arg = call[0];
         const str = Array.isArray(arg) ? arg.join('') : String(arg);
         return str.includes('INSERT INTO documents');
       });
-      const hasEmbeddingInsert = calls.some(call => {
+      const hasEmbeddingInsert = calls.some((call) => {
         const arg = call[0];
         const str = Array.isArray(arg) ? arg.join('') : String(arg);
         return str.includes('INSERT INTO embeddings');
@@ -150,7 +159,8 @@ describe('PersistentVectorStore', () => {
 
     it('should update existing document and increment version', async () => {
       const updatedContent = 'Updated content';
-      const mockSql = vi.fn()
+      const mockSql = vi
+        .fn()
         .mockResolvedValueOnce({ rows: [{ version: 1 }] }) // Get current version
         .mockResolvedValueOnce({ rows: [] }) // Insert into versions
         .mockResolvedValueOnce({ rows: [] }); // Update document
@@ -161,7 +171,7 @@ describe('PersistentVectorStore', () => {
 
       // Check update was called
       const calls = mockSql.mock.calls;
-      const hasUpdate = calls.some(call => {
+      const hasUpdate = calls.some((call) => {
         const arg = call[0];
         const str = Array.isArray(arg) ? arg.join('') : String(arg);
         return str.includes('UPDATE documents');
@@ -177,12 +187,12 @@ describe('PersistentVectorStore', () => {
 
       // Check delete calls were made
       const calls = mockSql.mock.calls;
-      const hasEmbeddingDelete = calls.some(call => {
+      const hasEmbeddingDelete = calls.some((call) => {
         const arg = call[0];
         const str = Array.isArray(arg) ? arg.join('') : String(arg);
         return str.includes('DELETE FROM embeddings');
       });
-      const hasDocumentDelete = calls.some(call => {
+      const hasDocumentDelete = calls.some((call) => {
         const arg = call[0];
         const str = Array.isArray(arg) ? arg.join('') : String(arg);
         return str.includes('DELETE FROM documents');
@@ -221,13 +231,13 @@ describe('PersistentVectorStore', () => {
           id: 'doc-1',
           content: 'Similar content',
           similarity: 0.95,
-          metadata: { source: 'test' }
+          metadata: { source: 'test' },
         },
         {
           id: 'doc-2',
           content: 'Another similar',
           similarity: 0.85,
-          metadata: { source: 'test' }
+          metadata: { source: 'test' },
         },
       ];
 
@@ -258,9 +268,7 @@ describe('PersistentVectorStore', () => {
 
     it('should return confidence scores', async () => {
       const queryEmbedding = new Array(1536).fill(0.1);
-      const mockResults = [
-        { id: 'doc-1', content: 'Content', similarity: 0.85 },
-      ];
+      const mockResults = [{ id: 'doc-1', content: 'Content', similarity: 0.85 }];
 
       (sql as any).mockResolvedValue({ rows: mockResults });
 
@@ -398,7 +406,7 @@ describe('PersistentVectorStore', () => {
 
       // Check that document was inserted with metadata
       const calls = mockSql.mock.calls;
-      const hasInsert = calls.some(call => {
+      const hasInsert = calls.some((call) => {
         const arg = call[0];
         const str = Array.isArray(arg) ? arg.join('') : String(arg);
         return str.includes('INSERT INTO documents');
@@ -424,7 +432,7 @@ describe('PersistentVectorStore', () => {
 
     it('should cache frequently accessed documents', async () => {
       const mockSql = vi.fn().mockResolvedValue({
-        rows: [{ id: 'doc-1', content: 'Cached content' }]
+        rows: [{ id: 'doc-1', content: 'Cached content' }],
       });
       (sql as any).mockImplementation(mockSql);
 
@@ -440,7 +448,8 @@ describe('PersistentVectorStore', () => {
 
   describe('Error Recovery', () => {
     it('should retry failed operations', async () => {
-      const mockSql = vi.fn()
+      const mockSql = vi
+        .fn()
         .mockRejectedValueOnce(new Error('Temporary failure'))
         .mockRejectedValueOnce(new Error('Temporary failure'))
         .mockResolvedValueOnce({ rows: [] })
@@ -448,11 +457,9 @@ describe('PersistentVectorStore', () => {
 
       (sql as any).mockImplementation(mockSql);
 
-      await store.addDocument(
-        { id: 'doc-1', content: 'Test' },
-        new Array(1536).fill(0.1),
-        { retries: 3 }
-      );
+      await store.addDocument({ id: 'doc-1', content: 'Test' }, new Array(1536).fill(0.1), {
+        retries: 3,
+      });
 
       // Initial attempt + 2 successful retries = 4 calls (2 for document, 2 for embedding)
       expect(mockSql).toHaveBeenCalledTimes(4);
@@ -462,7 +469,8 @@ describe('PersistentVectorStore', () => {
       let callCount = 0;
       const mockSql = vi.fn().mockImplementation((query) => {
         callCount++;
-        const queryStr = typeof query === 'object' && query.strings ? query.strings.join('') : String(query);
+        const queryStr =
+          typeof query === 'object' && query.strings ? query.strings.join('') : String(query);
 
         if (queryStr.includes('BEGIN')) {
           return Promise.resolve({ rows: [] });
@@ -487,9 +495,11 @@ describe('PersistentVectorStore', () => {
       ).rejects.toThrow('Insert failed');
 
       // Verify ROLLBACK was called
-      const rollbackCalls = mockSql.mock.calls.filter(call => {
-        const queryStr = typeof call[0] === 'object' && call[0].strings ?
-          call[0].strings.join('') : String(call[0]);
+      const rollbackCalls = mockSql.mock.calls.filter((call) => {
+        const queryStr =
+          typeof call[0] === 'object' && call[0].strings
+            ? call[0].strings.join('')
+            : String(call[0]);
         return queryStr.includes('ROLLBACK');
       });
       expect(rollbackCalls.length).toBeGreaterThan(0);

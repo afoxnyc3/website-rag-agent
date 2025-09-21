@@ -3,6 +3,7 @@
 ## System Architecture
 
 ### Response Validation Pipeline
+
 ```typescript
 interface ResponseValidation {
   hasRelevantContext: boolean;
@@ -20,6 +21,7 @@ interface AgentResponse {
 ```
 
 ### Core Data Types
+
 ```typescript
 type EmbeddingVector = number[] & { __brand: 'EmbeddingVector' };
 
@@ -31,15 +33,16 @@ type ContentChunk = {
 };
 
 interface AgentEvaluation {
-  accuracy: number;        // Correct answers / Total answers
-  precision: number;       // Relevant responses / Total responses
-  recall: number;         // Found answers / Available answers
-  responseTime: number;   // Average ms per query
+  accuracy: number; // Correct answers / Total answers
+  precision: number; // Relevant responses / Total responses
+  recall: number; // Found answers / Available answers
+  responseTime: number; // Average ms per query
   confidenceCalibration: number; // Confidence vs actual accuracy
 }
 ```
 
 ## TypeScript Configuration
+
 ```json
 {
   "compilerOptions": {
@@ -56,24 +59,28 @@ interface AgentEvaluation {
 ## Tool Integration Specifications
 
 ### Phase 1: Playwright Web Scraping
+
 - Extract clean text content from single URLs
 - Handle dynamic content and SPAs
 - Content sanitization and normalization
 - Error handling for failed scrapes
 
 ### Phase 2: Custom Web Crawling (CrawlTool)
+
 - Multi-page site discovery with configurable depth
 - Built-in robots.txt compliance and crawl delays
 - URL deduplication and pattern-based filtering
 - Batch processing with Playwright integration
 
 ### Phase 3: Vector Database (Vercel Postgres + pgvector)
+
 - Persistent vector storage with metadata
 - Efficient similarity search with indexing
 - Content versioning and updates
 - Connection pooling and optimization
 
 ## API Endpoints Structure
+
 ```typescript
 // POST /api/chat
 interface ChatRequest {
@@ -90,6 +97,7 @@ interface ChatResponse {
 ```
 
 ## Performance Requirements
+
 - Embedding generation: <100ms per chunk
 - Vector search: <50ms per query
 - Total response time: <200ms average

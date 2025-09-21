@@ -157,9 +157,15 @@ Crawl-delay: 1
         includePatterns: [/\/blog\//, /\/docs\//],
       };
 
-      expect(crawler.matchesPattern('https://example.com/blog/post', options.includePatterns)).toBe(true);
-      expect(crawler.matchesPattern('https://example.com/docs/api', options.includePatterns)).toBe(true);
-      expect(crawler.matchesPattern('https://example.com/about', options.includePatterns)).toBe(false);
+      expect(crawler.matchesPattern('https://example.com/blog/post', options.includePatterns)).toBe(
+        true
+      );
+      expect(crawler.matchesPattern('https://example.com/docs/api', options.includePatterns)).toBe(
+        true
+      );
+      expect(crawler.matchesPattern('https://example.com/about', options.includePatterns)).toBe(
+        false
+      );
     });
 
     it('should handle excludePatterns option', () => {
@@ -167,9 +173,15 @@ Crawl-delay: 1
         excludePatterns: [/\.pdf$/, /\/archive\//],
       };
 
-      expect(crawler.shouldExclude('https://example.com/doc.pdf', options.excludePatterns)).toBe(true);
-      expect(crawler.shouldExclude('https://example.com/archive/old', options.excludePatterns)).toBe(true);
-      expect(crawler.shouldExclude('https://example.com/page', options.excludePatterns)).toBe(false);
+      expect(crawler.shouldExclude('https://example.com/doc.pdf', options.excludePatterns)).toBe(
+        true
+      );
+      expect(
+        crawler.shouldExclude('https://example.com/archive/old', options.excludePatterns)
+      ).toBe(true);
+      expect(crawler.shouldExclude('https://example.com/page', options.excludePatterns)).toBe(
+        false
+      );
     });
   });
 

@@ -1,16 +1,19 @@
 # Phase 2: Intent Recognition - Learnings
 
 ## Overview
+
 Phase 2 introduces **intent parsing** - the foundation for agent autonomy. The agent can now understand what the user wants to do.
 
 ## Workflow Evolution
 
 ### Phase 1 (Configuration)
+
 - Static data storage
 - No logic, just properties
 - Foundation for the agent
 
 ### Phase 2 (Intent Recognition)
+
 - Dynamic query analysis
 - Pattern matching without AI
 - Decision foundation for tool selection
@@ -24,7 +27,7 @@ type IntentType = 'url' | 'question' | 'command' | 'unknown';
 interface ParsedIntent {
   type: IntentType;
   query: string;
-  urls?: string[];    // Extracted URLs if type = 'url'
+  urls?: string[]; // Extracted URLs if type = 'url'
   keywords?: string[]; // Command keywords if type = 'command'
 }
 ```
@@ -55,16 +58,20 @@ The `parseIntent` method uses **cascading pattern matching**:
 ## Key Learnings
 
 ### 1. **Order Matters**
+
 URLs are checked first because a query like "What is https://example.com?" should be treated as a URL intent, not a question.
 
 ### 2. **Pattern Matching vs AI**
+
 Simple regex patterns are:
+
 - Faster (no API calls)
 - Predictable (deterministic)
 - Testable (clear expectations)
 - Free (no token costs)
 
 ### 3. **Intent Drives Action**
+
 ```
 Intent Type → Tool Selection → Action
 url         → ScrapeTool/CrawlTool → Fetch content
@@ -73,6 +80,7 @@ command     → ToolExecutor → Execute action
 ```
 
 ### 4. **TDD Benefits Observed**
+
 - Caught edge cases early (URLs with www. prefix)
 - Clear specification before implementation
 - Confidence in refactoring (tests as safety net)
@@ -81,6 +89,7 @@ command     → ToolExecutor → Execute action
 ## Testing Strategy
 
 Each intent type got its own test:
+
 ```javascript
 ✓ URL test: "Check https://example.com" → type='url', urls=['https://example.com']
 ✓ Question test: "What is pricing?" → type='question'
@@ -90,11 +99,13 @@ Each intent type got its own test:
 ## Next Phase Preview
 
 Phase 3 (Decision Logic) will use these intents to:
+
 - Decide when to fetch new data (`shouldFetchNewData`)
 - Select appropriate tools (`selectTool`)
 - Build the agent's decision-making brain
 
 ## Metrics
+
 - Tests written: 3
 - Tests passing: 12/12 (100%)
 - Lines of code: ~35
