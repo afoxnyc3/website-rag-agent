@@ -62,7 +62,7 @@ Improve confidence score calculation and display to provide users with better tr
 
 ### Source Attribution Enhancement
 
-**Status**: Bug - Needs Fix
+**Status**: 🔍 Under Investigation - Debug Logging Added
 **Priority**: HIGH
 **Effort**: Small (1 day)
 
@@ -89,7 +89,7 @@ Fix source citations to link to actual relevant pages instead of website home pa
 
 ### Web Crawling Depth Issues
 
-**Status**: Bug - Critical
+**Status**: ✅ FIXED (2025-09-21)
 **Priority**: HIGH
 **Effort**: Medium (2 days)
 
@@ -105,11 +105,11 @@ Debug and fix crawling limitation where crawler stops after only a couple of pag
 
 #### Success Criteria
 
-- [ ] Crawl full sites as configured
-- [ ] Respect maxDepth parameter accurately
-- [ ] Process maxPages as specified
-- [ ] Fix URL queue management
-- [ ] Add progress tracking for large crawls
+- [x] Crawl full sites as configured
+- [x] Respect maxDepth parameter accurately
+- [x] Process maxPages as specified
+- [x] Fix URL queue management
+- [x] Add progress tracking for large crawls
 
 #### Implementation Notes
 
@@ -270,8 +270,8 @@ Implement safety checks and content filtering to ensure responsible AI behavior.
 
 ### Phase 1: Critical Fixes (Week 1)
 
-1. Fix source attribution (1 day)
-2. Fix web crawling depth (2 days)
+1. ~~Fix web crawling depth (2 days)~~ ✅ COMPLETED
+2. Fix source attribution (1 day) - Debug logging added, monitoring
 3. Enhance confidence scoring (1 day)
 
 ### Phase 2: Analysis & Documentation (Week 2)
