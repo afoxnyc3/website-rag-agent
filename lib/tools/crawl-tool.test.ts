@@ -2,6 +2,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CrawlTool } from './crawl-tool';
 import { ToolRegistry } from './tool';
 
+// Mock global fetch to prevent real HTTP requests
+global.fetch = vi.fn();
+
 // Mock ScrapeTool
 vi.mock('./scrape-tool', () => ({
   ScrapeTool: vi.fn().mockImplementation(() => ({
@@ -25,6 +28,9 @@ describe('CrawlTool', () => {
     registry = new ToolRegistry();
     tool = new CrawlTool(registry);
     vi.clearAllMocks();
+
+    // Reset fetch mock to avoid real network calls
+    (global.fetch as any).mockReset();
   });
 
   describe('Tool Properties', () => {
@@ -122,6 +128,12 @@ describe('CrawlTool', () => {
 
   describe('Robots.txt Compliance', () => {
     it('should respect robots.txt when enabled', async () => {
+      // Mock robots.txt fetch
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: true,
+        text: async () => 'User-agent: *\nAllow: /',
+      });
+
       const result = await tool.execute({
         url: 'https://example.com',
         respectRobotsTxt: true,
@@ -132,6 +144,7 @@ describe('CrawlTool', () => {
     });
 
     it('should skip robots.txt when disabled', async () => {
+      // No fetch should be called for robots.txt
       const result = await tool.execute({
         url: 'https://example.com',
         respectRobotsTxt: false,
@@ -139,6 +152,7 @@ describe('CrawlTool', () => {
 
       expect(result.success).toBe(true);
       expect(result.metadata?.robotsChecked).toBe(false);
+      expect(global.fetch).not.toHaveBeenCalled();
     });
   });
 
@@ -230,6 +244,15 @@ describe('CrawlTool', () => {
 
   describe('Sitemap Support', () => {
     it('should follow sitemap when enabled', async () => {
+      // Mock sitemap.xml fetch
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: true,
+        text: async () => `<?xml version="1.0" encoding="UTF-8"?>
+        <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+          <url><loc>https://example.com/page1</loc></url>
+        </urlset>`,
+      });
+
       const result = await tool.execute({
         url: 'https://example.com',
         followSitemap: true,

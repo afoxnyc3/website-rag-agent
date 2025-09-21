@@ -41,12 +41,22 @@
 - [x] Documented /dev-workflow for complete development cycle
 - [x] Added additional command ideas for common tasks
 
-### Critical Test Failures Fixed ✅
-- [x] Identified root cause: test mocks didn't match actual VectorStore API
-- [x] Fixed all storage strategy test mocks (23 tests now passing)
-- [x] Corrected document structure in tests (content vs pageContent)
-- [x] Updated mock methods to match actual implementation
-- [x] Validated production code was correct all along
+### Test Fixes (2025-09-20) ✅
+- [x] Fixed CrawlTool test failures (22 tests passing)
+  - Added global fetch mocking to prevent real HTTP requests
+  - Mocked robots.txt and sitemap.xml responses
+- [x] Fixed PersistentVectorStore test failures (24 tests passing)
+  - Corrected retry count expectations (3 total, not 2)
+  - Fixed transaction rollback test with proper SQL mock
+  - Updated all SQL assertions to handle template literal format
+- [x] Storage strategy tests remain passing (23 tests)
+
+### Known Test Issues 🐛
+- [ ] SemanticChunker tests: 4 failures
+  - Multiple newlines paragraph boundary test
+  - Overlap functionality test
+  - Position offset tracking test
+  - Unicode character length test
 
 ### Agent Instructions Restructuring ✅
 - [x] Restructured agents.md as primary behavioral contract

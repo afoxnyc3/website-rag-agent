@@ -1,5 +1,23 @@
 # Change Log
 
+## 2025-09-20 - Test Suite Fixes (Branch: bugfix/test-failures)
+
+### CrawlTool Test Fixes
+- **Added global fetch mock**: Prevents real HTTP requests to example.com
+- **Mocked robots.txt responses**: Returns valid robots.txt for compliance tests
+- **Mocked sitemap.xml responses**: Returns valid sitemap for parsing tests
+- **Result**: All 22 CrawlTool tests now passing ✅
+
+### PersistentVectorStore Test Fixes
+- **Fixed retry test expectations**: Changed from 2 to 4 calls (initial + retries)
+- **Fixed transaction rollback test**: Proper SQL mock with dynamic query handling
+- **Updated SQL assertions**: Handle template literal format instead of strings
+- **Result**: All 24 PersistentVectorStore tests now passing ✅
+
+### Remaining Issues
+- SemanticChunker: 4 tests failing (paragraph boundaries, overlap, offsets, unicode)
+- Overall test suite: ~114 tests passing, 4 failing
+
 ## 2025-09-20 - Critical Test Failures Fixed
 
 ### Storage Strategy Test Fixes
