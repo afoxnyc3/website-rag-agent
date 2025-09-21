@@ -1,5 +1,43 @@
 # Change Log
 
+## 2025-09-21 - Source Attribution Fix & Tool Selection Bug Fix
+
+### Major Bug Fixes
+
+#### Full URL Display in Source Citations - FIXED
+
+- **Problem**: Source citations were showing only hostnames (e.g., "example.com") instead of full URLs with paths
+- **User Impact**: Users couldn't see which specific page the information came from
+- **Root Cause**: InlineCitationCardTrigger component was extracting only hostname with `new URL(sources[0]).hostname`
+- **Fix**: Changed to display full URL by using `sources[0]` directly
+- **Result**: Sources now show complete URLs like "https://docs.example.com/api/methods/getUserData"
+
+#### BaseAgent Tool Selection - FIXED
+
+- **Problem**: BaseAgent was not scraping URLs when provided
+- **Impact**: URLs were being processed via RAG instead of being scraped
+- **Root Cause**: selectTool() was returning 'ScrapeTool' and 'CrawlTool' but tools were registered as 'scrape' and 'crawl'
+- **Fix**: Updated selectTool() to return correct tool names ('scrape', 'crawl')
+- **Result**: URLs are now properly scraped and ingested
+
+### Testing
+
+- Created comprehensive URL preservation tests (15 new tests):
+  - `lib/tools/scrape-tool.url.test.ts`: 5 tests for ScrapeTool URL preservation
+  - `lib/tools/crawl-tool.url.test.ts`: 5 tests for CrawlTool URL preservation
+  - `lib/rag.url.test.ts`: 5 tests for RAG service URL preservation
+- All tests passing, confirming URL preservation throughout the pipeline
+
+### Files Modified
+
+- `components/ai-elements/inline-citation.tsx`: Fixed URL display in badges
+- `lib/agent/base-agent.ts`: Fixed tool name returns in selectTool()
+- `lib/tools/scrape-tool.url.test.ts`: Added URL preservation tests
+- `lib/tools/crawl-tool.url.test.ts`: Added URL preservation tests
+- `lib/rag.url.test.ts`: Added URL preservation tests with proper mocking
+
+---
+
 ## 2025-09-21 - RAG vs Direct Mode Analysis & Accurate Mode Detection
 
 ### Major Feature: Mode Detection and Metrics Tracking

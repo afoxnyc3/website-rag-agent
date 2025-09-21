@@ -1,5 +1,95 @@
 # Scratchpad - Planning & Notes
 
+## 2025-09-21 - Source Attribution Fix (ULTRATHINK)
+
+### Problem Statement
+
+**Issue**: Sources in chat responses show base URLs only (e.g., "example.com") instead of full page URLs (e.g., "example.com/docs/api/methods")
+**User Impact**: Users cannot verify which specific page information came from, reducing trust and verifiability
+**Priority**: HIGH - Direct impact on user experience and trust
+
+### Investigation Analysis
+
+#### URL Flow Through System
+
+```
+1. ScrapeTool/CrawlTool → Captures full URL
+   ↓ (Debug logs show full URL preserved here ✓)
+2. ProcessContent → Adds URL to metadata
+   ↓ (Tests show URL preserved here ✓)
+3. IngestToRAG → Stores document with metadata
+   ↓ (Need to verify)
+4. SearchKnowledge → Retrieves documents
+   ↓ (Need to verify)
+5. Source Extraction → Gets URLs from results
+   ↓ (Need to verify)
+6. UI Display → Shows sources to user
+   ↓ (Currently shows base URLs only ✗)
+```
+
+#### Hypothesis Ranking
+
+1. **Most Likely**: URL metadata not being properly extracted from search results
+   - Sources array might be using wrong field
+   - Metadata.url might not be included in search results
+
+2. **Possible**: Storage layer truncating URLs
+   - Document metadata might be modified during storage
+   - URL field might have character limit
+
+3. **Less Likely**: UI truncating for display
+   - Frontend might be parsing URLs to show domain only
+   - Could be intentional design choice
+
+### TDD Implementation Strategy
+
+#### Phase 1: Write Comprehensive Tests
+
+1. **Test URL preservation in tools** (scrape-tool.url.test.ts exists ✓)
+2. **Test URL in RAG storage** (NEW)
+3. **Test URL in RAG retrieval** (NEW)
+4. **Test source extraction logic** (NEW)
+
+#### Phase 2: Run Tests to Find Failure Point
+
+- Run tests sequentially to identify where URLs get truncated
+- Add console.log at each step to trace URL values
+
+#### Phase 3: Fix the Issue
+
+- Once identified, fix the specific truncation point
+- Ensure full URL flows through entire pipeline
+
+#### Phase 4: Verify End-to-End
+
+- Test with real URLs
+- Verify sources show full paths in UI
+
+### Test Cases to Write
+
+```typescript
+// 1. Test RAG stores full URL in metadata
+test('RAGService preserves full URL in document metadata');
+
+// 2. Test RAG returns full URL in sources
+test('RAGService.query returns full URLs in sources array');
+
+// 3. Test BaseAgent preserves URLs in response
+test('BaseAgent.execute returns full URLs in sources');
+
+// 4. Test API route preserves URLs
+test('POST /api/chat returns full URLs in sources');
+```
+
+### Success Criteria
+
+- Sources show full URLs like "https://docs.example.com/api/methods"
+- URLs are clickable and lead to correct pages
+- No regression in existing functionality
+- All new tests passing
+
+---
+
 ## 2025-09-21 - Documentation Update & Project Status
 
 ### Current Project State

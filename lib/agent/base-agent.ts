@@ -149,7 +149,7 @@ export class BaseAgent {
 
     // Explicit crawl keywords or base domain URLs
     if (query.includes('crawl') || query.includes('entire') || query.includes('all pages')) {
-      return 'CrawlTool';
+      return 'crawl';
     }
 
     // Check if URL looks like a specific page (has path beyond domain)
@@ -157,15 +157,15 @@ export class BaseAgent {
       const url = new URL(firstUrl.startsWith('http') ? firstUrl : `https://${firstUrl}`);
       // If URL has a specific path (not just domain), use ScrapeTool
       if (url.pathname && url.pathname !== '/') {
-        return 'ScrapeTool';
+        return 'scrape';
       }
     } catch {
       // If URL parsing fails, default to ScrapeTool
-      return 'ScrapeTool';
+      return 'scrape';
     }
 
     // Default to CrawlTool for domain-level URLs
-    return 'CrawlTool';
+    return 'crawl';
   }
 
   async executeTool(
