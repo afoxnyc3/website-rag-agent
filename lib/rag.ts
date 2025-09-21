@@ -2,10 +2,13 @@ import { generateEmbedding } from './embeddings';
 import { StorageFactory, StorageStrategy } from './storage/storage-strategy';
 import { openai } from '@ai-sdk/openai';
 import { generateText } from 'ai';
+import { ConfidenceCalculator, ConfidenceLevel } from './confidence-calculator';
 
 export interface RAGResponse {
   answer: string;
   confidence: number;
+  confidenceLevel?: ConfidenceLevel;
+  confidenceExplanation?: string;
   sources: string[];
   chunks: any[];
 }
@@ -13,6 +16,7 @@ export interface RAGResponse {
 export class RAGService {
   private storage: StorageStrategy;
   private readonly confidenceThreshold = 0.3; // Lowered from 0.5 to 0.3
+  private readonly confidenceCalculator = new ConfidenceCalculator();
   private initialized = false;
 
   constructor(options?: { forceMemory?: boolean; forcePersistent?: boolean }) {
@@ -74,9 +78,18 @@ export class RAGService {
 
     if (searchResults.length === 0) {
       console.log(`❌ No results found`);
+      const confidenceResult = this.confidenceCalculator.calculateConfidence({
+        similarityScores: [],
+        sourceTimestamps: [],
+        sourceDomains: [],
+        queryLength: question.length,
+        responseLength: 0,
+      });
       return {
         answer: "I don't have enough information to answer accurately.",
         confidence: 0,
+        confidenceLevel: confidenceResult.level,
+        confidenceExplanation: confidenceResult.explanation,
         sources: [],
         chunks: [],
       };
@@ -88,16 +101,46 @@ export class RAGService {
     if (relevantResults.length === 0) {
       const maxConfidence = Math.max(...searchResults.map((r) => r.similarity));
       console.log(`⚠️ No results above confidence threshold (${this.confidenceThreshold})`);
+
+      // When no relevant results, use max similarity directly as confidence
+      // This avoids inflating the score with source count/diversity factors
+      const confidenceLevel =
+        maxConfidence >= 0.7 ? 'high' : maxConfidence >= 0.4 ? 'medium' : 'low';
+
+      const confidenceExplanation = `I have low confidence in this answer. Found ${searchResults.length} sources but none were sufficiently relevant (max similarity: ${maxConfidence.toFixed(2)}).`;
+
       return {
         answer: "I don't have enough information to answer accurately.",
         confidence: maxConfidence,
+        confidenceLevel: confidenceLevel as any,
+        confidenceExplanation,
         sources: [],
         chunks: searchResults,
       };
     }
 
-    const maxConfidence = Math.max(...relevantResults.map((r) => r.similarity));
-    console.log(`✨ Max confidence: ${maxConfidence.toFixed(3)}`);
+    // Calculate multi-factor confidence
+    const confidenceResult = this.confidenceCalculator.calculateConfidence({
+      similarityScores: relevantResults.map((r) => r.similarity),
+      sourceTimestamps: relevantResults.map((r) =>
+        r.metadata?.timestamp ? new Date(r.metadata.timestamp) : new Date()
+      ),
+      sourceDomains: relevantResults.map((r) => {
+        const url = r.metadata?.url || r.metadata?.source || 'unknown';
+        try {
+          return new URL(url).hostname;
+        } catch {
+          return url;
+        }
+      }),
+      queryLength: question.length,
+      responseLength: 200, // Estimate, will be updated after generation
+    });
+
+    console.log(
+      `✨ Multi-factor confidence: ${confidenceResult.score.toFixed(3)} (${confidenceResult.level})`
+    );
+    console.log(`📊 ${confidenceResult.explanation}`);
 
     const context = relevantResults.map((r) => r.content).join('\n\n');
 
@@ -126,7 +169,9 @@ Answer:`;
 
     return {
       answer: text,
-      confidence: maxConfidence,
+      confidence: confidenceResult.score,
+      confidenceLevel: confidenceResult.level,
+      confidenceExplanation: confidenceResult.explanation,
       sources,
       chunks: relevantResults,
     };
