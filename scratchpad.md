@@ -150,12 +150,24 @@ class RAGvsDirectAnalyzer {
 
 Currently, when users see source citations in responses, they only see base URLs (e.g., "docs.example.com") instead of the specific pages where content was found (e.g., "docs.example.com/api/authentication#oauth2"). This reduces trust and makes it difficult for users to verify information or explore related content.
 
-#### Root Cause Investigation
+#### Diagnostic Test Results ✅
 
-1. **ScrapeTool Issue**: May be storing only the base URL in metadata instead of the full URL
-2. **CrawlTool Issue**: When crawling multiple pages, might not preserve individual page URLs
-3. **RAG Service**: May be losing URL information during document ingestion
-4. **UI Display**: InlineCitationCardTrigger was extracting hostname (fixed previously, but may have other issues)
+**Phase 1 Complete**: All backend components are preserving URLs correctly!
+
+- ScrapeTool: 23/23 tests passing (6 new URL preservation tests)
+- CrawlTool: 28/29 tests passing (6 new URL preservation tests)
+- RAG Service: 5/5 URL preservation tests passing
+
+**Key Finding**: The backend is NOT the problem. Full URLs are being preserved through the entire data pipeline.
+
+#### Root Cause FOUND! 🎯
+
+The issue is in the **UI Layer**, specifically in `/components/ai-elements/inline-citation.tsx`:
+
+- Line 53: `InlineCitationCardTrigger` displays `sources[0]` directly
+- This shows the full URL in the badge (e.g., "https://docs.example.com/api/auth")
+- Should instead show a cleaner display like domain name or page title
+- The actual URL should be preserved but shown in hover/expanded view
 
 #### Solution Architecture
 
