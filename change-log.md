@@ -1,5 +1,55 @@
 # Change Log
 
+## 2025-09-21 - Enhanced Confidence Scoring System ✅ COMPLETE
+
+### Multi-Factor Confidence Calculation Implementation
+
+#### Problem Solved
+
+- Basic confidence scoring existed but was simplistic (single similarity score)
+- No clear confidence levels or explanations for users
+- Low-confidence queries sometimes showed misleadingly high scores
+
+#### Solution Implemented
+
+1. **Multi-Factor Scoring Algorithm**:
+   - Similarity Score (40%): Semantic relevance of sources
+   - Source Count (20%): Number of relevant sources found
+   - Recency (20%): Age of source information
+   - Diversity (20%): Variety of source domains
+   - Weighted formula produces balanced confidence scores
+
+2. **Three Confidence Levels**:
+   - HIGH (≥0.7): Multiple relevant, recent, diverse sources
+   - MEDIUM (0.4-0.69): Moderate sources with average relevance
+   - LOW (<0.4): Limited sources or low relevance
+
+3. **Human-Readable Explanations**:
+   - Clear explanations in API responses
+   - Details about source quality, recency, and diversity
+   - Warnings when confidence is low
+
+4. **Edge Case Handling**:
+   - Fixed issue where low-relevance queries got inflated scores
+   - When no relevant results meet threshold, use max similarity directly
+   - Avoids multi-factor calculation for irrelevant results
+
+#### Testing
+
+- Created comprehensive test suite with 24 tests
+- 100% test coverage following TDD methodology
+- All tests passing
+
+### Files Modified
+
+- `lib/confidence-calculator.ts`: Created multi-factor calculation class
+- `lib/confidence-calculator.test.ts`: Comprehensive test suite
+- `lib/rag.ts`: Integrated ConfidenceCalculator into query pipeline
+- `app/api/chat/route.ts`: Added confidence fields to API response
+- `lib/agent/base-agent.ts`: Updated to pass through confidence fields
+
+---
+
 ## 2025-09-21 - Playwright Browser Auto-Installation Fix
 
 ### Critical Onboarding Issue Resolved
