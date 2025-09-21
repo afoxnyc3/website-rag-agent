@@ -9,7 +9,7 @@ An intelligent knowledge assistant powered by BaseAgent orchestration that autom
 - **🤖 BaseAgent Orchestration**: Sophisticated agent layer that coordinates tools and RAG pipeline
 - **🌐 Smart Web Ingestion**: Dual-mode scraping (static HTML & JavaScript-rendered content)
 - **🔍 Intelligent Crawling**: Multi-page crawling with depth control and robots.txt compliance
-- **💡 Confidence Scoring**: Every response includes a confidence score (0.0-1.0)
+- **💡 Enhanced Confidence Scoring**: Multi-factor confidence calculation with clear levels (HIGH/MEDIUM/LOW) and human-readable explanations
 - **📚 Source Attribution**: Expandable source citations with direct links
 - **🗄️ Dual Storage Modes**: In-memory for development, PostgreSQL + pgvector for production
 - **⚡ Real-time Progress**: Live updates during scraping and crawling operations
@@ -25,6 +25,8 @@ An intelligent knowledge assistant powered by BaseAgent orchestration that autom
 - Automatic fallback from fast fetch to Playwright for JavaScript sites
 - Execution metrics tracking with response time and tool usage analytics
 - Three distinct modes: Agent (tools), RAG (knowledge base), Direct (GPT-4)
+- **NEW: RAG vs Direct Analysis Framework** for performance comparison and decision-making
+- **NEW: Multi-factor confidence scoring** using similarity, source count, recency, and diversity
 
 ## 🔒 Security Features
 
@@ -152,7 +154,7 @@ Query: "How do I configure authentication?"
 - **Storage**:
   - Development: In-memory Map-based store
   - Production: Vercel Postgres with pgvector
-- **Testing**: Vitest with comprehensive test suite (97 tests passing)
+- **Testing**: Vitest with comprehensive test suite (144+ tests passing)
 - **Code Quality**: ESLint, Prettier, Husky pre-commit hooks
 
 ## 📦 API Endpoints
@@ -175,8 +177,15 @@ Main chat endpoint using BaseAgent orchestration.
 {
   "response": "The answer to your question...",
   "confidence": 0.85,
+  "confidenceLevel": "high",
+  "confidenceExplanation": "I have high confidence based on 3 relevant sources with recent information.",
   "sources": ["source-1", "source-2"],
-  "mode": "agent"
+  "mode": "agent",
+  "metrics": {
+    "toolsUsed": true,
+    "ragUsed": true,
+    "responseTime": 250
+  }
 }
 ```
 
