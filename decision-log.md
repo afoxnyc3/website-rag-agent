@@ -1,5 +1,56 @@
 # Decision Log
 
+## 2025-09-21 - Mode Detection Implementation
+
+### Decision: Track execution metrics to accurately determine response mode
+
+**Problem**: Mode was hardcoded as 'agent', preventing accurate RAG vs Direct analysis
+
+**Solution Chosen**:
+
+- Add ExecutionMetrics interface to track execution path
+- Modify BaseAgent.execute() to return metrics
+- Dynamically determine mode based on what was actually used
+- Support three modes: Agent (tools), RAG (knowledge base), Direct (neither)
+
+**Rationale**:
+
+- Users need accurate mode indicators for performance analysis
+- Metrics provide valuable insights into system behavior
+- Clean separation of concerns between execution and presentation
+
+**Implementation**:
+
+- Added metrics tracking in BaseAgent
+- Modified API route to determine mode from metrics
+- Updated UI to display all three modes with distinct badges
+- Created comprehensive tests for mode detection
+
+**Result**: 100% accurate mode detection with performance metrics
+
+## 2025-09-21 - Fix Critical Bugs
+
+### Decision: Prioritize web crawling depth and SSRF security fixes
+
+**Bugs Fixed**:
+
+1. **Web Crawling Depth**: Off-by-one error limiting crawl to maxDepth-1
+2. **SSRF Protection**: Added comprehensive URL validation
+3. **Source Attribution**: Added debug logging (fix pending)
+
+**Rationale**:
+
+- Crawling depth directly impacts knowledge ingestion
+- SSRF protection is critical for security
+- Source attribution helps users verify information
+
+**Trade-offs**:
+
+- Focused on critical fixes over new features
+- Added debug logging for investigation before implementing fixes
+
+**Result**: Improved security and crawling capabilities
+
 ## 2025-09-20 - Submit Project As-Is for Homework
 
 ### Decision: Project is ready for homework submission without additional features

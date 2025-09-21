@@ -14,6 +14,7 @@ An intelligent knowledge assistant powered by BaseAgent orchestration that autom
 - **🗄️ Dual Storage Modes**: In-memory for development, PostgreSQL + pgvector for production
 - **⚡ Real-time Progress**: Live updates during scraping and crawling operations
 - **🎛️ Knowledge Management**: Interactive UI for viewing and managing knowledge base
+- **📊 Mode Detection & Analytics**: Tracks execution mode (Agent/RAG/Direct) with performance metrics
 
 ### Technical Highlights
 
@@ -22,6 +23,8 @@ An intelligent knowledge assistant powered by BaseAgent orchestration that autom
 - Semantic chunking with overlap for context preservation
 - 5-minute URL caching to prevent redundant scraping
 - Automatic fallback from fast fetch to Playwright for JavaScript sites
+- Execution metrics tracking with response time and tool usage analytics
+- Three distinct modes: Agent (tools), RAG (knowledge base), Direct (GPT-4)
 
 ## 🔒 Security Features
 
@@ -250,15 +253,20 @@ USE_PERSISTENT_STORAGE=true
 
 ## 🗺️ Development Roadmap
 
-### Top Priority Items
+### Recently Completed ✅
+
+- **Mode Detection & Analytics** - Accurate tracking of Agent/RAG/Direct modes with metrics
+- **Web Crawling Depth Fix** - Fixed off-by-one error that limited crawling
+- **SSRF Protection** - Comprehensive URL validation for security
+
+### Next Priority Items
 
 1. **Fix Source Attribution** 🐛 - Sources should link to actual pages, not home pages
-2. **Fix Web Crawling Depth** 🐛 - Crawler limited to 2-3 pages despite higher settings
-3. **Enhance Confidence Scoring** 📊 - Improve calculation and add explanations
+2. **Enhance Confidence Scoring** 📊 - Improve calculation and add explanations
+3. **Documentation Cleanup** 📝 - Resolve discrepancies and standardize formats
 
 ### Coming Soon
 
-- **RAG vs Direct Analysis** - Performance comparison and recommendations
 - **Evals Framework** - Automated quality testing pipeline
 - **Guardrails** - Content filtering and safety checks
 - **Documentation Improvements** - Streamlined and consistent docs
@@ -272,8 +280,7 @@ See [roadmap.md](./roadmap.md) for the complete development roadmap with detaile
 - **Token Limits**: Large documents are chunked at 3000 characters
 - **Confidence Threshold**: Set to 0.3 (relatively low for better recall)
 - **ESLint Warnings**: ~115 warnings (mostly `any` types) but non-blocking
-- **Web Crawling**: Currently limited to 2-3 pages (fix in roadmap)
-- **Source Links**: Show base URL instead of specific pages (fix in roadmap)
+- **Source Links**: Show base URL instead of specific pages (under investigation)
 
 ## 📋 Development Commands
 
@@ -293,6 +300,7 @@ pnpm format:check # Check formatting without changes
 The project includes comprehensive tests for:
 
 - BaseAgent orchestration (31 tests passing ✅)
+- Mode Detection (7 tests passing ✅)
 - Tool execution (21 tests passing ✅)
 - Storage strategies (23 tests passing ✅)
 - Vector operations
