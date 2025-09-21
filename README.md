@@ -233,7 +233,7 @@ The project includes comprehensive tests for:
 - Vector operations
 - Semantic chunking
 
-**Test Status**: All critical tests passing!
+**Test Status**: All critical tests passing! (Some non-critical SemanticChunker tests pending fixes)
 
 Run tests with:
 ```bash

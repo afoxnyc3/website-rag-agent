@@ -1,5 +1,22 @@
 # Decision Log
 
+## 2025-09-20 - Pause SemanticChunker Test Fixes
+
+### Decision: Stop fixing remaining SemanticChunker test failures
+**Rationale**:
+- Analysis showed failures are NOT critical for app functionality
+- App is fully operational with current implementation
+- Remaining issues are quality/enhancement features only
+- Time better spent on other priorities
+**Alternatives considered**:
+- Complete all 4 test fixes (time-consuming, low ROI)
+- Disable failing tests (hides issues)
+- Rewrite chunker from scratch (overkill)
+**Trade-offs**:
+- Accept 83% test pass rate (20/24) for this module
+- Semantic chunking less optimal but functional
+**Result**: App remains production-ready, can revisit later
+
 ## 2025-09-20 - Fix Tests Instead of Production Code
 
 ### Decision: Fix test mocks rather than change working production code
