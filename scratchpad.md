@@ -1,5 +1,42 @@
 # Scratchpad - Planning & Notes
 
+## 2025-09-20 - Context-Priming Slash Command `/prime` Created
+
+### What We Built
+Created an optimal context-loading slash command for AI engineering sessions.
+
+### The `/prime` Command
+- **Purpose**: Load essential project context at session start
+- **Approach**: Hierarchical loading (behavioral → recent → technical)
+- **Output**: Actionable summary with next steps
+
+### Why This Matters
+1. **Prevents blind coding** - AI always knows recent context
+2. **Enforces workflow** - agents.md loads first (mandatory checklist)
+3. **Saves time** - No manual context gathering needed
+4. **Optimizes tokens** - Only loads what's essential
+5. **Git-aware** - Checks branch and uncommitted changes
+
+### Implementation
+- Added as first command in slash-ideas.md
+- Includes both full and short versions
+- Returns structured summary with:
+  - Last work from scratchpad
+  - Current tasks from todo
+  - Git branch status
+  - Suggested next action
+
+### Usage Pattern
+```
+User: /prime
+AI: [Loads context, returns summary]
+User: [Continues with suggested task]
+```
+
+This ensures every session starts with full project awareness.
+
+---
+
 ## 2025-09-20 - Slash Command Ideas Documented
 
 ### Created slash-ideas.md
