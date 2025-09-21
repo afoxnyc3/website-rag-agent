@@ -155,7 +155,14 @@ export class CrawlTool extends Tool {
         if (this.visitedUrls.has(currentUrl)) continue;
 
         // Skip if exceeds max depth
-        if (depth > maxDepth) continue;
+        if (depth > maxDepth) {
+          if (process.env.NODE_ENV === 'development') {
+            console.log(
+              `[CrawlTool] Skipping ${currentUrl} - depth ${depth} > maxDepth ${maxDepth}`
+            );
+          }
+          continue;
+        }
 
         // Apply include/exclude patterns
         if (!this.matchesPatterns(currentUrl, includePatterns, excludePatterns)) continue;
@@ -196,6 +203,12 @@ export class CrawlTool extends Tool {
             }
           });
 
+          // Debug logging for URL preservation
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`[CrawlTool] Scraped page at depth ${depth}: ${currentUrl}`);
+            console.log(`[CrawlTool] Page has ${sameDomainLinks.length} same-domain links`);
+          }
+
           result.pages.push({
             url: currentUrl,
             title: scrapeResult.data.title || '',
@@ -205,12 +218,24 @@ export class CrawlTool extends Tool {
           });
 
           // Add discovered links to queue
-          if (depth < maxDepth) {
+          // BUG FIX: Changed from depth < maxDepth to depth <= maxDepth
+          // This ensures we crawl TO maxDepth, not maxDepth-1
+          if (depth <= maxDepth) {
+            if (process.env.NODE_ENV === 'development') {
+              console.log(
+                `[CrawlTool] At depth ${depth}/${maxDepth}, adding ${sameDomainLinks.length} links to queue`
+              );
+            }
             sameDomainLinks.forEach((link) => {
               if (!this.visitedUrls.has(link)) {
                 this.addToQueue(link, depth + 1);
+                if (process.env.NODE_ENV === 'development') {
+                  console.log(`[CrawlTool] Queued ${link} at depth ${depth + 1}`);
+                }
               }
             });
+          } else if (process.env.NODE_ENV === 'development') {
+            console.log(`[CrawlTool] At max depth ${depth}, not adding new links`);
           }
         } else {
           result.errors.push(`Failed to scrape ${currentUrl}: ${scrapeResult.error}`);

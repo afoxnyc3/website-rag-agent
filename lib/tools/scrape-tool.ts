@@ -206,12 +206,20 @@ export class ScrapeTool extends Tool {
       content = content.substring(0, maxLength);
     }
 
-    return {
+    const result = {
       url: scraped.url,
       title: scraped.title,
       content,
       scrapedAt: scraped.scrapedAt,
     };
+
+    // Debug logging for URL preservation
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[ScrapeTool] Processing URL:', scraped.url);
+      console.log('[ScrapeTool] Returning URL:', result.url);
+    }
+
+    return result;
   }
 
   // Cache management

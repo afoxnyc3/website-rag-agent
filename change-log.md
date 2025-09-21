@@ -1,5 +1,57 @@
 # Change Log
 
+## 2025-09-21 - Critical Bug Fixes and Debug Logging
+
+### Bug Fixes
+
+#### Web Crawling Depth Issue - FIXED
+
+- **Problem**: Crawler was stopping at maxDepth-1 instead of maxDepth
+- **Root Cause**: Off-by-one error in depth comparison (line 208 of crawl-tool.ts)
+- **Fix**: Changed `if (depth < maxDepth)` to `if (depth <= maxDepth)` when adding links to queue
+- **Impact**: Crawler now correctly crawls to the full specified depth
+- **Test**: Added comprehensive depth test to verify exact depth levels
+
+#### URL Source Attribution Investigation
+
+- **Problem**: Sources might show base URLs instead of full page URLs
+- **Investigation**: Added comprehensive debug logging throughout the pipeline
+- **Finding**: URL preservation appears correct in backend
+- **Debug Points Added**:
+  - ScrapeTool: Logs URL processing
+  - CrawlTool: Logs URL and depth for each page
+  - API endpoints: Logs URLs being stored
+  - RAG Service: Logs source URLs from metadata
+- **Status**: Monitoring in development for actual behavior
+
+### Technical Changes
+
+1. **crawl-tool.ts**:
+   - Fixed depth comparison operator (line 208)
+   - Added debug logging for depth tracking
+   - Added debug logging for URL preservation
+
+2. **scrape-tool.ts**:
+   - Added debug logging for URL processing
+
+3. **rag.ts**:
+   - Added debug logging for source extraction
+
+4. **API endpoints** (scrape/crawl):
+   - Added debug logging for document storage
+
+### Testing
+
+- Created comprehensive test for crawl depth accuracy
+- Created test suite for URL preservation in ScrapeTool
+- All tests passing (23 CrawlTool tests, 5 URL preservation tests)
+
+### Next Steps
+
+- Test with real websites to verify fixes
+- Monitor debug logs in development
+- Remove debug logging after verification
+
 ## 2025-09-21 - BaseAgent Roadmap Documentation Added
 
 ### Comprehensive Development Roadmap

@@ -48,6 +48,11 @@ export async function POST(request: NextRequest) {
 
       const chunks = chunker.chunk(page.content, chunkOptions);
 
+      // Debug logging for URL preservation
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[API/crawl] Storing page ${page.url} at depth ${page.depth}`);
+      }
+
       // Add each chunk as a separate document
       for (const chunk of chunks) {
         await ragService.addDocument({
