@@ -116,10 +116,18 @@ Answer:`;
       prompt,
     });
 
+    const sources = relevantResults.map((r) => {
+      const source = r.metadata?.url || r.metadata?.source || r.id;
+      if (process.env.NODE_ENV === 'development' && r.metadata?.url) {
+        console.log('[RAGService] Source URL from metadata:', r.metadata.url);
+      }
+      return source;
+    });
+
     return {
       answer: text,
       confidence: maxConfidence,
-      sources: relevantResults.map((r) => r.metadata?.url || r.metadata?.source || r.id),
+      sources,
       chunks: relevantResults,
     };
   }

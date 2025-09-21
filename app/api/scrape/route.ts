@@ -46,6 +46,11 @@ export async function POST(request: NextRequest) {
 
     const chunks = chunker.chunk(content, chunkOptions);
 
+    // Debug logging for URL preservation
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[API/scrape] Storing document with URL:', scrapedUrl);
+    }
+
     // Add each chunk as a separate document
     for (const chunk of chunks) {
       await ragService.addDocument({

@@ -88,6 +88,78 @@ describe('CrawlTool', () => {
       });
     });
 
+    it('should crawl to exactly maxDepth levels (not maxDepth-1)', async () => {
+      // Create a mock that returns different links for each depth level
+      const mockScrapeTool = vi.fn();
+      mockScrapeTool.mockImplementation(({ url }: { url: string }) => {
+        if (url === 'https://example.com') {
+          return Promise.resolve({
+            success: true,
+            data: {
+              url: 'https://example.com',
+              title: 'Root Page',
+              content: '<a href="/level1">Level 1</a>',
+            },
+          });
+        } else if (url === 'https://example.com/level1') {
+          return Promise.resolve({
+            success: true,
+            data: {
+              url: 'https://example.com/level1',
+              title: 'Level 1 Page',
+              content: '<a href="/level2">Level 2</a>',
+            },
+          });
+        } else if (url === 'https://example.com/level2') {
+          return Promise.resolve({
+            success: true,
+            data: {
+              url: 'https://example.com/level2',
+              title: 'Level 2 Page',
+              content: '<a href="/level3">Level 3</a>',
+            },
+          });
+        }
+        return Promise.resolve({
+          success: true,
+          data: { url, title: 'Other Page', content: 'No links' },
+        });
+      });
+
+      // Replace the scrape tool execute method
+      tool['scrapeTool'].execute = mockScrapeTool;
+
+      const result = await tool.execute({
+        url: 'https://example.com',
+        maxDepth: 2,
+        maxPages: 10,
+      });
+
+      expect(result.success).toBe(true);
+      const pages = result.data?.pages || [];
+      const urls = pages.map((p: any) => p.url);
+
+      // Should have crawled:
+      // Depth 0: https://example.com
+      // Depth 1: https://example.com/level1
+      // Depth 2: https://example.com/level2
+      expect(urls).toContain('https://example.com');
+      expect(urls).toContain('https://example.com/level1');
+      expect(urls).toContain('https://example.com/level2');
+
+      // Should NOT have crawled level3 (depth would be 3)
+      expect(urls).not.toContain('https://example.com/level3');
+
+      // Verify depth values
+      const rootPage = pages.find((p: any) => p.url === 'https://example.com');
+      const level1Page = pages.find((p: any) => p.url === 'https://example.com/level1');
+      const level2Page = pages.find((p: any) => p.url === 'https://example.com/level2');
+
+      expect(rootPage?.depth).toBe(0);
+      expect(level1Page?.depth).toBe(1);
+      expect(level2Page?.depth).toBe(2);
+    });
+
     it('should respect maxPages limit', async () => {
       const result = await tool.execute({
         url: 'https://example.com',

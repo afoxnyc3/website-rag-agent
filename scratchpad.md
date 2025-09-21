@@ -1,5 +1,124 @@
 # Scratchpad - Planning & Notes
 
+## 2025-09-21 - Critical Bugs Fix (ULTRATHINK Analysis)
+
+### Bug 1: Source Attribution Shows Base URLs Only
+
+#### Problem Investigation
+
+- **Symptom**: Sources in chat responses show "example.com" instead of "example.com/specific/page"
+- **User Impact**: Cannot verify which specific page information came from
+- **Code Analysis**:
+  - ScrapeTool correctly preserves full URL in processContent() (line 210)
+  - BaseAgent preserves all metadata from tools (lines 231-236)
+  - RAG service uses metadata.url for sources (line 122)
+
+#### Root Cause Hypothesis
+
+1. **Primary Suspect**: URL normalization somewhere in the pipeline
+2. **Secondary**: Metadata overwriting during document storage
+3. **Tertiary**: UI display truncating URLs to base domain
+
+#### Solution Approach
+
+1. Add test to verify full URL preservation through entire pipeline
+2. Trace URL from ScrapeTool → BaseAgent → RAG → Storage → Retrieval
+3. Fix any point where URL gets truncated or normalized
+4. Ensure UI displays full URL in sources
+
+#### Risk Assessment
+
+- **Low Risk**: Only changing metadata handling, not core functionality
+- **Testing**: Can verify with simple URL scraping test
+
+---
+
+### Bug 2: Web Crawling Depth Limited to 2-3 Pages
+
+#### Problem Investigation
+
+- **Symptom**: Crawler stops after 2-3 pages even with maxDepth=5
+- **User Impact**: Cannot ingest full websites, limiting knowledge base
+- **Code Analysis**:
+  - Default maxDepth = 2 (line 92)
+  - Depth check: `if (depth > maxDepth)` skips processing (line 158)
+  - Queue addition: `if (depth < maxDepth)` adds links (line 208)
+  - **BUG FOUND**: Inconsistent depth comparison operators!
+
+#### Root Cause - CONFIRMED
+
+**Line 208 bug**: Uses `depth < maxDepth` instead of `depth <= maxDepth`
+
+- When depth=1 and maxDepth=2, links at depth 2 are NOT added to queue
+- This creates an off-by-one error limiting crawl to maxDepth-1 levels
+
+#### Solution Approach
+
+1. Fix line 208: Change `depth < maxDepth` to `depth <= maxDepth`
+2. Add comprehensive test for depth traversal
+3. Verify with multi-level website crawl
+4. Consider adding debug logging for depth tracking
+
+#### Risk Assessment
+
+- **Medium Risk**: Could potentially crawl more pages than before
+- **Mitigation**: Add maxPages safeguard, test thoroughly
+
+---
+
+### Additional Findings
+
+#### URL Queue Management
+
+- Queue is properly managed with deduplication
+- visitedUrls Set prevents revisiting
+- No apparent issues with queue processing
+
+#### Metadata Preservation Chain
+
+- ScrapeTool → returns full URL
+- BaseAgent → preserves all metadata
+- Storage → needs verification
+- Retrieval → needs verification
+
+---
+
+### Implementation Strategy
+
+#### Phase 1: Write Tests (TDD)
+
+1. Test full URL preservation in ScrapeTool
+2. Test metadata flow through BaseAgent
+3. Test storage preserves full URLs
+4. Test crawl depth accuracy
+
+#### Phase 2: Fix Source Attribution
+
+1. Add debug logging to trace URL through pipeline
+2. Fix any truncation points found
+3. Update UI to show full URLs
+
+#### Phase 3: Fix Crawl Depth
+
+1. Fix the depth comparison operator
+2. Add depth tracking logs
+3. Test with various maxDepth values
+
+#### Phase 4: Verification
+
+1. Manual test with real websites
+2. Verify sources show full URLs
+3. Verify crawl reaches correct depth
+
+### Success Metrics
+
+- Sources display full URLs like "docs.example.com/api/methods"
+- Crawler successfully reaches maxDepth pages (not maxDepth-1)
+- No regression in existing functionality
+- All new tests passing
+
+---
+
 ## 2025-09-21 - BaseAgent Roadmap Planning
 
 ### ULTRATHINK Analysis
