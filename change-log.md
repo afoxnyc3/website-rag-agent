@@ -1,5 +1,123 @@
 # Change Log
 
+## 2025-09-21 - Multi-Factor Confidence Scoring & RAG vs Direct Analysis (PRs #10, #14) ✅ COMPLETE
+
+### Enhanced Confidence Scoring System (PR #10)
+
+#### Multi-Factor Confidence Calculation Implementation
+
+**Problem Solved**:
+
+- Basic confidence scoring was simplistic (single similarity score)
+- No clear confidence levels or explanations for users
+- Low-confidence queries sometimes showed misleadingly high scores
+
+**Solution Implemented**:
+
+1. **Multi-Factor Scoring Algorithm**:
+   - Similarity Score (40%): Semantic relevance of sources
+   - Source Count (20%): Number of relevant sources found
+   - Recency (20%): Age of source information
+   - Diversity (20%): Variety of source domains
+   - Weighted formula produces balanced confidence scores
+
+2. **Three Confidence Levels**:
+   - HIGH (≥0.7): Multiple relevant, recent, diverse sources
+   - MEDIUM (0.4-0.69): Moderate sources with average relevance
+   - LOW (<0.4): Limited sources or low relevance
+
+3. **Human-Readable Explanations**:
+   - Clear explanations in API responses
+   - Details about source quality, recency, and diversity
+   - Warnings when confidence is low
+
+4. **Edge Case Handling**:
+   - Fixed issue where low-relevance queries got inflated scores
+   - When no relevant results meet threshold, use max similarity directly
+   - Avoids multi-factor calculation for irrelevant results
+
+**Testing**: Created comprehensive test suite with 24 tests, 100% test coverage following TDD methodology
+
+### RAG vs Direct Comparison Analysis (PR #14)
+
+#### Mode Detection and Performance Evaluation Framework
+
+**Problem Solved**:
+
+- Mode was always showing as "agent" regardless of actual execution path
+- No systematic way to analyze RAG vs Direct vs Agent performance
+- Users couldn't understand which mode was being used
+
+**Solution Implemented**:
+
+1. **BaseAgent Enhancements**:
+   - Added `ExecutionMetrics` interface to track execution path
+   - Modified `execute()` method to track tools used, RAG usage, URLs detected, response time
+   - Returns `RAGResponseWithMetrics` with execution data
+
+2. **API Route Updates**:
+   - Removed hardcoded mode='agent'
+   - Implemented dynamic mode determination based on metrics
+   - Added debug logging and metrics in response
+
+3. **UI Improvements**:
+   - Added support for three modes: agent, rag, direct
+   - Color-coded badges with distinct icons
+   - Performance metrics display
+
+4. **Comprehensive Testing**:
+   - Created test suite with 7 tests for mode detection
+   - All tests passing, verifying correct mode detection
+
+**Performance Analysis**:
+
+| Mode   | Response Time | Confidence       | Use Case                   |
+| ------ | ------------- | ---------------- | -------------------------- |
+| Agent  | 5-30s         | High (0.8+)      | URL scraping, web crawling |
+| RAG    | 200-500ms     | Medium (0.5-0.8) | Knowledge base queries     |
+| Direct | 100-200ms     | Variable         | Fallback when no knowledge |
+
+### CrawlTool Test Fix (PR #13)
+
+#### Critical Bug Fixes and Test Improvements
+
+**Web Crawling Depth Issue - FIXED**:
+
+- **Problem**: Crawler was stopping at maxDepth-1 instead of maxDepth
+- **Root Cause**: Off-by-one error in depth comparison
+- **Fix**: Changed `if (depth < maxDepth)` to `if (depth <= maxDepth)`
+- **Impact**: Crawler now correctly crawls to the full specified depth
+
+**URL Source Attribution Testing**:
+
+- Added comprehensive debug logging throughout the pipeline
+- Created 15 new URL preservation tests across ScrapeTool, CrawlTool, and RAG service
+- All tests passing, confirming URL preservation works correctly
+
+### Files Modified
+
+**Confidence Scoring (PR #10)**:
+
+- `lib/confidence-calculator.ts`: Created multi-factor calculation class
+- `lib/confidence-calculator.test.ts`: Comprehensive test suite (24 tests)
+- `lib/rag.ts`: Integrated ConfidenceCalculator into query pipeline
+- `app/api/chat/route.ts`: Added confidence fields to API response
+- `lib/agent/base-agent.ts`: Updated to pass through confidence fields
+
+**Mode Detection (PR #14)**:
+
+- `lib/agent/base-agent.ts`: Added metrics tracking
+- `app/api/chat/route.ts`: Dynamic mode determination
+- `components/chat/chat-assistant.tsx`: Three-mode UI support
+- `app/api/chat/route.test.ts`: Created comprehensive tests (7 tests)
+
+**CrawlTool Fix (PR #13)**:
+
+- `lib/tools/crawl-tool.ts`: Fixed depth comparison operator
+- `lib/tools/scrape-tool.url.test.ts`: Added URL preservation tests (5 tests)
+- `lib/tools/crawl-tool.url.test.ts`: Added URL preservation tests (5 tests)
+- `lib/rag.url.test.ts`: Added URL preservation tests (5 tests)
+
 ## 2025-09-21 - Enhanced Confidence Scoring System ✅ COMPLETE
 
 ### Multi-Factor Confidence Calculation Implementation

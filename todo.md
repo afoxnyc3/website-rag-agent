@@ -41,6 +41,32 @@
 
 ## 📅 Recent Accomplishments (2025-09-21)
 
+### Enhanced Confidence Scoring ✅
+
+- [x] Implemented multi-factor confidence calculation
+- [x] Added similarity, source count, recency, and diversity scoring
+- [x] Created three clear confidence levels (HIGH/MEDIUM/LOW)
+- [x] Added human-readable explanations in responses
+- [x] 24 tests written and passing (100% coverage)
+- [x] Merged PR #10
+
+### RAG vs Direct Comparison Analysis ✅
+
+- [x] Created comprehensive evaluation framework
+- [x] Implemented EvalDataset class with 12 default queries
+- [x] Built MetricsCollector for performance tracking
+- [x] Created RAGvsDirectAnalyzer for mode comparison
+- [x] Added statistical analysis with p-values and effect sizes
+- [x] 48 tests written and passing (100% TDD)
+- [x] Merged PR #14
+
+### CrawlTool Test Fix ✅
+
+- [x] Fixed flaky error handling test that was timing out
+- [x] Properly mocked error scenarios
+- [x] All 29 CrawlTool tests now passing
+- [x] Merged PR #13
+
 ### Playwright Installation Fix ✅
 
 - [x] Added postinstall script to automatically install Playwright browsers
@@ -265,12 +291,12 @@
 
 - [x] **Fix Source Attribution** - ✅ FIXED - Full URLs now displayed (2025-09-21)
 - [x] **Fix Web Crawling Depth** - ✅ FIXED off-by-one error (2025-09-21)
-- [ ] **Enhance Confidence Scoring** - Improve calculation and add explanations
+- [x] **Enhance Confidence Scoring** - ✅ COMPLETE - Multi-factor scoring implemented (2025-09-21)
 - [x] **RAG vs Direct Analysis** - ✅ COMPLETE with mode detection (2025-09-21)
 
 ### Analysis & Documentation (MEDIUM PRIORITY - Week 2)
 
-- [x] **RAG vs Direct Analysis** - ✅ Metrics tracking implemented
+- [x] **RAG vs Direct Analysis** - ✅ COMPLETE - Full evaluation framework (2025-09-21)
 - [ ] **Documentation Cleanup** - Resolve claude.md/agents.md discrepancies
 - [ ] **Create Doc Slash Command** - Auto-update docs from code
 

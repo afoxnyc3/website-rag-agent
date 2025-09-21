@@ -9,12 +9,12 @@ An intelligent knowledge assistant powered by BaseAgent orchestration that autom
 - **🤖 BaseAgent Orchestration**: Sophisticated agent layer that coordinates tools and RAG pipeline
 - **🌐 Smart Web Ingestion**: Dual-mode scraping (static HTML & JavaScript-rendered content)
 - **🔍 Intelligent Crawling**: Multi-page crawling with depth control and robots.txt compliance
-- **💡 Enhanced Confidence Scoring**: Multi-factor confidence calculation with clear levels (HIGH/MEDIUM/LOW) and human-readable explanations
+- **💡 Multi-Factor Confidence Scoring**: Advanced confidence calculation using similarity, source count, recency, and diversity with clear levels (HIGH/MEDIUM/LOW) and human-readable explanations
 - **📚 Source Attribution**: Expandable source citations with direct links
 - **🗄️ Dual Storage Modes**: In-memory for development, PostgreSQL + pgvector for production
 - **⚡ Real-time Progress**: Live updates during scraping and crawling operations
 - **🎛️ Knowledge Management**: Interactive UI for viewing and managing knowledge base
-- **📊 Mode Detection & Analytics**: Tracks execution mode (Agent/RAG/Direct) with performance metrics
+- **📊 RAG vs Direct Performance Evaluation**: Comprehensive analysis framework tracking execution mode (Agent/RAG/Direct) with performance metrics and response time analytics
 
 ### Technical Highlights
 
@@ -25,8 +25,8 @@ An intelligent knowledge assistant powered by BaseAgent orchestration that autom
 - Automatic fallback from fast fetch to Playwright for JavaScript sites
 - Execution metrics tracking with response time and tool usage analytics
 - Three distinct modes: Agent (tools), RAG (knowledge base), Direct (GPT-4)
-- **NEW: RAG vs Direct Analysis Framework** for performance comparison and decision-making
-- **NEW: Multi-factor confidence scoring** using similarity, source count, recency, and diversity
+- **NEW: RAG vs Direct Performance Evaluation Framework** for systematic mode comparison and optimization
+- **NEW: Multi-factor confidence scoring system** using weighted similarity, source count, recency, and diversity metrics
 
 ## 🔒 Security Features
 
