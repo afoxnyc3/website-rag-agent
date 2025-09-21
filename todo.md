@@ -41,6 +41,14 @@
 
 ## 📅 Recent Accomplishments (2025-09-21)
 
+### Source Attribution Fix ✅
+
+- [x] Fixed source URLs to display full paths instead of just hostnames
+- [x] Fixed InlineCitationCardTrigger component to show complete URLs
+- [x] Fixed BaseAgent selectTool() to return correct tool names
+- [x] Added 15 comprehensive URL preservation tests
+- [x] Created PR #8 for source attribution fix
+
 ### RAG vs Direct Mode Analysis ✅
 
 - [x] Implemented ExecutionMetrics tracking in BaseAgent
@@ -247,7 +255,7 @@
 
 ### Critical Fixes (HIGH PRIORITY - Week 1)
 
-- [ ] **Fix Source Attribution** - Links should point to actual pages, not home pages
+- [x] **Fix Source Attribution** - ✅ FIXED - Full URLs now displayed (2025-09-21)
 - [x] **Fix Web Crawling Depth** - ✅ FIXED off-by-one error (2025-09-21)
 - [ ] **Enhance Confidence Scoring** - Improve calculation and add explanations
 - [x] **RAG vs Direct Analysis** - ✅ COMPLETE with mode detection (2025-09-21)

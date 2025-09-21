@@ -13,7 +13,8 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
-    "prepare": "husky"
+    "prepare": "husky",
+    "postinstall": "npx playwright install"
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.30",
